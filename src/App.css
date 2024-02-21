@@ -1,0 +1,12 @@
+@media (max-width: 575px) {
+    .site-layout {
+      margin-left: 0 !important;
+    }
+  }
+  
+  @media (min-width: 576px) {
+    .site-layout {
+      margin-left: 80px !important;
+    }
+  }
+  
