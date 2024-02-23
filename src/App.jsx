@@ -1,26 +1,15 @@
 import React from 'react';
 import { FileAddOutlined, UserOutlined, BookOutlined, LogoutOutlined, RestOutlined, DashboardOutlined, ContainerOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
-import { useNavigate } from 'react-router-dom';
-const { Header, Content, Footer, Sider } = Layout;
-
-const ListsItems = [
-  { icon: DashboardOutlined, label: 'Dashboard', key: '/' },
-  { icon: FileAddOutlined, label: 'Hire a Machine', key: '/hire-machine' },
-  { icon: BookOutlined, label: 'View Legal Agreement', key: '/view-legal-agreement' },
-  { icon: ContainerOutlined, label: 'View Code of Conduct', key: '/view-code-conduct' },
-  { icon: SnippetsOutlined, label: 'View Company Guidelines' },
-  { icon: RestOutlined, label: 'Change Password', key: '/change-password' },
-  { icon: LogoutOutlined, label: 'Logout', key: '/logout' }
-]
-
-const menuItems = ListsItems.map((data, index) => {
-  return ({
-    key: data.key,
-    icon: React.createElement(data.icon),
-    label: data.label
-  })
-});
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import Login from './components/Login/Login';
+import PrivateRoutes from './utils/PrivateRoutes';
+import HirerDashboard from './components/Hirer/HirerDashboard';
+import Navbar from './components/Navbar/Navbar';
+import { Footer } from 'antd/es/layout/layout';
+import HirerLayout from './components/Hirer/HirerLayout';
+import HireMachines from './components/Hirer/HireMachines';
+import AppHeader from './components/AppHeader/AppHeader';
 
 const App = () => {
   const navigate = useNavigate();
@@ -30,53 +19,31 @@ const App = () => {
     navigate(value.key)
   }
 
-
-
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          console.log(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
-      >
-        <div className="demo-logo-vertical">
-          <h3 style={{ color: 'white', textAlign: 'center' }}>Company Logo</h3>
-        </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={navigateMenuItems} items={menuItems} />
-      </Sider>
-      <Layout>
-        <Header
-          style={{
-            background: colorBgContainer,
-            padding: 0,
-          }}
-        />
-        <Content style={{ margin: '24px 16px 0' }}>
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              textAlign: 'center',
-            }}
-          >
-           
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
-      </Layout>
-    </Layout>
+    <>
+      {/* <Navbar /> */}
+
+      <Routes>
+        <Route element={<PrivateRoutes />}>
+          <Route path="/hirer/*" element={<HirerLayout />}>
+            <Route index element={<HirerDashboard />} />
+            <Route path="hire-machine" element={<HireMachines />} />
+            <Route path="view-legal-agreement" element={<HireMachines />} />
+            <Route path="view-code-conduct" element={<HireMachines />} />
+            <Route path="change-password" element={<HireMachines />} />
+          </Route>
+        </Route>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+
+
+    </>
+
+
   );
 };
 export default App;
