@@ -1,20 +1,19 @@
 import React from 'react';
-import { Layout, Menu, theme } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
+import { Layout, Divider, theme, Typography } from 'antd';
+const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
 
 function HeaderTitle({ title }) {
     return (
         <>
             <Layout>
-                <Header
-                    style={{
-                        color:'white',
-                        padding: 0,
-                    }}
-                >
-                    {title}
+                <Header style={{ background: 'white', top }}>
+                    <Title level={3} style={{ textAlign: 'center', color: 'black', marginTop: '15px' }}>
+                        {title}
+                    </Title>
                 </Header>
             </Layout>
+            <Divider />
         </>
     )
 }

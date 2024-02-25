@@ -1,59 +1,59 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle'
 import { Card, Col, Row, Button, Input, Select, Space } from 'antd';
+import axios from 'axios';
 const { Search } = Input;
+const { Meta } = Card;
 
 function HirerDashboard() {
+
+
+
     return (
         <>
-            <Row gutter={16}>
-                <h4>Search your machines or category or type or year...</h4>
-                <Space.Compact
-                    style={{
-                        width: '100%',
-                    }}
-                >
-                    <Input placeholder='Search your machines...' />
-                    <Button type="primary">Search</Button>
-                </Space.Compact>
-            </Row>
-
+            <HeaderTitle title={'Dashboard'} />
             <Row gutter={16}>
                 <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
-                    </Card>
-                    <Button type="primary">Book</Button>
-                </Col>
-                <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
+                    <Card bordered={false} hoverable>
+                        <Meta title="No. Of Hiring Hours" />
+                        <p>156</p>
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
+                    <Card bordered={false} hoverable>
+                        <Meta title="No. Of Jobs completed" />
+                        <p>120</p>
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card bordered={false} hoverable>
+                        <Meta title="Amount Saved" />
+                        <p>100</p>
                     </Card>
                 </Col>
             </Row>
 
             <Row gutter={16}>
                 <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
+                    <Card bordered={false} hoverable>
+                        <Meta title="No. Of Rental Hours" />
+                        <p>156</p>
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
+                    <Card bordered={false} hoverable>
+                        <Meta title="No. Of Rental Jobs completed" />
+                        <p>120</p>
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card title="Card title" bordered={false}>
-                        Card content
+                    <Card bordered={false} hoverable>
+                        <Meta title="Amount Saved" />
+                        <p>100</p>
                     </Card>
                 </Col>
             </Row>
+
         </>
     )
 }

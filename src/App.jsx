@@ -10,6 +10,19 @@ import { Footer } from 'antd/es/layout/layout';
 import HirerLayout from './components/Hirer/HirerLayout';
 import HireMachines from './components/Hirer/HireMachines';
 import AppHeader from './components/AppHeader/AppHeader';
+import HomePage from './components/Homepage/HomePage';
+// Tools
+import BuyTools from './components/Tools/BuyTools';
+import RentTools from './components/Tools/RentTools';
+import SellTools from './components/Tools/SellTools';
+// gauges
+import BuyGauges from './components/Gauges/BuyGauges';
+import RentGauges from './components/Gauges/RentGauges';
+import SellGauges from './components/Gauges/SellGauges';
+
+import RawMaterial from './components/RawMaterial/RawMaterial';
+import SellScrap from './components/Scrap/SellScrap';
+import Settings from './components/Settings/Settings';
 
 const App = () => {
   const navigate = useNavigate();
@@ -26,17 +39,54 @@ const App = () => {
   return (
     <>
       {/* <Navbar /> */}
+      {/* <AppHeader /> */}
 
       <Routes>
+        {/* With Auth */}
         <Route element={<PrivateRoutes />}>
-          <Route path="/hirer/*" element={<HirerLayout />}>
+          <Route path="/*" element={<HirerLayout />}>
             <Route index element={<HirerDashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
           </Route>
+          {/* Tools */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path='buy-tools' element={<BuyTools />} />
+            <Route path="rent-tools" element={<RentTools />} />
+            <Route path="sell-tools" element={<SellTools />} />
+          </Route>
+          {/* Gauges */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path='buy-gauges' element={<BuyGauges />} />
+            <Route path="rent-gauges" element={<RentGauges />} />
+            <Route path="sell-gauges" element={<SellGauges />} />
+          </Route>
+          {/* Raw Material */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path='sell-raw-materials' element={<RawMaterial />} />
+          </Route>
+          {/* Scrap */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path='sell-scrap' element={<SellScrap />} />
+          </Route>
+          {/* Settings */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path='settings' element={<Settings />} />
+          </Route>
+
+          {/* Documents */}
+          <Route path="/*" element={<HirerLayout />}>
+            <Route path="view-legal-docs" element={<RentGauges />} />
+            <Route path="view-code-conduct" element={<SellGauges />} />
+            <Route path="view-company-guidelines" element={<SellGauges />} />
+          </Route>
+
         </Route>
+
+        {/* Without Auth */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
       </Routes>
 

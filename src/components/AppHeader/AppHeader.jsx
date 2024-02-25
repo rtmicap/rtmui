@@ -65,7 +65,12 @@ function AppHeader() {
         console.log('click ', e);
         setCurrent(e.key);
     };
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
+    return (
+        <>
+            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
+            <h2>Company Name</h2>
+        </>
+    )
 }
 
 export default AppHeader
