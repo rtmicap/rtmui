@@ -1,0 +1,15 @@
+.logo {
+    float: left;
+  }
+  
+  .menu {
+    float: right;
+  }
+  
+  .ant-menu-horizontal {
+    border-bottom: none;
+  }
+  
+  .ant-menu-horizontal .ant-menu-item, .ant-menu-horizontal .ant-menu-submenu-title {
+    padding: 0 15px;
+  }

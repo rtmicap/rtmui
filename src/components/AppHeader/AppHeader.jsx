@@ -68,7 +68,6 @@ function AppHeader() {
     return (
         <>
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
-            <h2>Company Name</h2>
         </>
     )
 }

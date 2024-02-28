@@ -23,6 +23,7 @@ import SellGauges from './components/Gauges/SellGauges';
 import RawMaterial from './components/RawMaterial/RawMaterial';
 import SellScrap from './components/Scrap/SellScrap';
 import Settings from './components/Settings/Settings';
+import RegistrationAccount from './components/Registration Supplier/RegistrationAccount';
 
 const App = () => {
   const navigate = useNavigate();
@@ -38,7 +39,6 @@ const App = () => {
 
   return (
     <>
-      {/* <Navbar /> */}
       {/* <AppHeader /> */}
 
       <Routes>
@@ -86,7 +86,8 @@ const App = () => {
         </Route>
 
         {/* Without Auth */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/register" element={<RegistrationAccount />} />
         <Route path="/login" element={<Login />} />
       </Routes>
 
