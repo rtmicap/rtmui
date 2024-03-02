@@ -24,6 +24,7 @@ import RawMaterial from './components/RawMaterial/RawMaterial';
 import SellScrap from './components/Scrap/SellScrap';
 import Settings from './components/Settings/Settings';
 import RegistrationAccount from './components/Registration Supplier/RegistrationAccount';
+import Booking from './components/Hirer/Booking/Booking';
 
 const App = () => {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
+            <Route path="hire-machine/booking/:machineId" element={<Booking />} />
           </Route>
           {/* Tools */}
           <Route path="/*" element={<HirerLayout />}>

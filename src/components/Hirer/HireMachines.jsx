@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal } from 'antd';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import ViewMachineDetail from './ViewMachineDetail';
 const { Search } = Input;
 const { Meta } = Card;
 const { Option } = Select;
@@ -10,12 +12,26 @@ function HireMachines() {
     const [users, setUsers] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [form] = Form.useForm();
 
     const [categories, setCategories] = useState([]);
     const [machineTypes, setMachineTypes] = useState([]);
     const [categoryValue, setCategoryValue] = useState('');
-    const [machineTypeValue, setMachineTypeValue] = useState('');
     const [loading, setLoading] = useState(false);
+    const [selectedMachineCategory, setSelectedMachineCategory] = useState('');
+    const [selectedMachineType, setSelectedMachineType] = useState('');
+
+    const [categoryAndType, setCategoryAndType] = useState([]);
+    // pagination
+    const [pages, setPages] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [showAllMachines, setShowAllMachines] = useState([]);
+    // modal
+    const [open, setOpen] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [passData, setPassData] = useState(null);
+
+    const navigate = useNavigate();
 
     const getAllUsers = async () => {
         try {
@@ -35,8 +51,8 @@ function HireMachines() {
 
             // query parameters
             const queryParams = {
-                category: 'drilling',
-                machineType: '',
+                category: selectedMachineCategory,
+                machineType: selectedMachineType,
                 pincode: ''
             };
 
@@ -45,6 +61,7 @@ function HireMachines() {
             });
 
             // Handle the response data
+            setShowAllMachines(response.data.results);
             console.log('Response data:', response.data);
         } catch (error) {
             // Handle errors
@@ -52,116 +69,193 @@ function HireMachines() {
         }
     };
 
-    const getAllMachinesCategory = async () => {
+    const getAllMachinesCategoryAndType = async () => {
         try {
-            const baseUrl = 'http://localhost:5100/api/machines/getAllMachinesCategory';
+            const baseUrl = 'http://localhost:5100/api/machines/getMachinesByCatAndType';
             const response = await axios.get(baseUrl);
-            const categories = response.data;
-            const categoryNames = categories.map(user => ({ value: user.machineCategoryId, categoryName: user.categoryName }));
-            console.log("categoryNames: ", categoryNames);
-            setCategories(categoryNames);
-            // Handle the response data
-            console.log('Response getAllMachinesCategory data:', response.data);
+            const machineCategories = response.data;
+            console.log("categoryNames: ", machineCategories);
+            const machinesKey = Object.keys(machineCategories);
+            setCategoryAndType(machineCategories);
+            setCategories(machinesKey);
+            console.log("machinesKey log: ", machinesKey);
         } catch (error) {
             // Handle errors
             console.error('Error getAllMachinesCategory data:', error);
         }
     }
 
-    const getAllMachinesTypeByCategoryId = async () => {
+    const getAllMachines = async () => {
         try {
-            const baseUrl = 'http://localhost:5100/api/machines/getAllMachinesTypeByCategoryId/' + categoryValue;
-            const response = await axios.get(baseUrl);
-            const machineTypes = response.data;
-            const machinesType = machineTypes.map(user => ({ value: user.machineCategoryId, typeName: user.typeName }));
-            console.log("machinesType: ", machinesType);
-            setMachineTypes(machinesType);
-            // Handle the response data
-            console.log('Response getAllMachinesTypeByCategoryId data:', response.data);
+            const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
+            const params = {
+                page: pages,
+                pageSize: pageSize,
+                sortOrder: 'asc',
+            };
+            const machinesData = await axios.get(apiUrl, { params });
+            setShowAllMachines(machinesData.data.results)
+            console.log("machinesData: ", machinesData);
         } catch (error) {
             // Handle errors
-            console.error('Error getAllMachinesTypeByCategoryId data:', error);
+            console.error('Error machinesData data:', error);
         }
     }
 
     const handleCategoryChange = (value) => {
         setCategoryValue(value);
+        if (value) {
+            const values = categoryAndType[value];
+            setMachineTypes(values);
+            console.log("setMachineTypes: ", values);
+        }
+        setSelectedMachineCategory(value);
+    };
+
+    const handleTypeChange = (value) => {
+        console.log("handleTypeChange", value);
+        setSelectedMachineType(value);
     };
 
     const handleMachineTypeChange = (value) => {
         setMachineTypeValue(value);
     };
 
+    const clearSearch = () => {
+        setCategoryAndType([]);
+        setSelectedMachineType('');
+        setSelectedMachineCategory('');
+        getAllMachines();
+    }
+
+    const handleViewDetail = (machine) => {
+        console.log("handleViewDetail: ", machine);
+        setOpen(true);
+        setShowViewModal(true);
+        setPassData(machine);
+    }
+
     useEffect(() => {
-        getAllUsers();
-        getAllMachinesCategory();
+        getAllMachinesCategoryAndType();
+        getAllMachines();
     }, []);
 
     return (
         <>
             <HeaderTitle title={'Hire a Machine'} />
-            <Row gutter={16}>
-                <h4>Search your machines or category or type or year...</h4>
-                <Space.Compact
-                    style={{
-                        width: '100%',
-                    }}
-                >
-                    {/* <Input placeholder='Search your machines...' /> */}
-                    <Select
-                        mode="multiple"
-                        style={{ width: '100%' }}
-                        placeholder="Select names and emails"
-                        onChange={handleCategoryChange}
-                        value={categoryValue}
-                    >
-                        {loading ? (
-                            <Option key="loading" disabled>
-                                <Spin />
-                            </Option>
-                        ) : (
-                            categories.map(item => (
-                                <Option key={item.value} value={item.value}>
-                                    {item.categoryName}
-                                </Option>
-                            ))
-                        )}
-                    </Select>
-                    <br />
-                    <Button type="primary" onClick={fetchData}>Search</Button>
-                </Space.Compact>
-            </Row> <br />
+            <Form form={form} layout='vertical'>
+                <h4 style={{ textAlign: "left" }}>Search your machines</h4>
+                <Row gutter={16}>
+                    <Col>
+                        <Form.Item name={'categoryInput'} label="Choose Machine Category" rules={[
+                            { required: true, message: "You must choose the machine category" }
+                        ]}>
+
+                            <Select
+                                style={{ width: '100%' }}
+                                placeholder="Select Category"
+                                onChange={handleCategoryChange}
+                                value={selectedMachineCategory}
+                            >
+                                {loading ? (
+                                    <Select.Option key="loading" disabled>
+                                        <Spin />
+                                    </Select.Option>
+                                ) : (
+                                    categories.map((item, index) => (
+                                        <Select.Option key={index} value={item}>
+                                            {item}
+                                        </Select.Option>
+                                    ))
+                                )}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col>
+                        <Form.Item name={'typeInput'} label="Choose Machine Type" rules={[
+                            { required: true, message: "You must choose the machine type" }
+                        ]}>
+                            <Select
+
+                                style={{ width: '100%' }}
+                                placeholder="Select Machine Type"
+                                onChange={handleTypeChange}
+                                value={selectedMachineType}
+                            >
+                                {loading ? (
+                                    <Select.Option key="loading" disabled>
+                                        <Spin />
+                                    </Select.Option>
+                                ) : (
+                                    machineTypes.map((item, index) => (
+                                        <Select.Option key={index} value={item}>
+                                            {item}
+                                        </Select.Option>
+                                    ))
+                                )}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col>
+                        <Form.Item
+                            name="pincode"
+                            label="Enter pincode"
+                            rules={[
+                                {
+                                    pattern: /^[0-9]{6}$/, // Regex pattern to match exactly 6 digits
+                                    message: 'Please enter a valid 6-digit',
+                                },]}
+                        >
+                            <Input placeholder="Enter pincode" allowClear />
+                        </Form.Item>
+                    </Col>
+                    <Col>
+                        <Button type="primary" onClick={fetchData} style={{ marginTop: "30px" }}>Search</Button>
+                    </Col>
+                    <Col>
+                        <Button onClick={clearSearch} style={{ marginTop: "30px" }}>Clear search</Button>
+                    </Col>
+                </Row>
+            </Form>
+            <br />
 
             <Row gutter={[16, 16]}>
-                {users.map((user) => (
-                    <Col key={user.id} xs={24} sm={12} md={8} lg={6}>
+                {showAllMachines.map((machine) => (
+                    <Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
                         <Card
                             hoverable
-                            cover={<img alt="example" src={`https://picsum.photos/200/300?random=${user.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
+                            cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
                             actions={[
-                                <Button type="primary" onClick={() => console.log(`Book ${user.name}`)}>Book</Button>,
+                                <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
+                                <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
                             ]}
+                            style={{ width: '100%' }}
                         >
-                            <Meta title={user.name} />
+                            <Meta title={machine.companyName} />
                             <br />
-                            <Meta description={user.email} />
+                            <Meta style={{ textAlign: "justify" }} description={machine.Category} />
                             <br />
-                            <Meta description={user.phone} />
-                            <br />
+                            <Meta style={{ fontWeight: "bold", textAlign: "justify" }} description={machine.Machine_Type} />
                             <Meta
                                 description={
-                                    <ul>
-                                        <li>{user.address.street}</li>
-                                        <li>{user.address.suite}</li>
-                                        <li>{user.address.city}</li>
-                                        <li>{user.address.zipcode}</li>
+                                    <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "justify" }}>
+                                        <li>Brand: {machine.Brand}</li>
+                                        <li>Year: {machine.Year_of_Purchase}</li>
+                                        <li>Model: {machine.Model}</li>
+                                        <li>Score: {machine.Score}</li>
                                     </ul>
                                 }
+
                             />
                         </Card>
                     </Col>
                 ))}
             </Row>
+
+            {/* // View Details */}
+            {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
         </>
     )
 }
