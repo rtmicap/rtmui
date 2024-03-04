@@ -1,23 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select } from 'antd';
-
+import React, { useState, useEffect, useMemo } from 'react';
+import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
 
 import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
+import { Document, Page } from 'react-pdf';
 
 const RegistrationAccount = () => {
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState(1);
     const [form] = Form.useForm();
     const [listsOfStates, setListsOfStates] = useState([]);
     const [selectedState, setSelectedState] = useState('');
 
     const [listsOfCities, setListsOfCities] = useState([]);
     const [selectedCity, setSelectedCity] = useState('');
+    // checkbox
+    const [isChecked, setIsChecked] = useState(false);
+    // ownership
+    const [selectedOwnership, setSelectedOwnership] = useState('');
+    // cin file
+    const [fileList, setFileList] = useState(null);
+    const [fileError, setFileError] = useState('');
 
     useEffect(() => {
         getAllStatesFn();
-    }, [])
+    }, []);
+
+    const handleCheckboxChange = (e) => {
+        console.log("e.target: ", e.target);
+        setIsChecked(e.target.checked);
+    };
 
     const getAllStatesFn = async () => {
         const StatesData = await getAllStates();
@@ -57,6 +70,52 @@ const RegistrationAccount = () => {
 
     const filterOptionCity = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
+
+    const ownership = [
+        { id: 1, value: "Public Limited" },
+        { id: 2, value: "Private Limited" },
+        { id: 3, value: "Partnership" },
+        { id: 4, value: "Proprietary" }
+    ];
+
+    const onChangeOwnership = (e) => {
+        console.log("onChangeOwnership: ", e);
+    }
+
+    const handleFileChange = async ({ fileList }) => {
+        console.log("file: ", fileList);
+        // setFileList(fileList);
+        const response = await fetch(fileList.originFileObj);
+        const blob = await response.blob();
+        console.log("file blob: ", blob);
+        setFileList(blob);
+        // 1. Limit the number of uploaded files
+    };
+
+    const fileProps = {
+        action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
+        onChange: handleFileChange,
+        accept: '.pdf'
+    };
+
+    const beforeUpload = (file) => {
+        const isPdf = file.type === 'application/pdf';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isPdf) {
+            // Show error message for non-PDF files
+            setFileError('You can only upload PDF file!');
+            console.error('You can only upload PDF file!');
+        }
+        if (!isLt2M) {
+            // Show error message for files larger than 2MB
+            setFileError('File must be smaller than 2MB!');
+            console.error('File must be smaller than 2MB!');
+        }
+        return isPdf && isLt2M;
+    };
+
+    // Memoize the options prop
+    const options = useMemo(() => ({ workerSrc: 'http://127.0.0.1:5173/pdf.worker.js/pdf.worker.js' }), []);
 
     const steps = [
         {
@@ -171,7 +230,6 @@ const RegistrationAccount = () => {
                     {/* End of Certified */}
 
                     {/* Mobile Number Fields */}
-
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item
@@ -293,19 +351,12 @@ const RegistrationAccount = () => {
                     </Row>
                     {/* End of  Factory Telephone Number Fields */}
 
-                    {/* Address Fields */}
                     <Row gutter={[16, 16]}>
-                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'officeAddre'} label="Office Address" rules={[
-                                {
-                                    required: true,
-                                    message: "Please enter your office address"
+                        <h4>Address Details:</h4>
+                    </Row>
 
-                                }
-                            ]}>
-                                <Input.TextArea rows={4} placeholder="Enter your office address (100 words)" maxLength={100} showCount />
-                            </Form.Item>
-                        </Col>
+                    {/* Factory Address Fields */}
+                    <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'factoryAddre'} label="Factory Address" rules={[
                                 {
@@ -317,21 +368,101 @@ const RegistrationAccount = () => {
                                 <Input.TextArea rows={4} placeholder="Enter your factory address (100 words)" maxLength={100} showCount />
                             </Form.Item>
                         </Col>
-                    </Row>
-                    {/* End of Address Fields */}
-
-                    <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'state'} label="Please select a State (or) Enter your State" rules={[
+                            <Form.Item name={'state'} label="Please select your Factory State" rules={[
                                 {
                                     required: true,
-                                    message: "Please select your state"
+                                    message: "Please select your factory state"
 
                                 }
                             ]}>
                                 <Select
                                     showSearch
-                                    placeholder="Select a state"
+                                    placeholder="Select your Factory State (or) Enter your Factory State"
+                                    optionFilterProp="children"
+                                    onChange={onChangeState}
+                                    filterOption={filterOption}
+                                    style={{ width: "90%" }}
+                                    value={selectedState}
+                                >
+                                    {listsOfStates.map((state) => (
+                                        <Select.Option key={state.isoCode} value={state.isoCode}>
+                                            {state.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'city'} label="Please select your Factory City" rules={[
+                                {
+                                    required: true,
+                                    message: "Please select your city"
+
+                                }
+                            ]}>
+                                <Select
+                                    showSearch
+                                    placeholder="Select your Factory City (or) Enter your Factory City"
+                                    optionFilterProp="children"
+                                    onChange={onChangeCity}
+                                    filterOption={filterOptionCity}
+                                    style={{ width: "90%" }}
+                                    value={selectedCity}
+                                >
+                                    {listsOfCities.map((city) => (
+                                        <Select.Option key={city.name} value={city.name}>
+                                            {city.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    {/* End of Factory Address Fields */}
+
+                    {/* checkbox Fields */}
+                    <Row gutter={[16, 16]}>
+                        <Form.Item
+                            name="remember"
+                        >
+                            <Checkbox onChange={handleCheckboxChange} checked={isChecked} style={{ color: '#1890ff' }} >
+                                <ul style={{ listStyle: 'none', marginRight: '10px' }}>
+                                    <li>Check here if Office and Factory address are different.</li>
+                                    <li>
+                                        <strong>Note:</strong>&nbsp;If not checked then we will store factory address as office address
+                                    </li>
+                                </ul>
+                            </Checkbox>
+                        </Form.Item>
+                    </Row>
+                    {/* End of checkbox Fields */}
+
+                    {/* Office Address Fields */}
+                    {isChecked && <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'officeAddre'} label="Office Address" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your office address"
+
+                                }
+                            ]}>
+                                <Input.TextArea rows={4} placeholder="Enter your office address (100 words)" maxLength={100} showCount />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'officeState'} label="Please select your Office State" rules={[
+                                {
+                                    required: true,
+                                    message: "Please select your Office state"
+
+                                }
+                            ]}>
+                                <Select
+                                    showSearch
+                                    placeholder="Select a Office State (or) Enter your Office State"
                                     optionFilterProp="children"
                                     onChange={onChangeState}
                                     filterOption={filterOption}
@@ -348,16 +479,16 @@ const RegistrationAccount = () => {
                         </Col>
 
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'city'} label="Please select a City (or) Enter your City" rules={[
+                            <Form.Item name={'officeCity'} label="Please select your Office City" rules={[
                                 {
                                     required: true,
-                                    message: "Please select your city"
+                                    message: "Please select your office city"
 
                                 }
                             ]}>
                                 <Select
                                     showSearch
-                                    placeholder="Select a city"
+                                    placeholder="Select your Office City (or) Enter your Office City"
                                     optionFilterProp="children"
                                     onChange={onChangeCity}
                                     filterOption={filterOptionCity}
@@ -372,33 +503,132 @@ const RegistrationAccount = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                    </Row>
+                    </Row>}
+                    {/* End of Office Address Fields */}
+
+
                 </Form >
             ),
         },
         {
-            title: 'Documents Upload',
+            title: 'Documents Verification',
             content: (
                 <Form form={form} layout="vertical">
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item label="Input 1">
-                                <Input placeholder="input placeholder" />
+                            <Form.Item name={'ownership'} label="Ownership Pattern" rules={[
+                                {
+                                    required: true,
+                                    message: "Please select ownership pattern"
+                                }
+                            ]}>
+                                <Select
+                                    placeholder="Select your ownership pattern"
+                                    onChange={onChangeOwnership}
+                                    style={{ width: "90%" }}
+                                    value={selectedOwnership}
+                                >
+                                    {ownership.map((owner) => (
+                                        <Select.Option key={owner.id} value={owner.value}>
+                                            {owner.value}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item label="Input 2">
-                                <Input placeholder="input placeholder" />
+                            <Form.Item name={'year'} label="Year of Establishment" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter year of establishment"
+                                },
+                                {
+                                    pattern: /^[0-9]{4}$/,
+                                    message: 'Please enter a valid year of establishment! (Max allowed 4 digits)',
+                                },
+                            ]}>
+                                <Input placeholder="Enter year of establishment" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    {/* CIN Input and file */}
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'cin'} label="CIN (Corporate Identification Number)" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your CIN number"
+                                }
+                            ]}>
+                                <Input placeholder="Enter your CIN number" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item label="Input 3">
-                                <Input placeholder="input placeholder" />
+                            <Form.Item name={'cinFile'} label="Upload your CIN File" rules={[
+                                {
+                                    required: true,
+                                    message: "Please upload your CIN file"
+                                }
+                            ]}>
+                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                    <Button icon={<UploadOutlined />}>Upload</Button>
+                                </Upload>
                             </Form.Item>
                         </Col>
-                        {/* Repeat this pattern for the remaining inputs */}
-                        {/* You can change the span of Col based on your requirement */}
+                    </Row>
+
+                    {/* GST input and files */}
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'gstin'} label="GSTIN (Goods and Services Tax Identification Number)" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your GSTIN number"
+                                }
+                            ]}>
+                                <Input placeholder="Enter your GSTIN number" />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'gstFile'} label="Upload your GSTIN File" rules={[
+                                {
+                                    required: true,
+                                    message: "Please upload your GSTIN file"
+                                }
+                            ]}>
+                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                    <Button icon={<UploadOutlined />}>Upload</Button>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    {/* PAN input and files */}
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'pan'} label="PAN (Permanent Account Number)" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your PAN number"
+                                }
+                            ]}>
+                                <Input placeholder="Enter your PAN number" />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'panFile'} label="Upload your PAN File" rules={[
+                                {
+                                    required: true,
+                                    message: "Please upload your PAN file"
+                                }
+                            ]}>
+                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                    <Button icon={<UploadOutlined />}>Upload</Button>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
                     </Row>
                 </Form >
             ),
