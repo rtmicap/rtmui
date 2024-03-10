@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, EyeOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
 
 import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
-import { Document, Page } from 'react-pdf';
 import axios from 'axios';
 
 const RegistrationAccount = () => {
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState(1);
     const [form] = Form.useForm();
     const [listsOfStates, setListsOfStates] = useState([]);
     const [listsOfCities, setListsOfCities] = useState([]);
@@ -28,12 +27,13 @@ const RegistrationAccount = () => {
     const [isChecked, setIsChecked] = useState(false);
     // ownership
     const [selectedOwnership, setSelectedOwnership] = useState('');
-    // cin file
-    const [fileList, setFileList] = useState(null);
     const [fileError, setFileError] = useState('');
 
     const [formData, setFormData] = useState({});
-    const formRefs = useRef(Array.from({ length: 3 }, () => React.createRef())); // Assuming 3 steps
+    // files
+    const [cinPdfFileList, setCinPdfFileList] = useState([]);
+    const [gstPdfFileList, setGstPdfFileList] = useState([]);
+    const [panPdfFileList, setPanPdfFileList] = useState([]);
 
     useEffect(() => {
         getAllStatesFn();
@@ -124,22 +124,6 @@ const RegistrationAccount = () => {
         console.log("onChangeOwnership: ", e);
     }
 
-    const handleFileChange = async ({ fileList }) => {
-        console.log("file: ", fileList);
-        // setFileList(fileList);
-        const response = await fetch(fileList.originFileObj);
-        const blob = await response.blob();
-        console.log("file blob: ", blob);
-        setFileList(blob);
-        // 1. Limit the number of uploaded files
-    };
-
-    const fileProps = {
-        // action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
-        onChange: handleFileChange,
-        accept: '.pdf'
-    };
-
     const beforeUpload = (file) => {
         const isPdf = file.type === 'application/pdf';
         const isLt2M = file.size / 1024 / 1024 < 2;
@@ -157,7 +141,7 @@ const RegistrationAccount = () => {
     };
 
     // Memoize the options prop
-    const options = useMemo(() => ({ workerSrc: 'http://127.0.0.1:5173/pdf.worker.js/pdf.worker.js' }), []);
+    // const options = useMemo(() => ({ workerSrc: 'http://127.0.0.1:5173/pdf.worker.js/pdf.worker.js' }), []);
 
     const accountTypeLists = [
         { id: 1, value: "Current" },
@@ -169,12 +153,32 @@ const RegistrationAccount = () => {
         console.log("onChangeAccountType: ", e);
     }
 
+    const normFile = (e) => {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
+    };
+
+    const handleCinPdfChange = (info) => {
+        console.log("handleCinPdfChange: ", info);
+        setShowPdfViewer(true);
+        setCinPdfFileList(info.fileList[0].originFileObj);
+    };
+
+    const handleGstPdfChange = (info) => {
+        setGstPdfFileList(info.fileList[0].originFileObj);
+    };
+
+    const handlePanPdfChange = (info) => {
+        setPanPdfFileList(info.fileList[0].originFileObj);
+    };
+
     const steps = [
         {
             title: 'General Information',
             content: (
-                <Form form={form} layout="vertical" ref={formRefs.current[0]}
-                    onFinish={(values) => handleFinish(values, 0)}>
+                <Form form={form} layout="vertical">
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -606,8 +610,7 @@ const RegistrationAccount = () => {
         {
             title: 'Documents Verification',
             content: (
-                <Form form={form} layout="vertical" ref={formRefs.current[1]}
-                    onFinish={(values) => handleFinish(values, 1)}>
+                <Form form={form} layout="vertical">
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -660,13 +663,13 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'cinPdf'} label="Upload your CIN File" rules={[
+                            <Form.Item name={'cinPdf'} label="Upload your CIN File" getValueFromEvent={normFile} rules={[
                                 {
                                     required: true,
                                     message: "Please upload your CIN file"
                                 }
                             ]}>
-                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
@@ -686,13 +689,13 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'gstInPdf'} label="Upload your GSTIN File" rules={[
+                            <Form.Item name={'gstInPdf'} label="Upload your GSTIN File" getValueFromEvent={normFile} rules={[
                                 {
                                     required: true,
                                     message: "Please upload your GSTIN file"
                                 }
                             ]}>
-                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
@@ -712,13 +715,13 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'panPdf'} label="Upload your PAN File" rules={[
+                            <Form.Item name={'panPdf'} label="Upload your PAN File" getValueFromEvent={normFile} rules={[
                                 {
                                     required: true,
                                     message: "Please upload your PAN file"
                                 }
                             ]}>
-                                <Upload {...fileProps} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
@@ -730,8 +733,7 @@ const RegistrationAccount = () => {
         {
             title: 'Bank Information',
             content: (
-                <Form form={form} layout="vertical" ref={formRefs.current[2]}
-                    onFinish={(values) => handleFinish(values, 2)}>
+                <Form form={form} layout="vertical">
                     {/* Add your title and account type */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -883,14 +885,12 @@ const RegistrationAccount = () => {
         },
     ];
 
-    const handleFinish = (values, stepIndex) => {
-        setFormData(prevState => ({ ...prevState, [stepIndex]: values }));
-        handleNext(); // Move to the next step
-    };
+    // const formData = new FormData();
 
     const handleNext = () => {
         form.validateFields().then((values) => {
             console.log("form: ", values);
+            setFormData({ ...formData, ...values });
             setCurrentStep(currentStep + 1);
         });
     };
@@ -900,25 +900,34 @@ const RegistrationAccount = () => {
     };
 
     const handleSubmit = (e) => {
-        const allFormData = Object.values(formData).reduce((acc, curr) => ({ ...acc, ...curr }), {});
-        console.log('All form data:', allFormData);
+        console.log("fileform: ", cinPdfFileList);
+
+        console.log("formData**: ", formData);
+        // const allFormData = Object.values(formData).reduce((acc, curr) => ({ ...acc, ...curr }), {});
+        // console.log('All form data:', allFormData);
         form.validateFields().then((values) => {
             // Process form submission
             const baseUrl = "http://localhost:5100/api/registration/saveuser";
             // update latitude and longitude
-            // values.officeLatitude = selectedOfficeLatitude;
-            // values.officeLongitude = selectedOfficeLongitude;
-            // values.officeCountry = "IN";
+            formData.officeLatitude = selectedOfficeLatitude;
+            formData.officeLongitude = selectedOfficeLongitude;
+            formData.officeCountry = "IN";
 
-            // values.factoryLatitude = selectedFactoryLatitude;
-            // values.factoryLongitude = selectedFactoryLongitude;
-            // values.factoryCountry = "IN";
+            formData.factoryLatitude = selectedFactoryLatitude;
+            formData.factoryLongitude = selectedFactoryLongitude;
+            formData.factoryCountry = "IN";
+
+            formData.cinPdf = cinPdfFileList;
+            formData.gstInPdf = gstPdfFileList;
+            formData.panPdf = panPdfFileList;
+
+            // console.log("panPdf: ", fileFormData);
 
             const configHeaders = {
                 headers: { "content-type": "multipart/form-data" },
             }; // htmlFor file uploads
 
-            axios.post(baseUrl, values, configHeaders).then((response, err) => {
+            axios.post(baseUrl, formData, configHeaders).then((response, err) => {
                 if (err) {
                     console.log("Form Error1: ", err);
                     return;
