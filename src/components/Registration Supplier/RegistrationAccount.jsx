@@ -8,7 +8,7 @@ import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
 import axios from 'axios';
 
 const RegistrationAccount = () => {
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(0);
     const [form] = Form.useForm();
     const [listsOfStates, setListsOfStates] = useState([]);
     const [listsOfCities, setListsOfCities] = useState([]);
@@ -933,12 +933,12 @@ const RegistrationAccount = () => {
                     return;
                 } else {
                     console.log("submitted to db: ", response);
+                    message.success(`${response.data.message}`);
                 }
             }).catch((error) => {
                 console.log("Form Error: ", error);
             })
             console.log("handleSubmit values: ", values);
-            message.success('Registration successful!');
         }).catch((error) => {
             console.log("form field error: ", error);
         })
