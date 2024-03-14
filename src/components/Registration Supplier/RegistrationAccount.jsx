@@ -6,23 +6,21 @@ const { Content } = Layout;
 
 import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
 import axios from 'axios';
+import Countries from '../../utils/Countries and States/countries.json';
 
 const RegistrationAccount = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [form] = Form.useForm();
+    const [listsOfCountries, setListsOfCountries] = useState([]);
     const [listsOfStates, setListsOfStates] = useState([]);
-    const [listsOfCities, setListsOfCities] = useState([]);
-
     // office 
     const [selectedOfficeState, setSelectedOfficeState] = useState('');
-    const [selectedOfficeCity, setSelectedOfficeCity] = useState('');
-    const [selectedOfficeLatitude, setSelectedOfficeLatitude] = useState('');
-    const [selectedOfficeLongitude, setSelectedOfficeLongitude] = useState('');
+    const [selectedOfficeCountry, setSelectedOfficeCountry] = useState('');
+    const [selectedOfficeArea, setSelectedOfficeArea] = useState('');
     // factory
     const [selectedFactoryState, setSelectedFactoryState] = useState('');
-    const [selectedFactoryCity, setSelectedFactoryCity] = useState('');
-    const [selectedFactoryLatitude, setSelectedFactoryLatitude] = useState('');
-    const [selectedFactoryLongitude, setSelectedFactoryLongitude] = useState('');
+    const [selectedFactoryCountry, setSelectedFactoryCountry] = useState('');
+    const [selectedFactoryArea, setSelectedFactoryArea] = useState('');
     // checkbox
     const [isChecked, setIsChecked] = useState(false);
     // ownership
@@ -36,7 +34,7 @@ const RegistrationAccount = () => {
     const [panPdfFileList, setPanPdfFileList] = useState([]);
 
     useEffect(() => {
-        getAllStatesFn();
+        getAllCountries();
     }, []);
 
     const handleCheckboxChange = (e) => {
@@ -44,9 +42,10 @@ const RegistrationAccount = () => {
         setIsChecked(e.target.checked);
     };
 
-    const getAllStatesFn = async () => {
-        const StatesData = await getAllStates();
-        setListsOfStates(StatesData);
+    const getAllCountries = async () => {
+        // console.log("Countries: ", Countries);
+        const countriesData = await Countries;
+        setListsOfCountries(countriesData);
     }
 
     const data = [
@@ -66,53 +65,49 @@ const RegistrationAccount = () => {
     // office State and City
     const onChangeOfficeState = async (value) => {
         setSelectedOfficeState(value);
-        setSelectedOfficeCity(''); // Clear the value of selected city when state changes
-        const postsData = await getAllCitiesByStateCode({ isoCode: value });
-        setListsOfCities(postsData);
+        console.log("onChangeOfficeState value: ", value);
     };
 
-    const filterOfficeOption = (input, option) =>
+    const filterOfficeOptionState = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
 
-    const onChangeOfficeCity = (value) => {
-        console.log(`selected city ${value}`);
-        const filteredLoc = listsOfCities.filter((data) => data.name == value);
-        console.log("onChangeOfficeCity: ", filteredLoc);
-        setSelectedOfficeLatitude(filteredLoc[0].latitude);
-        setSelectedOfficeLongitude(filteredLoc[0].longitude);
-        setSelectedOfficeCity(value);
+    const onChangeOfficeCountry = (value) => {
+        setSelectedOfficeCountry(value);
+        const filteredCountries = Countries.filter((country) => (country.iso2 || country.iso3) == value);
+        setListsOfStates(filteredCountries[0].states);
     };
 
-    const filterOfficeOptionCity = (input, option) =>
+    const filterOfficeOptionCountry = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
+    const onChangeOfficeArea = (value) => {
+        console.log(`selected office area ${value}`);
+        setSelectedFactoryArea(value);
+    };
     // end of office state and city
 
     const onChangeFactoryState = async (value) => {
-        console.log("onChangeFactoryState: ", value);
         setSelectedFactoryState(value);
-        setSelectedFactoryCity(''); // Clear the value of selected city when state changes
-        const postsData = await getAllCitiesByStateCode({ isoCode: value });
-        setListsOfCities(postsData);
     };
 
-    const filterFactoryOption = (input, option) =>
+    const filterFactoryOptionState = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
 
-    const onChangeFactoryCity = (value) => {
-        console.log(`selected city ${value}`);
-        const filteredLoc = listsOfCities.filter((data) => data.name == value);
-        console.log("onChangeFactoryCity: ", filteredLoc);
-        setSelectedFactoryLatitude(filteredLoc[0].latitude);
-        setSelectedFactoryLongitude(filteredLoc[0].longitude);
-        setSelectedFactoryCity(value);
+    const onChangeFactoryCountry = (value) => {
+        // set states as per the country value
+        const filteredCountries = Countries.filter((country) => (country.iso2 || country.iso3) == value);
+        setListsOfStates(filteredCountries[0].states)
     };
 
-    const filterFactoryOptionCity = (input, option) =>
+    const filterFactoryOptionCountry = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
+    const onChangeFactoryArea = (value) => {
+        console.log(`selected area ${value}`);
+        setSelectedFactoryArea(value);
+    };
     const ownership = [
         { id: 1, value: "Public Limited" },
         { id: 2, value: "Private Limited" },
@@ -461,6 +456,33 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'factoryCountry'} label="Please select your Factory Country" rules={[
+                                {
+                                    required: true,
+                                    message: "Please select your country"
+
+                                }
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="Select your Factory Country (or) Enter your Factory Country"
+                                    optionFilterProp="children"
+                                    onChange={onChangeFactoryCountry}
+                                    filterOption={filterFactoryOptionCountry}
+                                    style={{ width: "90%" }}
+                                    value={selectedFactoryCountry}
+                                >
+                                    {listsOfCountries.map((country) => (
+                                        <Select.Option key={country.name} value={country.iso2}>
+                                            {country.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'factoryState'} label="Please select your Factory State" rules={[
                                 {
                                     required: true,
@@ -475,12 +497,12 @@ const RegistrationAccount = () => {
                                     placeholder="Select your Factory State (or) Enter your Factory State"
                                     optionFilterProp="children"
                                     onChange={onChangeFactoryState}
-                                    filterOption={filterFactoryOption}
+                                    filterOption={filterFactoryOptionState}
                                     style={{ width: "90%" }}
                                     value={selectedFactoryState}
                                 >
                                     {listsOfStates.map((state) => (
-                                        <Select.Option key={state.isoCode} value={state.isoCode}>
+                                        <Select.Option key={state.id} value={state.name}>
                                             {state.name}
                                         </Select.Option>
                                     ))}
@@ -488,30 +510,16 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'factoryCity'} label="Please select your Factory City" rules={[
+                            <Form.Item name={'factoryArea'} label="Please Enter your Factory Area" rules={[
                                 {
                                     required: true,
-                                    message: "Please select your city"
+                                    message: "Please enter your factory area"
 
                                 }
                             ]}
                                 valuePropName="value"
                             >
-                                <Select
-                                    showSearch
-                                    placeholder="Select your Factory City (or) Enter your Factory City"
-                                    optionFilterProp="children"
-                                    onChange={onChangeFactoryCity}
-                                    filterOption={filterFactoryOptionCity}
-                                    style={{ width: "90%" }}
-                                    value={selectedFactoryCity}
-                                >
-                                    {listsOfCities.map((city) => (
-                                        <Select.Option key={city.name} value={city.name}>
-                                            {city.name}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
+                                <Input name={'factoryArea'} placeholder='Enter your factory area' onChange={onChangeFactoryArea} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -550,6 +558,32 @@ const RegistrationAccount = () => {
                         </Col>
 
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'officeCountry'} label="Please select your Office Country" rules={[
+                                {
+                                    required: true,
+                                    message: "Please select your office country"
+
+                                }
+                            ]}>
+                                <Select
+                                    showSearch
+                                    placeholder="Select your Office Country (or) Enter your Office Country"
+                                    optionFilterProp="children"
+                                    onChange={onChangeOfficeCountry}
+                                    filterOption={filterOfficeOptionCountry}
+                                    style={{ width: "90%" }}
+                                    value={selectedOfficeCountry}
+                                >
+                                    {listsOfCountries.map((country) => (
+                                        <Select.Option key={country.name} value={country.iso2}>
+                                            {country.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'officeState'} label="Please select your Office State" rules={[
                                 {
                                     required: true,
@@ -562,12 +596,12 @@ const RegistrationAccount = () => {
                                     placeholder="Select a Office State (or) Enter your Office State"
                                     optionFilterProp="children"
                                     onChange={onChangeOfficeState}
-                                    filterOption={filterOfficeOption}
+                                    filterOption={filterOfficeOptionState}
                                     style={{ width: "90%" }}
                                     value={selectedOfficeState}
                                 >
                                     {listsOfStates.map((state) => (
-                                        <Select.Option key={state.isoCode} value={state.isoCode}>
+                                        <Select.Option key={state.id} value={state.name}>
                                             {state.name}
                                         </Select.Option>
                                     ))}
@@ -576,28 +610,16 @@ const RegistrationAccount = () => {
                         </Col>
 
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'officeCity'} label="Please select your Office City" rules={[
+                            <Form.Item name={'officeArea'} label="Please Enter your Office Area" rules={[
                                 {
                                     required: true,
-                                    message: "Please select your office city"
+                                    message: "Please enter your office area"
 
                                 }
-                            ]}>
-                                <Select
-                                    showSearch
-                                    placeholder="Select your Office City (or) Enter your Office City"
-                                    optionFilterProp="children"
-                                    onChange={onChangeOfficeCity}
-                                    filterOption={filterOfficeOptionCity}
-                                    style={{ width: "90%" }}
-                                    value={selectedOfficeCity}
-                                >
-                                    {listsOfCities.map((city) => (
-                                        <Select.Option key={city.name} value={city.name}>
-                                            {city.name}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Input name={'officeArea'} placeholder='Enter your office area' onChange={onChangeOfficeArea} />
                             </Form.Item>
                         </Col>
                     </Row>}

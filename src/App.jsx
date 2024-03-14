@@ -90,8 +90,8 @@ const App = () => {
         </Route>
 
         {/* Without Auth */}
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/register" element={<RegistrationAccount />} />
+        <Route path="/home" element={<HomePage />}/>
+        <Route path="/register-account" element={<RegistrationAccount />} />
         <Route path="/login" element={<Login />} />
       </Routes>
 
