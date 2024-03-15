@@ -10,11 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf/renderer": "^3.4.0",
     "antd": "^5.14.1",
     "axios": "^1.6.7",
     "india-pincode-search": "^1.0.2",
-    "pdfjs-dist": "^3.4.120",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-pdf": "^6.2.2",

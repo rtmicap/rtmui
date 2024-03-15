@@ -26,6 +26,7 @@ import Settings from './components/Settings/Settings';
 import RegistrationAccount from './components/Registration Supplier/RegistrationAccount';
 import Booking from './components/Hirer/Booking/Booking';
 import RegisterMachines from './components/Register Machines/RegisterMachines';
+import SuccessMessage from './components/Registration Supplier/SuccessMessage';
 
 const App = () => {
   const navigate = useNavigate();
@@ -90,9 +91,10 @@ const App = () => {
         </Route>
 
         {/* Without Auth */}
-        <Route path="/home" element={<HomePage />}/>
+        <Route path="/home" element={<HomePage />} />
         <Route path="/register-account" element={<RegistrationAccount />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/success" element={<SuccessMessage />} />
       </Routes>
 
 

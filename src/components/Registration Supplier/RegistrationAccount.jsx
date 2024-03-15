@@ -1,26 +1,18 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload } from 'antd';
-import { UploadOutlined, EyeOutlined } from '@ant-design/icons';
+import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload, Flex, Descriptions, Collapse, Modal } from 'antd';
+import { UploadOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
 
-import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
 import axios from 'axios';
 import Countries from '../../utils/Countries and States/countries.json';
-
-import { Worker } from '@react-pdf-viewer/core';
-
-import '@react-pdf-viewer/core/lib/styles/index.css';
-// Import the main component
-import { Viewer } from '@react-pdf-viewer/core';
-
-// Import the styles
-import '@react-pdf-viewer/core/lib/styles/index.css';
-import packageJson from '../../../package.json';
+import { Document, Page } from '@react-pdf/renderer';
+import { useNavigate } from "react-router-dom";
 
 const RegistrationAccount = () => {
-    const pdfjsVersion = packageJson.dependencies['pdfjs-dist'];
-    const [currentStep, setCurrentStep] = useState(1);
+    const navigate = useNavigate();
+
+    const [currentStep, setCurrentStep] = useState(0);
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -43,7 +35,10 @@ const RegistrationAccount = () => {
     const [gstPdfFileList, setGstPdfFileList] = useState([]);
     const [panPdfFileList, setPanPdfFileList] = useState([]);
 
-    const [pdfFile, setPdfFile] = useState(null)
+    const [viewCinPdf, setViewCinPdf] = useState(null);
+    const [viewGstPdf, setViewGstPdf] = useState(null);
+    const [viewPanPdf, setViewPanPdf] = useState(null);
+
 
     useEffect(() => {
         getAllCountries();
@@ -121,6 +116,7 @@ const RegistrationAccount = () => {
     ];
 
     const onChangeOwnership = (e) => {
+        setSelectedOwnership(e.target.value)
         console.log("onChangeOwnership: ", e);
     }
 
@@ -179,10 +175,9 @@ const RegistrationAccount = () => {
     };
 
     const handleCinPdfChange = (info) => {
-        console.log("handleCinPdfChange: ", info);
+        // console.log("handleCinPdfChange: ", info);
         // setShowPdfViewer(true);
         const selectedFile = info.fileList[0].originFileObj;
-        console.log("selectedFile: ", selectedFile);
         if (selectedFile) {
             if (selectedFile && selectedFile.type.includes(fileType)) {
                 let render = new FileReader();
@@ -190,23 +185,425 @@ const RegistrationAccount = () => {
                 render.onload = (e) => {
                     console.log("onload: ", e);
                     // const url = URL.createObjectURL(base64toBlob(e.target.result));
-                    setPdfFile(e.target.result);
+                    setViewCinPdf(e.target.result);
+                    message.success("CIN Pdf file uploaded");
                 }
             } else {
-                setPdfFile(null);
-                message.error("Invalid Unsupported File. Please Upload PDF file")
+                setViewCinPdf(null);
+                message.error("Invalid Unsupported File. Please Upload PDF file");
             }
         }
         setCinPdfFileList(info.fileList[0].originFileObj);
     };
 
     const handleGstPdfChange = (info) => {
+        const selectedFile = info.fileList[0].originFileObj;
+        if (selectedFile) {
+            if (selectedFile && selectedFile.type.includes(fileType)) {
+                let render = new FileReader();
+                render.readAsDataURL(selectedFile);
+                render.onload = (e) => {
+                    console.log("onload: ", e);
+                    // const url = URL.createObjectURL(base64toBlob(e.target.result));
+                    setViewGstPdf(e.target.result);
+                    message.success("GSTIN Pdf file uploaded");
+                }
+            } else {
+                setViewGstPdf(null);
+                message.error("Invalid Unsupported File. Please Upload PDF file");
+            }
+        }
         setGstPdfFileList(info.fileList[0].originFileObj);
     };
 
     const handlePanPdfChange = (info) => {
+        const selectedFile = info.fileList[0].originFileObj;
+        if (selectedFile) {
+            if (selectedFile && selectedFile.type.includes(fileType)) {
+                let render = new FileReader();
+                render.readAsDataURL(selectedFile);
+                render.onload = (e) => {
+                    console.log("onload: ", e);
+                    // const url = URL.createObjectURL(base64toBlob(e.target.result));
+                    setViewPanPdf(e.target.result);
+                    message.success("PAN Pdf file uploaded");
+                }
+            } else {
+                setViewPanPdf(null);
+                message.error("Invalid Unsupported File. Please Upload PDF file");
+            }
+        }
         setPanPdfFileList(info.fileList[0].originFileObj);
     };
+
+    const handleViewFile = () => {
+        if (viewCinPdf) {
+            const newWindow = window.open();
+            newWindow.document.write(`<iframe width='100%' height='100%' src='${viewCinPdf}'></iframe>`);
+        } else {
+            console.error('No PDF uploaded');
+
+        }
+
+    };
+
+    const handleGstViewFile = () => {
+        if (viewGstPdf) {
+            const newWindow = window.open();
+            newWindow.document.write(`<iframe width='100%' height='100%' src='${viewGstPdf}'></iframe>`);
+        } else {
+            console.error('No GSTIN PDF uploaded');
+        }
+    };
+
+    const handlePanViewFile = () => {
+        if (viewPanPdf) {
+            const newWindow = window.open();
+            newWindow.document.write(`<iframe width='100%' height='100%' src='${viewPanPdf}'></iframe>`);
+        } else {
+            console.error('No PAN PDF uploaded');
+        }
+    };
+
+    const descriptive = [
+        {
+            label: (<h4>Company Name</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.companyname,
+        },
+        {
+            label: (<h4>Company Website</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.website ? formData.website : '-',
+        },
+        {
+            label: (<h4>ISO Certified</h4>),
+            children: formData.isoCert ? formData.isoCert : '-',
+        },
+        {
+            label: (<h4>TS Certified</h4>),
+
+            children: formData.tsCert ? formData.tsCert : '-',
+        },
+        {
+            label: (<h4>ISO 4001 Certified</h4>),
+
+            children: formData.iso14001 ? formData.iso14001 : '-',
+        },
+        {
+            label: (<h4>Company Turnover</h4>),
+
+            children: formData.turnover + ' Lakhs',
+        },
+        {
+            label: (<h4>Major Customer Served</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.majCustServed,
+        },
+        {
+            label: '',
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: ''
+        },
+        {
+            label: (<h4>Office Country</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeCountry,
+        },
+        {
+            label: (<h4>Factory Country</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryCountry,
+        },
+        {
+            label: (<h4>Office Address</h4>),
+            // children: formData.officeAddress,
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeAddress,
+        },
+        {
+            label: (<h4>Factory Address</h4>),
+            // children: formData.factoryAddress,
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryAddress,
+        },
+        {
+            label: (<h4>Office State</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeState,
+        },
+        {
+            label: (<h4>Factory State</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryState,
+        },
+        {
+            label: (<h4>Office City</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeCity,
+        },
+        {
+            label: (<h4>Factory City</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryCity,
+        },
+        {
+            label: (<h4>Office Area</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeArea,
+        },
+        {
+            label: (<h4>Factory Area</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryArea,
+        },
+        {
+            label: (<h4>Office PIN Code</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.offPinCode,
+        },
+        {
+            label: (<h4>Factory PIN Code</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.facPinCode,
+        },
+        {
+            label: (<h4>Office Telephone</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: `${formData.officeTelephoneStd} ${formData.officeTelephone}`,
+        }
+    ];
+
+    const bankDescriptive = [
+        {
+            label: (<h4>Title of Account</h4>),
+            children: formData.bankTitle
+        },
+        {
+            label: (<h4>Type of Account</h4>),
+            children: formData.bankAccType
+        },
+        {
+            label: (<h4>Bank Account Number</h4>),
+            children: formData.bankAccNum
+        },
+        {
+            label: (<h4>Bank Contact Number</h4>),
+            children: formData.bankContact ? formData.bankContact : '-'
+        },
+        {
+            label: (<h4>Bank Address</h4>),
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.bankNameAddr ? formData.bankNameAddr : '-'
+        }
+    ];
+
+    const documentDescriptive = [
+        {
+            label: (<h4>Ownership</h4>),
+            children: formData.ownership
+        },
+        {
+            label: (<h4>Year of Establishment</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.yearEstablished
+        },
+        {
+            label: (<h4>CIN Number</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.indLicNum
+        },
+        {
+            label: (<h4>GSTIN Number</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.GSTIN
+        },
+        {
+            label: (<h4>PAN Number</h4>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.PAN
+        },
+        {
+            label: (<h4>CIN Uploaded File</h4>),
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: (
+                <Button type='link' onClick={handleViewFile}>View CIN File</Button>
+            )
+        },
+        {
+            label: (<h4>GSTIN Uploaded File</h4>),
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: (
+                <Button type='link' onClick={handleGstViewFile}>View GSTIN File</Button>
+            )
+        },
+        {
+            label: (<h4>PAN Uploaded File</h4>),
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: (
+                <Button type='link' onClick={handlePanViewFile}>View PAN File</Button>
+            )
+        }
+    ];
+
+    const items = [
+        {
+            key: 1,
+            label: 'General Information Details',
+            children: (
+                <Descriptions
+                    // title="General Information Details"
+                    bordered
+                    column={{
+                        xs: 1,
+                        sm: 2,
+                        md: 3,
+                        lg: 3,
+                        xl: 4,
+                        xxl: 4,
+                    }}
+                    items={descriptive}
+                />
+            )
+        },
+        {
+            key: 2,
+            label: 'Documents Verification Details',
+            children: (
+                <Descriptions
+                    // title="General Information Details"
+                    bordered
+                    column={{
+                        xs: 1,
+                        sm: 2,
+                        md: 3,
+                        lg: 3,
+                        xl: 4,
+                        xxl: 4,
+                    }}
+                    items={documentDescriptive}
+                />
+            )
+        },
+        {
+            key: 3,
+            label: 'Bank Information Details',
+            children: (
+                <Descriptions
+                    // title="General Information Details"
+                    bordered
+                    column={{
+                        xs: 1,
+                        sm: 2,
+                        md: 3,
+                        lg: 3,
+                        xl: 4,
+                        xxl: 4,
+                    }}
+                    items={bankDescriptive}
+                />
+            )
+        }
+    ];
 
     const steps = [
         {
@@ -303,6 +700,29 @@ const RegistrationAccount = () => {
                             >
                                 <Select
                                     placeholder="Choose TS Certified"
+
+                                    options={[
+                                        {
+                                            value: 'yes',
+                                            label: 'Yes',
+                                        },
+                                        {
+                                            value: 'no',
+                                            label: 'No',
+                                        }
+                                    ]}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item
+                                name="iso14001"
+                                label="Choose ISO 4001 Certified"
+                                rules={[
+                                    { required: true, message: 'Please Choose ISO 4001 Certified or not' }]}
+                            >
+                                <Select
+                                    placeholder="Choose ISO 4001 Certified"
 
                                     options={[
                                         {
@@ -442,7 +862,7 @@ const RegistrationAccount = () => {
                     </Row>
                     {/* End of  Factory Telephone Number Fields */}
 
-                    {/* Office Factory Number Fields */}
+                    {/* Office Factory email Fields */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item
@@ -475,7 +895,7 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                     </Row>
-                    {/* End of  Factory Telephone Number Fields */}
+                    {/* End of  Factory Telephone email Fields */}
 
                     <Row gutter={[16, 16]}>
                         <h4>Address Details:</h4>
@@ -572,6 +992,22 @@ const RegistrationAccount = () => {
                                 valuePropName="value"
                             >
                                 <Input name={'factoryArea'} placeholder='Enter your factory area' />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'facPinCode'} label="Please Enter your Factory PIN code" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your factory PIN code"
+                                },
+                                {
+                                    pattern: /^[0-9]{6}$/, // Regex pattern to match exactly 6 digits
+                                    message: 'Please enter a valid 6-digit pin code number!',
+                                },
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Input name={'facPinCode'} placeholder='Enter your factory PIN code' />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -688,6 +1124,23 @@ const RegistrationAccount = () => {
                                 <Input name={'officeArea'} placeholder='Enter your office area' />
                             </Form.Item>
                         </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'offPinCode'} label="Please Enter your Office PIN code" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your office PIN code"
+                                },
+                                {
+                                    pattern: /^[0-9]{6}$/, // Regex pattern to match exactly 6 digits
+                                    message: 'Please enter a valid 6-digit pin code number!',
+                                },
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Input name={'offPinCode'} placeholder='Enter your office PIN code' />
+                            </Form.Item>
+                        </Col>
                     </Row>}
                     {/* End of Office Address Fields */}
 
@@ -712,7 +1165,6 @@ const RegistrationAccount = () => {
                                     placeholder="Select your ownership pattern"
                                     onChange={onChangeOwnership}
                                     style={{ width: "90%" }}
-                                    value={selectedOwnership}
                                 >
                                     {ownership.map((owner) => (
                                         <Select.Option key={owner.id} value={owner.value}>
@@ -751,31 +1203,23 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'cinPdf'} label="Upload your CIN File" getValueFromEvent={normFile} rules={[
+                            <Form.Item name={'cinPdf'} label="Upload your CIN File" rules={[
                                 {
                                     required: true,
                                     message: "Please upload your CIN file"
                                 }
                             ]}>
-                                <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
-                                    <Button icon={<UploadOutlined />}>Upload</Button>
-                                </Upload>
+                                <Flex gap="small" wrap="wrap">
+                                    <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                        <Button icon={<UploadOutlined />}>Upload</Button>
+                                    </Upload>
+                                    {viewCinPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                                        <Button type='link' onClick={handleViewFile}>View Uploaded CIN</Button>
+                                    </Col>}
+                                </Flex>
                             </Form.Item>
                         </Col>
-                        {/* <Col>
-                            <div
-                                style={{
-                                    border: '1px solid rgba(0, 0, 0, 0.3)',
-                                    height: '750px',
-                                }}
-                            >
-                                <Worker workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`}>
-                                    {pdfFile && <Viewer fileUrl={pdfFile} />}
-                                    {!pdfFile && <p>no **pdf will render here</p>}
-                                </Worker>
 
-                            </div>
-                        </Col> */}
                     </Row>
 
                     {/* GST input and files */}
@@ -791,15 +1235,20 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'gstInPdf'} label="Upload your GSTIN File" getValueFromEvent={normFile} rules={[
+                            <Form.Item name={'gstInPdf'} label="Upload your GSTIN File" rules={[
                                 {
                                     required: true,
                                     message: "Please upload your GSTIN file"
                                 }
                             ]}>
-                                <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
-                                    <Button icon={<UploadOutlined />}>Upload</Button>
-                                </Upload>
+                                <Flex gap="small" wrap="wrap">
+                                    <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                        <Button icon={<UploadOutlined />}>Upload</Button>
+                                    </Upload>
+                                    {viewGstPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                                        <Button type='link' onClick={handleGstViewFile}>View Uploaded GSTIN</Button>
+                                    </Col>}
+                                </Flex>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -817,15 +1266,20 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'panPdf'} label="Upload your PAN File" getValueFromEvent={normFile} rules={[
+                            <Form.Item name={'panPdf'} label="Upload your PAN File" rules={[
                                 {
                                     required: true,
                                     message: "Please upload your PAN file"
                                 }
                             ]}>
-                                <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
-                                    <Button icon={<UploadOutlined />}>Upload</Button>
-                                </Upload>
+                                <Flex gap="small" wrap="wrap">
+                                    <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                        <Button icon={<UploadOutlined />}>Upload</Button>
+                                    </Upload>
+                                    {viewPanPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                                        <Button type='link' onClick={handlePanViewFile}>View Uploaded PAN</Button>
+                                    </Col>}
+                                </Flex>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -983,7 +1437,9 @@ const RegistrationAccount = () => {
         },
         {
             title: 'Review',
-            content: 'Review your details before submission',
+            content: (
+                <Collapse items={items} accordion />
+            )
         },
     ];
 
@@ -1001,6 +1457,17 @@ const RegistrationAccount = () => {
         setCurrentStep(currentStep - 1);
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
     const handleSubmit = (e) => {
         console.log("fileform: ", cinPdfFileList);
 
@@ -1014,15 +1481,17 @@ const RegistrationAccount = () => {
 
             if (isChecked) {
                 formData.officeAddress
-                formData.officeArea
                 formData.officeState
                 formData.officeCity
+                formData.officeArea
+                formData.offPinCode
             } else {
                 // if not checked update factory data to office data
                 formData.officeAddress = formData.factoryAddress;
-                formData.officeArea = formData.factoryArea;
                 formData.officeState = formData.factoryState;
                 formData.officeCity = formData.factoryCity;
+                formData.officeArea = formData.factoryArea;
+                formData.offPinCode = formData.facPinCode
             }
 
             console.log("formData2**: ", formData);
@@ -1040,12 +1509,16 @@ const RegistrationAccount = () => {
                 } else {
                     console.log("submitted to db: ", response);
                     message.success(`${response.data.message}`);
+                    setIsModalOpen(false);
+                    navigate('/success');
                 }
             }).catch((error) => {
                 console.log("Form Error: ", error);
+                message.error(`There is some error while submitting`);
             })
             // console.log("handleSubmit values: ", values);
         }).catch((error) => {
+            message.error(`There is some error while submitting. Please contact support team`);
             console.log("form field error: ", error);
         })
     };
@@ -1082,7 +1555,7 @@ const RegistrationAccount = () => {
                                 </Button>
                             )}
                             {currentStep === steps.length - 1 && (
-                                <Button type="primary" htmlType='submit' onClick={handleSubmit}>
+                                <Button type="primary" htmlType='submit' onClick={showModal}>
                                     Submit
                                 </Button>
                             )}
@@ -1090,7 +1563,13 @@ const RegistrationAccount = () => {
                     </div>
                 </Content>
             </Layout>
-
+            <Modal title="Confirm to Submit" open={isModalOpen} onOk={handleSubmit} onCancel={handleCancel}>
+                <p>
+                    Once the account is approved. We will be using your factory email <strong>({formData.factoryEmailAddress})</strong> as a username for login purpose.
+                    <br /><br />
+                    <b>Note:</b> If you want to modify click cancel and update your email.
+                </p>
+            </Modal>
         </div>
     );
 };
