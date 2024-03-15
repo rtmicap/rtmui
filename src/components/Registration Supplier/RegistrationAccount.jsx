@@ -8,19 +8,29 @@ import { getAllCitiesByStateCode, getAllStates } from '../Api/apiServices';
 import axios from 'axios';
 import Countries from '../../utils/Countries and States/countries.json';
 
+import { Worker } from '@react-pdf-viewer/core';
+
+import '@react-pdf-viewer/core/lib/styles/index.css';
+// Import the main component
+import { Viewer } from '@react-pdf-viewer/core';
+
+// Import the styles
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import packageJson from '../../../package.json';
+
 const RegistrationAccount = () => {
-    const [currentStep, setCurrentStep] = useState(0);
+    const pdfjsVersion = packageJson.dependencies['pdfjs-dist'];
+    const [currentStep, setCurrentStep] = useState(1);
     const [form] = Form.useForm();
+
     const [listsOfCountries, setListsOfCountries] = useState([]);
     const [listsOfStates, setListsOfStates] = useState([]);
     // office 
     const [selectedOfficeState, setSelectedOfficeState] = useState('');
     const [selectedOfficeCountry, setSelectedOfficeCountry] = useState('');
-    const [selectedOfficeArea, setSelectedOfficeArea] = useState('');
     // factory
     const [selectedFactoryState, setSelectedFactoryState] = useState('');
     const [selectedFactoryCountry, setSelectedFactoryCountry] = useState('');
-    const [selectedFactoryArea, setSelectedFactoryArea] = useState('');
     // checkbox
     const [isChecked, setIsChecked] = useState(false);
     // ownership
@@ -32,6 +42,8 @@ const RegistrationAccount = () => {
     const [cinPdfFileList, setCinPdfFileList] = useState([]);
     const [gstPdfFileList, setGstPdfFileList] = useState([]);
     const [panPdfFileList, setPanPdfFileList] = useState([]);
+
+    const [pdfFile, setPdfFile] = useState(null)
 
     useEffect(() => {
         getAllCountries();
@@ -81,10 +93,6 @@ const RegistrationAccount = () => {
     const filterOfficeOptionCountry = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
-    const onChangeOfficeArea = (value) => {
-        console.log(`selected office area ${value}`);
-        setSelectedFactoryArea(value);
-    };
     // end of office state and city
 
     const onChangeFactoryState = async (value) => {
@@ -96,6 +104,7 @@ const RegistrationAccount = () => {
 
 
     const onChangeFactoryCountry = (value) => {
+        setSelectedFactoryCountry(value);
         // set states as per the country value
         const filteredCountries = Countries.filter((country) => (country.iso2 || country.iso3) == value);
         setListsOfStates(filteredCountries[0].states)
@@ -104,10 +113,6 @@ const RegistrationAccount = () => {
     const filterFactoryOptionCountry = (input, option) =>
         (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)
 
-    const onChangeFactoryArea = (value) => {
-        console.log(`selected area ${value}`);
-        setSelectedFactoryArea(value);
-    };
     const ownership = [
         { id: 1, value: "Public Limited" },
         { id: 2, value: "Private Limited" },
@@ -155,9 +160,43 @@ const RegistrationAccount = () => {
         return e && e.fileList;
     };
 
+    const fileType = ['application/pdf'];
+    const pdfContentType = 'application/pdf';
+
+    const base64toBlob = (data) => {
+        // Cut the prefix `data:application/pdf;base64` from the raw base 64
+        const base64WithoutPrefix = data.substr(`data:${pdfContentType};base64,`);
+        console.log("base64WithoutPrefix: ", base64WithoutPrefix);
+        const bytes = atob(base64WithoutPrefix);
+        let length = bytes.length;
+        let out = new Uint8Array(length);
+
+        while (length--) {
+            out[length] = bytes.charCodeAt(length);
+        }
+
+        return new Blob([out], { type: pdfContentType });
+    };
+
     const handleCinPdfChange = (info) => {
         console.log("handleCinPdfChange: ", info);
-        setShowPdfViewer(true);
+        // setShowPdfViewer(true);
+        const selectedFile = info.fileList[0].originFileObj;
+        console.log("selectedFile: ", selectedFile);
+        if (selectedFile) {
+            if (selectedFile && selectedFile.type.includes(fileType)) {
+                let render = new FileReader();
+                render.readAsDataURL(selectedFile);
+                render.onload = (e) => {
+                    console.log("onload: ", e);
+                    // const url = URL.createObjectURL(base64toBlob(e.target.result));
+                    setPdfFile(e.target.result);
+                }
+            } else {
+                setPdfFile(null);
+                message.error("Invalid Unsupported File. Please Upload PDF file")
+            }
+        }
         setCinPdfFileList(info.fileList[0].originFileObj);
     };
 
@@ -510,6 +549,19 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'factoryCity'} label="Please Enter your Factory City" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your factory city"
+
+                                }
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Input name={'factoryCity'} placeholder='Enter your factory city' />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'factoryArea'} label="Please Enter your Factory Area" rules={[
                                 {
                                     required: true,
@@ -519,7 +571,7 @@ const RegistrationAccount = () => {
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'factoryArea'} placeholder='Enter your factory area' onChange={onChangeFactoryArea} />
+                                <Input name={'factoryArea'} placeholder='Enter your factory area' />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -610,6 +662,20 @@ const RegistrationAccount = () => {
                         </Col>
 
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                            <Form.Item name={'officeCity'} label="Please Enter your Office City" rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter your office city"
+
+                                }
+                            ]}
+                                valuePropName="value"
+                            >
+                                <Input name={'officeCity'} placeholder='Enter your office city' />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'officeArea'} label="Please Enter your Office Area" rules={[
                                 {
                                     required: true,
@@ -619,7 +685,7 @@ const RegistrationAccount = () => {
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'officeArea'} placeholder='Enter your office area' onChange={onChangeOfficeArea} />
+                                <Input name={'officeArea'} placeholder='Enter your office area' />
                             </Form.Item>
                         </Col>
                     </Row>}
@@ -691,11 +757,25 @@ const RegistrationAccount = () => {
                                     message: "Please upload your CIN file"
                                 }
                             ]}>
-                                <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
                         </Col>
+                        {/* <Col>
+                            <div
+                                style={{
+                                    border: '1px solid rgba(0, 0, 0, 0.3)',
+                                    height: '750px',
+                                }}
+                            >
+                                <Worker workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`}>
+                                    {pdfFile && <Viewer fileUrl={pdfFile} />}
+                                    {!pdfFile && <p>no **pdf will render here</p>}
+                                </Worker>
+
+                            </div>
+                        </Col> */}
                     </Row>
 
                     {/* GST input and files */}
@@ -717,7 +797,7 @@ const RegistrationAccount = () => {
                                     message: "Please upload your GSTIN file"
                                 }
                             ]}>
-                                <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
@@ -743,7 +823,7 @@ const RegistrationAccount = () => {
                                     message: "Please upload your PAN file"
                                 }
                             ]}>
-                                <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={beforeUpload}>
+                                <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
                                     <Button icon={<UploadOutlined />}>Upload</Button>
                                 </Upload>
                             </Form.Item>
@@ -925,23 +1005,27 @@ const RegistrationAccount = () => {
         console.log("fileform: ", cinPdfFileList);
 
         console.log("formData**: ", formData);
-        // const allFormData = Object.values(formData).reduce((acc, curr) => ({ ...acc, ...curr }), {});
-        // console.log('All form data:', allFormData);
         form.validateFields().then((values) => {
             // Process form submission
             const baseUrl = "http://localhost:5100/api/registration/saveuser";
-            // update latitude and longitude
-            formData.officeLatitude = selectedOfficeLatitude;
-            formData.officeLongitude = selectedOfficeLongitude;
-            formData.officeCountry = "IN";
-
-            formData.factoryLatitude = selectedFactoryLatitude;
-            formData.factoryLongitude = selectedFactoryLongitude;
-            formData.factoryCountry = "IN";
-
             formData.cinPdf = cinPdfFileList;
             formData.gstInPdf = gstPdfFileList;
             formData.panPdf = panPdfFileList;
+
+            if (isChecked) {
+                formData.officeAddress
+                formData.officeArea
+                formData.officeState
+                formData.officeCity
+            } else {
+                // if not checked update factory data to office data
+                formData.officeAddress = formData.factoryAddress;
+                formData.officeArea = formData.factoryArea;
+                formData.officeState = formData.factoryState;
+                formData.officeCity = formData.factoryCity;
+            }
+
+            console.log("formData2**: ", formData);
 
             // console.log("panPdf: ", fileFormData);
 
@@ -960,7 +1044,7 @@ const RegistrationAccount = () => {
             }).catch((error) => {
                 console.log("Form Error: ", error);
             })
-            console.log("handleSubmit values: ", values);
+            // console.log("handleSubmit values: ", values);
         }).catch((error) => {
             console.log("form field error: ", error);
         })
