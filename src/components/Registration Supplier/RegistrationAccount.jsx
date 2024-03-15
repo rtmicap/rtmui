@@ -373,7 +373,7 @@ const RegistrationAccount = () => {
                                         message: 'Please enter office STD code!',
                                     },
                                     {
-                                        pattern: /^[0-9]{5}$/, // Regex pattern to match exactly 5 digits
+                                        pattern: /^(\d{2,7})$/, // Regex pattern to match between 2 to 7 digits
                                         message: 'Please enter a valid office telephone STD code!',
                                     },
                                 ]}
@@ -391,7 +391,7 @@ const RegistrationAccount = () => {
                                         message: 'Please enter office telephone!',
                                     },
                                     {
-                                        pattern: /^[0-9]{12}$/, // Regex pattern to match exactly 12 digits
+                                        pattern: /^(\d{2,12})$/, // Regex pattern to match between 2 to 12 digits
                                         message: 'Please enter a valid office telephone number!',
                                     },
                                 ]}
@@ -413,7 +413,7 @@ const RegistrationAccount = () => {
                                         message: 'Please enter factory STD code!',
                                     },
                                     {
-                                        pattern: /^[0-9]{5}$/, // Regex pattern to match exactly 5 digits
+                                        pattern: /^(\d{2,7})$/, // Regex pattern to match between 2 to 7 digits
                                         message: 'Please enter a valid Factory telephone STD code!',
                                     },
                                 ]}
@@ -431,7 +431,7 @@ const RegistrationAccount = () => {
                                         message: 'Please enter factory telephone!',
                                     },
                                     {
-                                        pattern: /^[0-9]{12}$/, // Regex pattern to match exactly 12 digits
+                                        pattern: /^(\d{2,12})$/, // Regex pattern to match between 2 to 12 digits
                                         message: 'Please enter a valid factory telephone number!',
                                     },
                                 ]}
