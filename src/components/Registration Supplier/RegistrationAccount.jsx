@@ -8,6 +8,8 @@ import axios from 'axios';
 import Countries from '../../utils/Countries and States/countries.json';
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
+// import { saveUser } from '../Api/apiServices';
+import config from "../../env.json";
 
 const RegistrationAccount = () => {
     const navigate = useNavigate();
@@ -1468,59 +1470,71 @@ const RegistrationAccount = () => {
         setIsModalOpen(false);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         console.log("fileform: ", cinPdfFileList);
 
         console.log("formData**: ", formData);
-        form.validateFields().then((values) => {
-            // Process form submission
-            const baseUrl = "http://localhost:5100/api/registration/saveuser";
-            formData.cinPdf = cinPdfFileList;
-            formData.gstInPdf = gstPdfFileList;
-            formData.panPdf = panPdfFileList;
+        // form.validateFields().then((values) => {
 
-            if (isChecked) {
-                formData.officeAddress
-                formData.officeState
-                formData.officeCity
-                formData.officeArea
-                formData.offPinCode
+        // }).catch((error) => {
+        //     message.error(`There is some error while submitting. Please contact support team`);
+        //     console.log("form field error: ", error);
+        // })
+        // Process form submission
+        const baseUrl = `${config.rtmWsEndpoint}/api/registration/saveuser`;
+        formData.cinPdf = cinPdfFileList;
+        formData.gstInPdf = gstPdfFileList;
+        formData.panPdf = panPdfFileList;
+
+        if (isChecked) {
+            formData.officeAddress
+            formData.officeState
+            formData.officeCity
+            formData.officeArea
+            formData.offPinCode
+        } else {
+            // if not checked update factory data to office data
+            formData.officeAddress = formData.factoryAddress;
+            formData.officeState = formData.factoryState;
+            formData.officeCity = formData.factoryCity;
+            formData.officeArea = formData.factoryArea;
+            formData.offPinCode = formData.facPinCode
+        }
+
+        console.log("formData2**: ", formData);
+
+        // console.log("panPdf: ", fileFormData);
+
+        const configHeaders = {
+            headers: { "content-type": "multipart/form-data" },
+        }; // htmlFor file uploads
+
+        // const response = await saveUser(formData, configHeaders);
+
+        // console.log("response: ", response)
+
+        // if (response) {
+
+        // } else {
+        //     message.error(`There is some error while submitting`);
+        // }
+
+        axios.post(baseUrl, formData, configHeaders).then((response, err) => {
+            if (err) {
+                console.log("Form Error1: ", err);
+                message.error(`There is some error while submitting! ${err.message}`);
+                return;
             } else {
-                // if not checked update factory data to office data
-                formData.officeAddress = formData.factoryAddress;
-                formData.officeState = formData.factoryState;
-                formData.officeCity = formData.factoryCity;
-                formData.officeArea = formData.factoryArea;
-                formData.offPinCode = formData.facPinCode
+                console.log("submitted to db: ", response);
+                message.success(`${response.data.message}`);
+                setIsModalOpen(false);
+                navigate('/success');
             }
-
-            console.log("formData2**: ", formData);
-
-            // console.log("panPdf: ", fileFormData);
-
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            }; // htmlFor file uploads
-
-            axios.post(baseUrl, formData, configHeaders).then((response, err) => {
-                if (err) {
-                    console.log("Form Error1: ", err);
-                    return;
-                } else {
-                    console.log("submitted to db: ", response);
-                    message.success(`${response.data.message}`);
-                    setIsModalOpen(false);
-                    navigate('/success');
-                }
-            }).catch((error) => {
-                console.log("Form Error: ", error);
-                message.error(`There is some error while submitting`);
-            })
-            // console.log("handleSubmit values: ", values);
         }).catch((error) => {
-            message.error(`There is some error while submitting. Please contact support team`);
-            console.log("form field error: ", error);
+            console.log("Form Error: ", error);
+            message.error(`There is some error while submitting! ${error.message}`);
         })
+        console.log("handleSubmit values: ", values);
     };
 
     return (

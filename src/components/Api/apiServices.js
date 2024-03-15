@@ -2,25 +2,7 @@ import axios from 'axios';
 import config from "../../env.json";
 
 
-const BASE_URL = `${config.localEndpoint}/api`;
-
-export const getAllStates = async () => {
-    try {
-        const response = await axios.get(`${BASE_URL}/locations/getAllStates`);
-        return response.data;
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-export const getAllCitiesByStateCode = async (request) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/locations/getAllCitiesByStateCode`, request);
-        return response.data;
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+const BASE_URL = `${config.rtmWsEndpoint}/api`;
 
 export const getMachinesByCatAndType = async () => {
     try {
@@ -35,6 +17,15 @@ export const registerMachine = async (request, configHeaders) => {
     try {
         const response = await axios.post(`${BASE_URL}/machines/registerMachine`, request, configHeaders);
         return response.data;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const saveUser = async (request, configHeaders) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/registration/saveuser`, request, configHeaders);
+        return response;
     } catch (error) {
         throw new Error(error.message);
     }
