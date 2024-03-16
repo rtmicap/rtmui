@@ -1216,7 +1216,7 @@ const RegistrationAccount = () => {
                                 }
                             ]}>
                                 <Flex gap="small" wrap="wrap">
-                                    <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                    <Upload name={'cinPdf'} accept=".pdf" onChange={handleCinPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false} showUploadList={{ showRemoveIcon: false }}>
                                         <Button icon={<UploadOutlined />}>Upload</Button>
                                     </Upload>
                                     {viewCinPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1252,7 +1252,7 @@ const RegistrationAccount = () => {
                                 }
                             ]}>
                                 <Flex gap="small" wrap="wrap">
-                                    <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                    <Upload name={'gstInPdf'} accept=".pdf" onChange={handleGstPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false} showUploadList={{ showRemoveIcon: false }}>
                                         <Button icon={<UploadOutlined />}>Upload</Button>
                                     </Upload>
                                     {viewGstPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1287,7 +1287,7 @@ const RegistrationAccount = () => {
                                 }
                             ]}>
                                 <Flex gap="small" wrap="wrap">
-                                    <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false}>
+                                    <Upload name={'panPdf'} accept=".pdf" onChange={handlePanPdfChange} style={{ marginBottom: 16 }} maxCount={1} beforeUpload={() => false} showUploadList={{ showRemoveIcon: false }}>
                                         <Button icon={<UploadOutlined />}>Upload</Button>
                                     </Upload>
                                     {viewPanPdf && <Col xs={24} sm={12} md={8} lg={8} xl={8}>
