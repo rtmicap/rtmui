@@ -14,7 +14,7 @@ import config from "../../env.json";
 const RegistrationAccount = () => {
     const navigate = useNavigate();
 
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState(1);
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -1199,6 +1199,10 @@ const RegistrationAccount = () => {
                                 {
                                     required: true,
                                     message: "Please enter your CIN number"
+                                },
+                                {
+                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
+                                    message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
                                 }
                             ]}>
                                 <Input placeholder="Enter your CIN number" />
@@ -1231,6 +1235,10 @@ const RegistrationAccount = () => {
                                 {
                                     required: true,
                                     message: "Please enter your GSTIN number"
+                                },
+                                {
+                                    pattern: /^([0][1-9]|[1-2][0-9]|[3][0-5])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1})([1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
+                                    message: "Please provide your valid GSTIN number (05ABDCE1234F1Z2)"
                                 }
                             ]}>
                                 <Input placeholder="Enter your GSTIN number" />
@@ -1262,6 +1270,10 @@ const RegistrationAccount = () => {
                                 {
                                     required: true,
                                     message: "Please enter your PAN number"
+                                },
+                                {
+                                    pattern: /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/,
+                                    message: "Please provide your valid PAN number (ABCTY1234D)"
                                 }
                             ]}>
                                 <Input placeholder="Enter your PAN number" />
