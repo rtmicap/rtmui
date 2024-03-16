@@ -14,7 +14,7 @@ import config from "../../env.json";
 const RegistrationAccount = () => {
     const navigate = useNavigate();
 
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(0);
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
