@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FileAddOutlined, UserOutlined, BookOutlined, LogoutOutlined, RestOutlined, DashboardOutlined, ContainerOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -27,18 +27,19 @@ import RegistrationAccount from './components/Registration Supplier/Registration
 import Booking from './components/Hirer/Booking/Booking';
 import RegisterMachines from './components/Register Machines/RegisterMachines';
 import SuccessMessage from './components/Registration Supplier/SuccessMessage';
+import { useAuth } from './contexts/AuthContext';
+import AdminLayout from './components/Admin/AdminLayout';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import ListOfUsers from './components/Admin/Users/ListOfUsers';
 
 const App = () => {
-  const navigate = useNavigate();
+  // const {
+  //   token: { colorBgContainer, borderRadiusLG },
+  // } = theme.useToken();
 
-  const navigateMenuItems = (value) => {
-    console.log("value: ", value);
-    navigate(value.key)
-  }
 
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+  // const token = localStorage.getItem('userToken');
+  // console.log("localStorage.getItem('userToken'): ", token);
 
   return (
     <>
@@ -88,6 +89,11 @@ const App = () => {
             <Route path="view-company-guidelines" element={<SellGauges />} />
           </Route>
 
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={<AdminLayout />}>
+            <Route index path="dashboard" element={<AdminDashboard />} />
+            <Route path="list-users" element={<ListOfUsers />} />
+          </Route>
         </Route>
 
         {/* Without Auth */}

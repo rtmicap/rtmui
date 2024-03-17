@@ -1,11 +1,11 @@
-import { Layout, Menu, theme } from 'antd';
-import React from 'react'
-import { Outlet } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Layout, theme, Menu } from 'antd';
+import React from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import AdminDashboard from './AdminDashboard';
+import ListOfUsers from './Users/ListOfUsers';
 const { Header, Content, Footer, Sider } = Layout;
 import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
-
 
 function getItem(label, key, icon, children) {
     return {
@@ -16,34 +16,13 @@ function getItem(label, key, icon, children) {
     };
 }
 
-
-
 const items = [
-    getItem('Dashboard', '/', <DashboardOutlined />),
-    getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
-    getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
-    getItem('Tools', 'tools', <ToolOutlined />, [
-        getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
-        getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),
-        getItem('Rent Tools', 'rent-tools', <CheckSquareOutlined />),
-    ]),
-    getItem('Gauges', 'gauges', <FieldTimeOutlined />, [
-        getItem('Buy Gauges', 'buy-gauges', <PlusSquareOutlined />),
-        getItem('Sell Gauges', 'sell-gauges', <MinusSquareOutlined />),
-        getItem('Rent Gauges', 'rent-gauges', <CheckSquareOutlined />),
-    ]),
-    getItem('Sell Raw Material', 'sell-raw-materials', <FormatPainterOutlined />),
-    getItem('Sell Scrap', 'sell-scrap', <ScissorOutlined />),
-    getItem('Documents', 'documents', <BookOutlined />, [
-        getItem('View Legal Agreement', 'view-legal-docs'),
-        getItem('View Code of Conduct', 'view-code-conduct'),
-        getItem('View Company Guidelines', 'view-company-guidelines', null),
-    ]),
-    getItem('Settings', 'settings', <SettingOutlined />),
+    getItem('Dashboard', '/admin/dashboard', <DashboardOutlined />),
+    getItem('List of Users', 'list-users', <BookOutlined />),
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
-function HirerSidebar() {
+function AdminSidebar() {
     const { userSignOut } = useAuth();
 
     const navigate = useNavigate();
@@ -58,6 +37,7 @@ function HirerSidebar() {
                 }
             });
         } else { // navigate to other component
+            console.log('/admin/' + value.key);
             navigate(value.key)
         }
     }
@@ -80,7 +60,7 @@ function HirerSidebar() {
                     }}
                 >
                     <div className="demo-logo-vertical">
-                        <h3 style={{ color: 'white', textAlign: 'center' }}>Company Logo</h3>
+                        <h3 style={{ color: 'white', textAlign: 'center' }}>Admin Account</h3>
                     </div>
                     <Menu theme="dark" mode="inline" defaultSelectedKeys={window.location.pathname} onClick={navigateMenuItems} items={items} />
                 </Sider>
@@ -106,4 +86,4 @@ function HirerSidebar() {
     )
 }
 
-export default HirerSidebar
+export default AdminSidebar

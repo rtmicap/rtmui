@@ -58,7 +58,11 @@ const RegistrationAccount = () => {
     }
 
     const data = [
-        'PDF file size should not be greater than 2 MB',
+        (<ol style={{ fontWeight: 'bold', fontSize: '15px' }}>
+            <li><span style={{ color: 'red' }}>*</span> - Mandatory Fields</li>
+            <li>Please have your soft copy ready in <span style={{ color: 'red' }}>PDF format</span> for CIN or UAM, GST & PAN details.</li>
+            <li>PDF file size should not be greater than 2 MB</li>
+        </ol>)
     ];
 
     const infoMessage = () => {
@@ -1195,17 +1199,17 @@ const RegistrationAccount = () => {
                     {/* CIN Input and file */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number)" rules={[
+                            <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your CIN number"
+                                    message: "Please enter your CIN number or UAM"
                                 },
                                 {
-                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
+                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
                                     message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
                                 }
                             ]}>
-                                <Input placeholder="Enter your CIN number" />
+                                <Input placeholder="Enter your CIN number or UAM" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1416,15 +1420,15 @@ const RegistrationAccount = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter your bank MICR code!',
+                                        message: 'Please enter your bank MICR code',
                                     },
                                     {
-                                        pattern: /^[0-9]{5}$/, // Regex pattern to match exactly 5 digits
-                                        message: 'Please enter a valid bank MICR code!',
+                                        pattern: /^[0-9]{1,9}$/,
+                                        message: 'Please enter a valid bank MICR code! (Ex: 600002025)',
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch MICR Code" />
+                                <Input placeholder="Enter your bank branch MICR Code (Ex: 600002025)" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1434,15 +1438,15 @@ const RegistrationAccount = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter your bank IFSC code!',
+                                        message: 'Please enter your bank IFSC code',
                                     },
                                     {
-                                        pattern: /^[0-9]{5}$/, // Regex pattern to match exactly 5 digits
-                                        message: 'Please enter a valid bank IFSC code!',
+                                        pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/,
+                                        message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch IFSC Code" />
+                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1493,7 +1497,7 @@ const RegistrationAccount = () => {
         //     console.log("form field error: ", error);
         // })
         // Process form submission
-        const baseUrl = `${config.rtmWsEndpoint}/api/registration/saveuser`;
+        const baseUrl = `${config.localEndpoint}/api/registration/saveuser`;
         formData.cinPdf = cinPdfFileList;
         formData.gstInPdf = gstPdfFileList;
         formData.panPdf = panPdfFileList;
@@ -1554,7 +1558,7 @@ const RegistrationAccount = () => {
             <Layout>
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
-                        <h2>Registration as Hirer/Renter</h2>
+                        <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
                                 message="Informational Notes"

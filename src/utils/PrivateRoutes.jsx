@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-function PrivateRoutes() {
-    let auth = { token: false }
+function PrivateRoutes({ component, ...rest }) {
+    const token = localStorage.getItem("userToken");
+    let auth = { token }
 
     return (
         auth.token ? <Outlet /> : <Navigate to="/login" />
     )
 }
 
-export default PrivateRoutes
+export default PrivateRoutes;
