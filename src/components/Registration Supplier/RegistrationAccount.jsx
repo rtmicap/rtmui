@@ -1497,7 +1497,7 @@ const RegistrationAccount = () => {
         //     console.log("form field error: ", error);
         // })
         // Process form submission
-        const baseUrl = `${config.localEndpoint}/api/registration/saveuser`;
+        const baseUrl = `${config.rtmWsEndpoint}/api/registration/saveuser`;
         formData.cinPdf = cinPdfFileList;
         formData.gstInPdf = gstPdfFileList;
         formData.panPdf = panPdfFileList;
