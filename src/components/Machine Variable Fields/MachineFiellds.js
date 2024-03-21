@@ -14,7 +14,8 @@ export const machineFields = {
             { name: 'cutting_speed_in_mmin', label: 'Cutting Speed', type: 'text', placeholder: "Enter in m/min" },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Automatic'] },
             { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate" },
-            { name: 'identical', label: 'Identical', type: 'text', placeholder: "Enter machine identical" },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine" },
+            // { name: 'identical', label: 'Yes', type: 'checkbox' },
         ],
     },
     // apparel: {
