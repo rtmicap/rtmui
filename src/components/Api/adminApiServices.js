@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from "../../env.json";
 
 
-const BASE_URL = `${config.localEndpoint}`;
+const BASE_URL = `${config.rtmWsEndpoint}`;
 
 //Admin
 export const getCompanyDetails = async (params) => {
