@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from "../../env.json";
 
 
-const BASE_URL = `${config.localEndpoint}/api`;
+const BASE_URL = `${config.rtmWsEndpoint}/api`;
 
 export const getMachinesByCatAndType = async () => {
     try {
