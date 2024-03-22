@@ -104,6 +104,11 @@ function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachi
         console.log("onSave: ", valuesSaved);
     }
 
+    function formatString(input) {
+        // Replace occurrences of '([a-z])([A-Z])' with '$1 $2'
+        return input.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
     const submitMachine = async () => {
         try {
             var outputArray = [];
@@ -123,7 +128,7 @@ function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachi
                         const newMachine = {
                             "category": item.category,
                             "Model": item.model,
-                            "machineType": item.machineType,
+                            "machineType": formatString(item.machineType),
                             "brand": item.brand,
                             "yearOfPurchase": item.yearOfPurchase,
                             "machineHourRate": item.machineHourRate,
@@ -141,7 +146,7 @@ function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachi
                     outputArray.push({
                         "category": item.category,
                         "Model": item.model,
-                        "machineType": item.machineType,
+                        "machineType": formatString(item.machineType),
                         "brand": item.brand,
                         "yearOfPurchase": item.yearOfPurchase,
                         "machineHourRate": item.machineHourRate,
