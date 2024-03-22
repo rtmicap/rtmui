@@ -16,9 +16,11 @@ export const getMachinesByCatAndType = async () => {
 export const registerMachine = async (request, configHeaders) => {
     try {
         const response = await axios.post(`${BASE_URL}/machines/registerMachine`, request, configHeaders);
-        return response.data;
+        return response;
     } catch (error) {
-        throw new Error(error.message);
+        console.log("error put::", error);
+        // throw new Error(error);
+        return error.response;
     }
 };
 
