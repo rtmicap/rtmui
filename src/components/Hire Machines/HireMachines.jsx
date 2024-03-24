@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
@@ -143,6 +143,10 @@ function HireMachines() {
         getAllMachines();
     }, []);
 
+    const formatUpperCase = (text) => {
+        return text.toUpperCase();
+    }
+
     return (
         <>
             <HeaderTitle title={'Hire a Machine'} />
@@ -227,32 +231,35 @@ function HireMachines() {
             <Row gutter={[16, 16]}>
                 {showAllMachines.map((machine) => (
                     <Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
-                        <Card
-                            hoverable
-                            cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
-                            actions={[
-                                <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
-                                <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
-                            ]}
-                            style={{ width: '100%' }}
-                        >
-                            <Meta title={machine.companyName} />
-                            <br />
-                            <Meta style={{ textAlign: "justify" }} description={machine.Category} />
-                            <br />
-                            <Meta style={{ fontWeight: "bold", textAlign: "justify" }} description={machine.Machine_Type} />
-                            <Meta
-                                description={
-                                    <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "justify" }}>
-                                        <li>Brand: {machine.Brand}</li>
-                                        <li>Year: {machine.Year_of_Purchase}</li>
-                                        <li>Model: {machine.Model}</li>
-                                        <li>Score: {machine.Score}</li>
-                                    </ul>
-                                }
+                        <Badge.Ribbon text={formatUpperCase(machine.Category)} color='red'>
+                            <Card
+                                hoverable
+                                cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
+                                actions={[
+                                    <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
+                                    <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
+                                ]}
+                                style={{ width: '100%' }}
+                                title={machine.companyName}
+                            >
+                                {/* <Meta title={machine.companyName} />
+                                <br /> */}
+                                {/* <Meta style={{ textAlign: "justify" }} />
+                                <br /> */}
+                                <Meta style={{ fontWeight: "bold", textAlign: "left" }} description={machine.Machine_Type} />
+                                <Meta
+                                    description={
+                                        <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "left" }}>
+                                            <li>{formatUpperCase('Brand')}: {machine.Brand}</li>
+                                            <li>{formatUpperCase('Year')}: {machine.Year_of_Purchase}</li>
+                                            <li>{formatUpperCase('Model')}: {machine.Model}</li>
+                                            <li>{formatUpperCase('Score')}: {machine.Score}</li>
+                                        </ul>
+                                    }
 
-                            />
-                        </Card>
+                                />
+                            </Card>
+                        </Badge.Ribbon>
                     </Col>
                 ))}
             </Row>

@@ -1,11 +1,12 @@
-import { Form, DatePicker, Select, Checkbox, Input, Upload, Button } from 'antd';
+import { Form, DatePicker, Select, Checkbox, Input, Upload, Button, Tooltip, Divider } from 'antd';
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 const { RangePicker } = DatePicker;
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined, CaretLeftOutlined } from '@ant-design/icons';
 
 function Booking() {
     const { machineId } = useParams();
+    const navigate = useNavigate();
 
     const onOk = (value) => {
         console.log('onOk: ', value);
@@ -42,6 +43,12 @@ function Booking() {
     return (
         <>
             <h2>Machine Booking Process {machineId}</h2>
+            <div style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                <Tooltip title="Go Back">
+                    <Button type="dashed" shape="circle" icon={<CaretLeftOutlined />} onClick={() => navigate(-1)} />
+                </Tooltip>
+            </div>
+            <Divider plain></Divider>
             <Form
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 14 }}

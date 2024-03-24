@@ -1,4 +1,4 @@
-import { Modal } from 'antd'
+import { Button, Modal } from 'antd'
 import React from 'react'
 
 function ViewMachineDetail({ open, setOpen, machine }) {
@@ -9,9 +9,12 @@ function ViewMachineDetail({ open, setOpen, machine }) {
                 title="Modal 1000px width"
                 centered
                 open={open}
-                onOk={() => setOpen(false)}
-                // onCancel={() => setOpen(false)}
                 width={1000}
+                footer={[
+                    <Button type='primary' onClick={() => setOpen(false)}>
+                        Okay
+                    </Button>
+                ]}
             >
                 <p>some contents...</p>
                 <p>some contents...</p>

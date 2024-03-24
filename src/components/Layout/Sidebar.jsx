@@ -43,7 +43,7 @@ const items = [
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
-function HirerSidebar() {
+function Sidebar() {
     const { userSignOut } = useAuth();
 
     const navigate = useNavigate();
@@ -106,4 +106,4 @@ function HirerSidebar() {
     )
 }
 
-export default HirerSidebar
+export default Sidebar;
