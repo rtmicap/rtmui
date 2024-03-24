@@ -4,7 +4,7 @@ import HeaderTitle from '../../utils/HeaderTitle';
 import { registerMachine } from '../Api/apiServices';
 import { useNavigate } from 'react-router-dom';
 
-function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachine, setOptionsCategory, setMachineFieldsApi, setOpenIdenticalCheck }) {
+function SummaryPage({ setOpenSummary, resetForm }) {
     const [open, setOpen] = useState(false);
     const [editedData, setEditedData] = useState(null);
 
@@ -184,12 +184,7 @@ function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachi
                 console.log('Data sent successfully:', response);
                 message.success(`${response.data.message}`);
                 setOpenSummary(false);
-                setCategory('');
-                setType('');
-                setOptionsCategory([]);
-                setOptionsTypeMachine([]);
-                setMachineFieldsApi([]);
-                setOpenIdenticalCheck(false);
+                resetForm()
             } else {
                 message.error(`${response.data.message}`);
             }
@@ -202,11 +197,16 @@ function SummaryPage({ setOpenSummary, setType, setCategory, setOptionsTypeMachi
         }
     }
 
+    const addMoreMachines = () => {
+        setOpenSummary(false);
+        resetForm();
+    }
+
 
     return (
         <>
             <div style={{ textAlign: 'right' }}>
-                <Button type='primary' onClick={() => setOpenSummary(false)}>Add More Machines</Button>
+                <Button type='primary' onClick={addMoreMachines}>Add More Machines</Button>
             </div>
             <Table title={title} bordered columns={columns} dataSource={data} footer={() => <Button type='primary' onClick={submitMachine}>{isLoading ? 'Submitting' : 'Confirm & Submit'}</Button>} />
             <Drawer title="Basic Drawer" onClose={onClose} open={open}>

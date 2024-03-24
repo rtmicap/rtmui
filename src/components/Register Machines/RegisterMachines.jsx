@@ -27,7 +27,6 @@ const getBase64 = (img) => {
 
 function RegisterMachines() {
     const { authUser } = useAuth();
-
     const [form] = Form.useForm();
     const machineInputs = machineFields;
     const [machineFieldsApi, setMachineFieldsApi] = useState([]);
@@ -49,7 +48,7 @@ function RegisterMachines() {
     // summary Page
     const [openSummary, setOpenSummary] = useState(false);
 
-    // console.log("machineInputs: ", machineInputs);
+    console.log("machineInputsyo: ", machineInputs);
 
     const machineFieldsFromApi = async () => {
         try {
@@ -66,8 +65,6 @@ function RegisterMachines() {
     }
     useEffect(() => {
         machineFieldsFromApi();
-        // const test = query.search('600032');
-        // console.log("test pin code: ", test);
     }, [])
 
 
@@ -127,6 +124,13 @@ function RegisterMachines() {
         })
     }
 
+    const resetForm = () => {
+        form.resetFields();
+        setType('');
+        setCategory('');
+        setOpenIdenticalCheck(false);
+    }
+
     const onFinish = async (values) => {
         // Handle form submission here
         console.log('Received values:', values);
@@ -159,28 +163,19 @@ function RegisterMachines() {
         console.log("existingFormDataArray: ", existingFormDataArray);
         localStorage.setItem('machines', JSON.stringify(existingFormDataArray));
         if (existingFormDataArray && existingFormDataArray.length > 0) {
-            setOpenSummary(true)
+            setOpenSummary(true);
+            message.success("Woah! Your data has been submitted.")
         }
 
-        // api
-        // const configHeaders = {
-        //     headers: { "content-type": "application/json" },
-        // };
-
-        // var reqItem = {
-        //     machines: existingFormDataArray
-        // }
-
-        // const response = await registerMachine(reqItem, configHeaders);
-        // console.log('API response values:', response);
-        // message.success(`${response.message}`)
-        // if (response) {
-        //     localStorage.removeItem("machines");
-        // }
     };
 
-    const onFinishFailed = errorInfo => {
+    const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
+        console.log('Form submission failed:', errorInfo);
+        // Extract error messages from errorInfo and display them
+        errorInfo.errorFields.forEach(fieldError => {
+            message.error(fieldError.errors[0]);
+        });
     };
 
     const uploadButton = (
@@ -220,8 +215,14 @@ function RegisterMachines() {
 
     if (openSummary) {
         return (
-            <SummaryPage openSummary={openSummary} setOpenSummary={setOpenSummary} setType={setType} setCategory={setCategory} setOptionsTypeMachine={setOptionsTypeMachine} setOptionsCategory={setOptionsCategory} setMachineFieldsApi={setMachineFieldsApi} setOpenIdenticalCheck={setOpenIdenticalCheck} />
+            <SummaryPage openSummary={openSummary} setOpenSummary={setOpenSummary} resetForm={resetForm} />
         )
+    }
+
+    function formatString(input) {
+        // Replace occurrences of '([a-z])([A-Z])' with '$1 $2'
+        // Ex: BandSaw -> Band Saw or ConventionalLathe -> Conventional Lathe
+        return input.replace(/([a-z])([A-Z])/g, '$1 $2');
     }
 
     return (
@@ -252,7 +253,7 @@ function RegisterMachines() {
                                 onChange={onChangeTypeMachine}
                             >
                                 {optionsTypeMachine.map((item, index) => (
-                                    <Select.Option key={index} value={item}>{item}</Select.Option>
+                                    <Select.Option key={index} value={item}>{formatString(item)}</Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
@@ -319,7 +320,7 @@ function RegisterMachines() {
                     {category && type &&
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item
-                                label="Upload Photo"
+                                label="Upload Your Machine Image"
                                 name="Machine_Photo"
                                 valuePropName="fileList"
                                 getValueFromEvent={(e) => e && e.fileList}

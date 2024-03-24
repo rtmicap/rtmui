@@ -666,7 +666,7 @@ const RegistrationAccount = () => {
                                 label="Major Customer Served"
                                 rules={[{ required: true, message: "Please provide a Major Customer Served" }]}
                             >
-                                <Input placeholder="Enter major customer served in your company" maxLength={30} />
+                                <Input placeholder="Enter major customer served in your company (150 words)" maxLength={150} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1202,7 +1202,7 @@ const RegistrationAccount = () => {
                             <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your CIN number or UAM"
+                                    message: "Please enter your CIN number or UAM L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
                                 },
                                 {
                                     pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
@@ -1238,7 +1238,7 @@ const RegistrationAccount = () => {
                             <Form.Item name={'GSTIN'} label="GSTIN (Goods and Services Tax Identification Number)" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your GSTIN number"
+                                    message: "Please enter your GSTIN number (05ABDCE1234F1Z2)"
                                 },
                                 {
                                     pattern: /^([0][1-9]|[1-2][0-9]|[3][0-5])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1})([1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
@@ -1273,7 +1273,7 @@ const RegistrationAccount = () => {
                             <Form.Item name={'PAN'} label="PAN (Permanent Account Number)" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your PAN number"
+                                    message: "Please enter your PAN number (ABCTY1234D)"
                                 },
                                 {
                                     pattern: /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/,
@@ -1353,7 +1353,7 @@ const RegistrationAccount = () => {
                                     message: "Please enter bank account number"
                                 },
                                 {
-                                    pattern: /^[0-9]{11,17}$/,
+                                    pattern: /^[0-9]{11,16}$/,
                                     message: "Please provide a valid bank account number"
                                 }
                             ]}>
@@ -1420,7 +1420,7 @@ const RegistrationAccount = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter your bank MICR code',
+                                        message: 'Please enter your bank MICR code (Ex: 600002025)',
                                     },
                                     {
                                         pattern: /^[0-9]{1,9}$/,
@@ -1438,7 +1438,7 @@ const RegistrationAccount = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter your bank IFSC code',
+                                        message: 'Please enter your bank IFSC code (Ex: IDIB000A090 or SBIN0005943)',
                                     },
                                     {
                                         pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/,

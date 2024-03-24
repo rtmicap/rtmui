@@ -112,7 +112,7 @@ export const AuthContextProvider = ({ children }) => {
                 axios.defaults.headers.common['Authorization'] = '';
                 setLoadingUser(false);
             });
-    }, []);
+    }, [authUser]);
 
 
     const value = {
