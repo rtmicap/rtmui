@@ -64,7 +64,7 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine" },
         ]
     },
-    MachiningCenters: {
+    Machining: {
         VerticalMachiningCenters: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand' },
             { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model' },
@@ -340,7 +340,7 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine" },
         ]
     },
-    PlasticsMouldingMachines: {
+    Plastics: {
         InjectionMouldingMachine: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand' },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Horizontal', 'Vertical', 'Two Shot', 'Multi Shot', 'Micro'] },
