@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-pdf/renderer": "^3.4.0",
     "antd": "^5.14.1",
+    "aws-sdk": "^2.1584.0",
     "axios": "^1.6.7",
     "india-pincode-search": "^1.0.2",
     "js-cookie": "^3.0.5",

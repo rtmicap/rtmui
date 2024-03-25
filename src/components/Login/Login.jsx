@@ -33,6 +33,19 @@ function Login() {
     if (isLoading) {
         return <Spin tip='Loading...' fullscreen />
     } else {
+        // Example usage
+const files = [
+    'file1.txt', 'file2.txt',  'file.txt'
+];
+const bucketName = 'rtmdocuments';
+
+uploadFilesToS3(files, bucketName)
+    .then((response) => {
+        console.log(response);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
         return (
             <>
                 <h2>Login Page</h2>
