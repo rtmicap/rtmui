@@ -37,22 +37,27 @@ export const AuthContextProvider = ({ children }) => {
         login(user).then((loginResponse) => {
             console.log("loginResponse: ", loginResponse);
             const { data } = loginResponse;
-            if (data.authStatus && data.userData) { // supplier account
+            if (data && data.authStatus && data.userData) { // supplier account
                 fetchSuccess();
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
+                axios.defaults.headers.common['authorization'] = 'Bearer ' + data.token;
                 // Cookies.set('authToken', data.token);
-                localStorage.setItem('userToken', JSON.stringify(data.token));
+                localStorage.setItem('userToken', data.token);
                 getAuthUser();
                 if (callbackFun) {
                     callbackFun({ status: 1, admin: false })
                 }
-            } else if (data.authStatus && data.userType == 'admin') { // admin account
-                // fetchSuccess();
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
+            } else if (data && data.authStatus && data.userType == 'admin') { // admin account
+                fetchSuccess();
+                axios.defaults.headers.common['authorization'] = 'Bearer ' + data.token;
                 localStorage.setItem('userToken', data.token);
                 getAuthUser();
                 if (callbackFun) {
                     callbackFun({ status: 1, admin: true })
+                }
+            } else {
+                fetchSuccess();
+                if (callbackFun) {
+                    callbackFun({ status: 0, response: loginResponse.response.data })
                 }
             }
             console.log("loginResponse data: ", data);
@@ -64,7 +69,7 @@ export const AuthContextProvider = ({ children }) => {
 
     const userSignOut = (callbackFun) => {
         fetchStart();
-        axios.defaults.headers.common['Authorization'] = '';
+        axios.defaults.headers.common['authorization'] = '';
         localStorage.removeItem('userToken');
         setAuthUser(false);
         fetchSuccess();
@@ -86,7 +91,7 @@ export const AuthContextProvider = ({ children }) => {
             })
             .catch(function (error) {
                 console.log("error curr2: ", error);
-                axios.defaults.headers.common['Authorization'] = '';
+                axios.defaults.headers.common['authorization'] = '';
                 fetchError(error.message);
             });
     };
@@ -97,7 +102,7 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('userToken');
         if (token) {
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
         }
 
         currentUser()
@@ -109,10 +114,10 @@ export const AuthContextProvider = ({ children }) => {
             })
             .catch(function () {
                 localStorage.removeItem('userToken');
-                axios.defaults.headers.common['Authorization'] = '';
+                axios.defaults.headers.common['authorization'] = '';
                 setLoadingUser(false);
             });
-    }, [authUser]);
+    }, []);
 
 
     const value = {

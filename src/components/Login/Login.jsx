@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Layout, Spin } from 'antd';
+import { Button, Card, Form, Input, Layout, message, Spin } from 'antd';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,6 +23,8 @@ function Login() {
                 navigate('/');
             } else if (res && res.status && res.admin) {
                 navigate('/admin/dashboard');
+            } else {
+                message.error(res.response.message)
             }
         })
     };
