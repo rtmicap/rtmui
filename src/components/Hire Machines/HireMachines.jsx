@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
@@ -8,11 +8,12 @@ const { Search } = Input;
 const { Meta } = Card;
 const { Option } = Select;
 import Config from '../../env.json'
+import { useAuth } from '../../contexts/AuthContext';
+import { SmileOutlined } from '@ant-design/icons';
 
 function HireMachines() {
     const [users, setUsers] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
     const [form] = Form.useForm();
 
     const [categories, setCategories] = useState([]);
@@ -27,6 +28,7 @@ function HireMachines() {
     const [pages, setPages] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [showAllMachines, setShowAllMachines] = useState([]);
+    const [totalPages, setTotalPages] = useState(null);
     // modal
     const [open, setOpen] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
@@ -46,15 +48,16 @@ function HireMachines() {
 
     }
 
-    const fetchData = async () => {
+    const fetchData = async (pages) => {
         try {
+            setLoading(true);
             const baseUrl = `${Config.rtmWsEndpoint}/api/booking/searchMachines`;
 
             // query parameters
             const queryParams = {
                 category: selectedMachineCategory,
                 machineType: selectedMachineType,
-                pincode: ''
+                page: pages
             };
 
             const response = await axios.get(baseUrl, {
@@ -62,10 +65,17 @@ function HireMachines() {
             });
 
             // Handle the response data
-            setShowAllMachines(response.data.results);
+            setShowAllMachines(response.data.paginatedResults);
+            setPages(response.data.page);
+            setPageSize(response.data.pageSize);
+            setTotalPages(response.data.totalItems);
+            message.success(response.data.message);
+            setLoading(false);
             console.log('Response data:', response.data);
         } catch (error) {
             // Handle errors
+            setLoading(false);
+            message.error("There is some error while searching the machine!", error.message);
             console.error('Error fetching data:', error);
         }
     };
@@ -87,20 +97,26 @@ function HireMachines() {
         }
     }
 
-    const getAllMachines = async () => {
+    const getAllMachines = async (pages) => {
         try {
+            setLoading(true);
             const apiUrl = `${Config.rtmWsEndpoint}/api/machines/getAllMachines`;
             // const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
             const params = {
                 page: pages,
-                pageSize: pageSize,
-                sortOrder: 'asc',
             };
             const machinesData = await axios.get(apiUrl, { params });
-            setShowAllMachines(machinesData.data.results)
-            console.log("machinesData: ", machinesData);
+            setShowAllMachines(machinesData.data.paginatedResults);
+            setPages(machinesData.data.page);
+            setPageSize(machinesData.data.pageSize);
+            setTotalPages(machinesData.data.totalItems);
+            message.success(machinesData.data.message);
+            setLoading(false);
+            console.log("all machinesData: ", machinesData);
         } catch (error) {
             // Handle errors
+            setLoading(false);
+            message.error("There is some error!", error.message);
             console.error('Error machinesData data:', error);
         }
     }
@@ -125,9 +141,9 @@ function HireMachines() {
     };
 
     const clearSearch = () => {
-        setCategoryAndType([]);
-        setSelectedMachineType('');
         setSelectedMachineCategory('');
+        setSelectedMachineType('');
+        form.resetFields();
         getAllMachines();
     }
 
@@ -145,6 +161,36 @@ function HireMachines() {
 
     const formatUpperCase = (text) => {
         return text.toUpperCase();
+    }
+
+    const onShowSizeChange = (current, pageSize) => {
+        console.log("onShowSizeChange:", current, pageSize);
+    };
+
+    const handlePageChange = (page, pageSize) => {
+        setPages(page);
+        if (selectedMachineType && selectedMachineCategory) {
+            fetchData(page);
+        } else {
+            // alert("get all");
+            getAllMachines(page);
+        }
+        console.log("handlePageChange:", page, pageSize);
+    }
+
+    const noData =
+        (
+            <Result
+                icon={<SmileOutlined />}
+                title="No machines found!"
+            // extra={<Button type="primary">Next</Button>}
+            />
+        )
+
+    if (loading) {
+        return (
+            <Spin tip='Loading updated machines...' size='large' />
+        )
     }
 
     return (
@@ -206,19 +252,6 @@ function HireMachines() {
                     </Col>
 
                     <Col>
-                        <Form.Item
-                            name="pincode"
-                            label="Enter pincode"
-                            rules={[
-                                {
-                                    pattern: /^[0-9]{6}$/, // Regex pattern to match exactly 6 digits
-                                    message: 'Please enter a valid 6-digit',
-                                },]}
-                        >
-                            <Input placeholder="Enter pincode" allowClear />
-                        </Form.Item>
-                    </Col>
-                    <Col>
                         <Button type="primary" onClick={fetchData} style={{ marginTop: "30px" }}>Search</Button>
                     </Col>
                     <Col>
@@ -229,40 +262,60 @@ function HireMachines() {
             <br />
 
             <Row gutter={[16, 16]}>
-                {showAllMachines.map((machine) => (
-                    <Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
-                        <Badge.Ribbon text={formatUpperCase(machine.Category)} color='red'>
-                            <Card
-                                hoverable
-                                cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
-                                actions={[
-                                    <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
-                                    <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
-                                ]}
-                                style={{ width: '100%' }}
-                                title={machine.companyName}
-                            >
-                                {/* <Meta title={machine.companyName} />
+                {totalPages && totalPages > 0 ?
+                    showAllMachines.map((machine) => (
+                        <Col Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
+                            <Badge.Ribbon text={formatUpperCase(machine.Category)} color='red'>
+                                <Card
+                                    hoverable
+                                    cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
+                                    actions={[
+                                        <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
+                                        <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
+                                    ]}
+                                    style={{ width: '100%' }}
+                                    title={machine.companyName}
+                                >
+                                    {/* <Meta title={machine.companyName} />
                                 <br /> */}
-                                {/* <Meta style={{ textAlign: "justify" }} />
+                                    {/* <Meta style={{ textAlign: "justify" }} />
                                 <br /> */}
-                                <Meta style={{ fontWeight: "bold", textAlign: "left" }} description={machine.Machine_Type} />
-                                <Meta
-                                    description={
-                                        <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "left" }}>
-                                            <li>{formatUpperCase('Brand')}: {machine.Brand}</li>
-                                            <li>{formatUpperCase('Year')}: {machine.Year_of_Purchase}</li>
-                                            <li>{formatUpperCase('Model')}: {machine.Model}</li>
-                                            <li>{formatUpperCase('Score')}: {machine.Score}</li>
-                                        </ul>
-                                    }
+                                    <Meta style={{ fontWeight: "bold", textAlign: "left" }} description={machine.Machine_Type} />
+                                    <Meta
+                                        description={
+                                            <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "left" }}>
+                                                <li>{formatUpperCase('Brand')}: {machine.Brand}</li>
+                                                <li>{formatUpperCase('Year')}: {machine.Year_of_Purchase}</li>
+                                                <li>{formatUpperCase('Model')}: {machine.Model}</li>
+                                                <li>{formatUpperCase('Score')}: {machine.Score}</li>
+                                            </ul>
+                                        }
 
-                                />
-                            </Card>
-                        </Badge.Ribbon>
-                    </Col>
-                ))}
+                                    />
+                                </Card>
+                            </Badge.Ribbon>
+                        </Col>
+                    ))
+                    : <div style={{ textAlign: 'center' }}>{noData}</div>
+                }
+
             </Row>
+
+            {/* Pagination */}
+
+            {totalPages && totalPages > 0 &&
+                <Row gutter={[16, 16]}>
+                    <Pagination
+                        // showSizeChanger
+                        // onShowSizeChange={onShowSizeChange}
+                        defaultCurrent={pages}
+                        total={totalPages}
+                        onChange={handlePageChange}
+                        showTitle
+                    />
+                </Row>
+            }
+
 
             {/* // View Details */}
             {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
