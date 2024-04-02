@@ -90,7 +90,7 @@ uploadFilesToS3(files, bucketName)
                                         },
                                     ]}
                                 >
-                                    <Input />
+                                    <Input autoComplete='off' />
                                 </Form.Item>
 
                                 <Form.Item
