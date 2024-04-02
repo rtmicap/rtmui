@@ -7,8 +7,6 @@ const { Meta } = Card;
 
 function HirerDashboard() {
 
-
-
     return (
         <>
             <HeaderTitle title={'Dashboard'} />

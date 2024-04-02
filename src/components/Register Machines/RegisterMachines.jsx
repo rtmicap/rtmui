@@ -48,7 +48,7 @@ function RegisterMachines() {
     // summary Page
     const [openSummary, setOpenSummary] = useState(false);
 
-    console.log("machineInputsyo: ", machineInputs);
+    console.log("machineInputsyo: ", machineInputs["Machining"]);
 
     const machineFieldsFromApi = async () => {
         try {
@@ -67,22 +67,24 @@ function RegisterMachines() {
         machineFieldsFromApi();
     }, [])
 
-
-    const onChangeTypeMachine = (value) => {
-        console.log(`selected ${value}`);
-        setType(value);
-    };
-
     const handleMachineCategory = async (e) => {
         console.log("handleMachineCategory: ", e);
+        // setType('');
         setCategory(e);
         console.log("machineInputs: ", e);
-        const values = Object.keys(machineInputs[e]);
+        const inputVal = e == "Plastics Moulding Machines" ? "Plastics" : e == "Machining Centers" ? "Machining" : e;
+        console.log("inputVal: ", inputVal);
+        const values = Object.keys(machineInputs[inputVal]);
         if (values) {
             setOptionsTypeMachine(values);
         }
-        console.log("handleMachineCategory values: ", values);
     }
+
+    const onChangeTypeMachine = async (value) => {
+        console.log(`selected ${value}`);
+        const setValue = value == "BlowMouldingMachine" ? "BlowMoulding" : value == "InjectionMoulding" ? "InjectionMoulding" : value;
+        setType(setValue);
+    };
 
     const beforeUpload = (file) => {
         const isImage = file.type.startsWith('image/');
@@ -246,7 +248,7 @@ function RegisterMachines() {
 
                     </Col>
                     <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                        <Form.Item name="machineType" label="Machine Type" rules={[
+                        <Form.Item name={"machineType"} label="Machine Type" rules={[
                             { required: true, message: 'Please choose the machine type' }]}>
                             <Select
                                 placeholder="Please choose the machine type"
@@ -263,10 +265,15 @@ function RegisterMachines() {
                 {/* Update Machine Forms Fields here */}
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                        {console.log("logogogog: ", type)}
+                        {console.log("logog machineInputs: ", category && machineInputs[category])}
                         {category && type && machineInputs[category][type].map((field) => (
                             <Row gutter={[16, 16]}>
                                 <Col span={24}>
-                                    <Form.Item key={field.name} label={field.label} name={field.name} rules={[{ required: true, message: `Please input ${field.label}` }]}>
+                                    <Form.Item key={field.name} label={field.label} name={field.name} rules={[
+                                        { required: true, message: `Please input ${field.label}` },
+                                        { pattern: field.pattern == 'real' ? /^(?=.*\d)\d+(\.\d{1,2})?$/ : field.pattern ? field.pattern : '', message: `Please provide a valid ${field.label}` }
+                                    ]}>
                                         {field.type === 'select' ? (
                                             <Select name={field.name} placeholder={field.placeholder}>
                                                 {field.options.map((option) => (
@@ -276,7 +283,7 @@ function RegisterMachines() {
                                         ) : (
                                             <>
 
-                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} />
+                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength ? field.maxLength : 6} />
                                             </>
                                         )}
                                     </Form.Item>

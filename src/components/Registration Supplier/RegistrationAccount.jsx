@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload, Flex, Descriptions, Collapse, Modal } from 'antd';
+import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Select, Divider, Checkbox, Upload, Flex, Descriptions, Collapse, Modal, Typography } from 'antd';
 import { UploadOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
@@ -10,6 +10,7 @@ import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 // import { saveUser } from '../Api/apiServices';
 import config from "../../env.json";
+const { Text } = Typography;
 
 const RegistrationAccount = () => {
     const navigate = useNavigate();
@@ -611,6 +612,14 @@ const RegistrationAccount = () => {
         }
     ];
 
+    const [panNumber, setPanNumber] = useState('');
+
+    const handlePanChange = (e) => {
+        console.log("handlePanChange: ", e.target.value);
+        setPanNumber(e.target.value.toUpperCase());
+        console.log("eequal: ", e.target.value == 'ABCTY1234D');
+    };
+
     const steps = [
         {
             title: 'General Information',
@@ -621,7 +630,7 @@ const RegistrationAccount = () => {
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name="companyname" label="Company Name" rules={[
                                 { required: true, message: 'Please enter your Company Name' }]}>
-                                <Input placeholder="Please enter your company name" maxLength={15} />
+                                <Input placeholder="Please enter your company name" maxLength={100} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -763,7 +772,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your 10-digit mobile number" />
+                                <Input placeholder="Enter your 10-digit mobile number" maxLength={10} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -781,7 +790,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your 10-digit mobile number" />
+                                <Input placeholder="Enter your 10-digit mobile number" maxLength={10} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -804,7 +813,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input prefix={'+'} placeholder="Enter STD Code" />
+                                <Input prefix={'+'} placeholder="Enter STD Code" maxLength={7} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -822,7 +831,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter Telephone Number" />
+                                <Input placeholder="Enter Telephone Number" maxLength={12} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -844,7 +853,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input prefix={'+'} placeholder="Enter STD Code" />
+                                <Input prefix={'+'} placeholder="Enter STD Code" maxLength={7} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -862,7 +871,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter Telephone Number" />
+                                <Input placeholder="Enter Telephone Number" maxLength={12} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -882,7 +891,7 @@ const RegistrationAccount = () => {
                                     }
                                 ]}
                             >
-                                <Input placeholder="Enter factory email address" />
+                                <Input placeholder="Enter factory email address" autoComplete="off" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -897,7 +906,7 @@ const RegistrationAccount = () => {
                                     }
                                 ]}
                             >
-                                <Input placeholder="Enter office email address" />
+                                <Input placeholder="Enter office email address" autoComplete="off" />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -980,11 +989,15 @@ const RegistrationAccount = () => {
                                     required: true,
                                     message: "Please enter your factory city"
 
+                                },
+                                {
+                                    pattern: /^[a-zA-Z]+$/, // valid string
+                                    message: "Please enter a valid factory city (Allowed only characters)"
                                 }
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'factoryCity'} placeholder='Enter your factory city' />
+                                <Input name={'factoryCity'} placeholder='Enter your factory city' autoComplete="off" maxLength={60} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -993,11 +1006,15 @@ const RegistrationAccount = () => {
                                     required: true,
                                     message: "Please enter your factory area"
 
+                                },
+                                {
+                                    pattern: /^[a-zA-Z]+$/, // valid string
+                                    message: "Please enter a valid factory area (Allowed only characters)"
                                 }
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'factoryArea'} placeholder='Enter your factory area' />
+                                <Input name={'factoryArea'} placeholder='Enter your factory area' autoComplete="off" maxLength={60} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1109,11 +1126,15 @@ const RegistrationAccount = () => {
                                     required: true,
                                     message: "Please enter your office city"
 
+                                },
+                                {
+                                    pattern: /^[a-zA-Z]+$/, // valid string
+                                    message: "Please enter a valid office city (Allowed only characters)"
                                 }
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'officeCity'} placeholder='Enter your office city' />
+                                <Input name={'officeCity'} placeholder='Enter your office city' autoComplete="off" maxLength={60} />
                             </Form.Item>
                         </Col>
 
@@ -1123,11 +1144,15 @@ const RegistrationAccount = () => {
                                     required: true,
                                     message: "Please enter your office area"
 
+                                },
+                                {
+                                    pattern: /^[a-zA-Z]+$/, // valid string
+                                    message: "Please enter a valid office area (Allowed only characters)"
                                 }
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'officeArea'} placeholder='Enter your office area' />
+                                <Input name={'officeArea'} placeholder='Enter your office area' maxLength={60} />
                             </Form.Item>
                         </Col>
 
@@ -1144,7 +1169,7 @@ const RegistrationAccount = () => {
                             ]}
                                 valuePropName="value"
                             >
-                                <Input name={'offPinCode'} placeholder='Enter your office PIN code' />
+                                <Input name={'offPinCode'} placeholder='Enter your office PIN code' maxLength={6} />
                             </Form.Item>
                         </Col>
                     </Row>}
@@ -1191,7 +1216,7 @@ const RegistrationAccount = () => {
                                     message: 'Please enter a valid year of establishment! (Max allowed 4 digits)',
                                 },
                             ]}>
-                                <Input placeholder="Enter year of establishment" />
+                                <Input placeholder="Enter year of establishment" maxLength={4} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1201,15 +1226,15 @@ const RegistrationAccount = () => {
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
                                 {
+                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
+                                    message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
+                                },
+                                {
                                     required: true,
                                     message: "Please enter your CIN number or UAM L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
                                 },
-                                {
-                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
-                                    message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
-                                }
-                            ]}>
-                                <Input placeholder="Enter your CIN number or UAM" />
+                            ]} extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456">
+                                <Input placeholder="Enter your CIN number or UAM" maxLength={22} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1244,8 +1269,8 @@ const RegistrationAccount = () => {
                                     pattern: /^([0][1-9]|[1-2][0-9]|[3][0-5])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1})([1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
                                     message: "Please provide your valid GSTIN number (05ABDCE1234F1Z2)"
                                 }
-                            ]}>
-                                <Input placeholder="Enter your GSTIN number" />
+                            ]} extra="GSTIN Format: 05ABDCE1234F1Z2">
+                                <Input placeholder="Enter your GSTIN number" maxLength={15} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1279,8 +1304,8 @@ const RegistrationAccount = () => {
                                     pattern: /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/,
                                     message: "Please provide your valid PAN number (ABCTY1234D)"
                                 }
-                            ]}>
-                                <Input placeholder="Enter your PAN number" />
+                            ]} extra="PAN Format: ABCTY1234D">
+                                <Input placeholder="Enter your PAN number" maxLength={10} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1311,13 +1336,13 @@ const RegistrationAccount = () => {
                     {/* Add your title and account type */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'bankTitle'} label="Title of Account in the Bank" rules={[
+                            <Form.Item name={'bankTitle'} label="Bank Account Name" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter title of account in the bank"
+                                    message: "Please enter bank account name"
                                 },
                             ]}>
-                                <Input placeholder="Enter title of account in the bank" maxLength={40} />
+                                <Input placeholder="Enter title of account in the bank" maxLength={150} />
                             </Form.Item>
                         </Col>
 
@@ -1406,7 +1431,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter Mobile Number" />
+                                <Input placeholder="Enter Mobile Number" maxLength={10} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1456,7 +1481,10 @@ const RegistrationAccount = () => {
         {
             title: 'Review',
             content: (
-                <Collapse items={items} accordion />
+                <>
+                    <Text type='danger' strong>If you want to Edit your Information, Click previous button</Text>
+                    <Collapse items={items} accordion />
+                </>
             )
         },
     ];

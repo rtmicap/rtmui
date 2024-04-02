@@ -208,7 +208,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
             <div style={{ textAlign: 'right' }}>
                 <Button type='primary' onClick={addMoreMachines}>Add More Machines</Button>
             </div>
-            <Table title={title} bordered columns={columns} dataSource={data} footer={() => <Button type='primary' onClick={submitMachine}>{isLoading ? 'Submitting' : 'Confirm & Submit'}</Button>} />
+            <Table title={title} bordered columns={columns} dataSource={data} footer={() => data.length > 0 && <Button type='primary' onClick={submitMachine}>{isLoading ? 'Submitting' : 'Confirm & Submit'}</Button>} />
             <Drawer title="Basic Drawer" onClose={onClose} open={open}>
                 {editedData && editedData.length > 0 ?
                     editedData.map((item) => {

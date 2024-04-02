@@ -77,7 +77,7 @@ function Login() {
                                         },
                                     ]}
                                 >
-                                    <Input />
+                                    <Input autoComplete='off' />
                                 </Form.Item>
 
                                 <Form.Item
