@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result, Empty } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
@@ -9,10 +9,10 @@ const { Meta } = Card;
 const { Option } = Select;
 import Config from '../../env.json'
 import { useAuth } from '../../contexts/AuthContext';
-import { SmileOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
 
 function HireMachines() {
-    const [users, setUsers] = useState([]);
+    const { authUser } = useAuth();
     const [currentPage, setCurrentPage] = useState(1);
     const [form] = Form.useForm();
 
@@ -36,22 +36,10 @@ function HireMachines() {
 
     const navigate = useNavigate();
 
-    const getAllUsers = async () => {
-        try {
-            const usersData = await axios.get("https://jsonplaceholder.typicode.com/users");
-            console.log("usersData: ", usersData);
-            setUsers(usersData.data)
-            setTotalPages(Math.ceil(usersData.headers['x-total-count'] / 10));
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        }
-
-    }
-
     const fetchData = async (pages) => {
         try {
             setLoading(true);
-            const baseUrl = `${Config.rtmWsEndpoint}/api/booking/searchMachines`;
+            const baseUrl = `${Config.localEndpoint}/api/booking/searchMachines`;
 
             // query parameters
             const queryParams = {
@@ -82,7 +70,7 @@ function HireMachines() {
 
     const getAllMachinesCategoryAndType = async () => {
         try {
-            const baseUrl = `${Config.rtmWsEndpoint}/api/machines/getMachinesByCatAndType`;
+            const baseUrl = `${Config.localEndpoint}/api/machines/getMachinesByCatAndType`;
             // const baseUrl = 'http://localhost:5100/api/machines/getMachinesByCatAndType';
             const response = await axios.get(baseUrl);
             const machineCategories = response.data;
@@ -100,7 +88,7 @@ function HireMachines() {
     const getAllMachines = async (pages) => {
         try {
             setLoading(true);
-            const apiUrl = `${Config.rtmWsEndpoint}/api/machines/getAllMachines`;
+            const apiUrl = `${Config.localEndpoint}/api/machines/getAllMachines`;
             // const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
             const params = {
                 page: pages,
@@ -143,8 +131,9 @@ function HireMachines() {
     const clearSearch = () => {
         setSelectedMachineCategory('');
         setSelectedMachineType('');
+        setTotalPages(null);
         form.resetFields();
-        getAllMachines();
+        // getAllMachines();
     }
 
     const handleViewDetail = (machine) => {
@@ -156,7 +145,7 @@ function HireMachines() {
 
     useEffect(() => {
         getAllMachinesCategoryAndType();
-        getAllMachines();
+        // getAllMachines();
     }, []);
 
     const formatUpperCase = (text) => {
@@ -178,20 +167,36 @@ function HireMachines() {
         console.log("handlePageChange:", page, pageSize);
     }
 
-    const noData =
+    const searchData =
         (
             <Result
-                icon={<SmileOutlined />}
-                title="No machines found!"
+                icon={<FileSearchOutlined />}
+                title="Please search the type of machine you would like to book!"
             // extra={<Button type="primary">Next</Button>}
             />
+
         )
 
-    if (loading) {
-        return (
-            <Spin tip='Loading updated machines...' size='large' />
-        )
-    }
+    const noData = (
+        <Empty
+            image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+            imageStyle={{
+                height: 60,
+            }}
+            description={
+                <span style={{ fontSize: '22px' }}>
+                    No Machines Found!
+                </span>
+            }
+        >
+        </Empty>
+    )
+
+    // if (loading) {
+    //     return (
+    //         <Spin tip='Loading updated machines...' size='large' />
+    //     )
+    // }
 
     return (
         <>
@@ -212,7 +217,7 @@ function HireMachines() {
                             >
                                 {loading ? (
                                     <Select.Option key="loading" disabled>
-                                        <Spin />
+                                        <Spin tip='Loading...' />
                                     </Select.Option>
                                 ) : (
                                     categories.map((item, index) => (
@@ -238,7 +243,7 @@ function HireMachines() {
                             >
                                 {loading ? (
                                     <Select.Option key="loading" disabled>
-                                        <Spin />
+                                        <Spin tip='Loading2...' />
                                     </Select.Option>
                                 ) : (
                                     machineTypes.map((item, index) => (
@@ -260,13 +265,23 @@ function HireMachines() {
                 </Row>
             </Form>
             <br />
+            {/* Search Message */}
+            {(!selectedMachineCategory || !selectedMachineType) && <>{searchData}</>}
 
+            {/* Loading */}
+            {loading && <Spin tip='Loading updated machines' size='large'><div style={{
+                padding: '50px',
+                background: 'rgba(0, 0, 0, 0.05)',
+                borderRadius: '4px',
+            }} /></Spin>}
+
+            {/* Display All Machines */}
             <Row gutter={[16, 16]}>
-                {totalPages && totalPages > 0 ?
+                {!loading && totalPages > 0 &&
                     showAllMachines.map((machine) => (
                         <Col Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
                             <Badge.Ribbon text={formatUpperCase(machine.Category)} color='red'>
-                                <Card
+                                {/* <Card
                                     hoverable
                                     cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
                                     actions={[
@@ -276,10 +291,6 @@ function HireMachines() {
                                     style={{ width: '100%' }}
                                     title={machine.companyName}
                                 >
-                                    {/* <Meta title={machine.companyName} />
-                                <br /> */}
-                                    {/* <Meta style={{ textAlign: "justify" }} />
-                                <br /> */}
                                     <Meta style={{ fontWeight: "bold", textAlign: "left" }} description={machine.Machine_Type} />
                                     <Meta
                                         description={
@@ -292,18 +303,46 @@ function HireMachines() {
                                         }
 
                                     />
+                                </Card> */}
+                                <Card
+                                    style={{ width: '100%', marginTop: 16 }}
+                                    cover={<img alt="example" src="https://via.placeholder.com/150" style={{ objectFit: 'cover', maxHeight: 200 }} />}
+                                    actions={[
+                                        <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
+                                        <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
+                                    ]}
+                                    hoverable
+                                >
+                                    <Meta
+                                        title={formatUpperCase(machine.CompanyName)}
+                                        description={
+                                            <div>
+                                                {/* <p>Category: {machine.Category}</p> */}
+                                                <p>Machine Type: {machine.Machine_Type}</p>
+                                                <p>Machine Hour Rate: {machine.Machine_Hour_Rate}</p>
+                                                <p>Year: {machine.Year_of_Purchase}</p>
+                                                <p>Rating: {machine.Score}</p>
+                                                <Button type="link" icon={<WechatOutlined />} onClick={() => handleViewDetail(machine)} size='small'>Chat with Supplier</Button>,
+
+                                            </div>
+                                        }
+                                    />
                                 </Card>
                             </Badge.Ribbon>
                         </Col>
+
                     ))
-                    : <div style={{ textAlign: 'center' }}>{noData}</div>
                 }
-
             </Row>
+            {/* No Machines */}
+            {totalPages == 0 &&
+                <>{noData}</>
+            }
 
-            {/* Pagination */}
+            <br />
+            {/* Machines Pagination */}
 
-            {totalPages && totalPages > 0 &&
+            {!loading && totalPages > 0 &&
                 <Row gutter={[16, 16]}>
                     <Pagination
                         // showSizeChanger
