@@ -1,8 +1,8 @@
 export const machineFields = {
     Cutting: {
         BandSaw: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Automatic'] },
             { name: 'max_diameter_round_in_mm', label: 'Max Diameter Round', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -14,8 +14,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         PowerHackSaw: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Automatic'] },
             { name: 'max_diameter_in_mm', label: 'Max Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -30,8 +30,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         CircularSaw: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Automatic'] },
             { name: 'min_diameter_round_in_mm', label: 'Min Diameter Round', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -48,8 +48,8 @@ export const machineFields = {
     },
     Drilling: {
         ConventionalDrillingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Bench', 'Pillar', 'Column Type', 'Deep Hole'] },
             { name: 'max_diameter_drill_in_mm', label: 'Max Diameter of the Drill', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -67,8 +67,8 @@ export const machineFields = {
     },
     Machining: {
         VerticalMachiningCenters: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'duty', label: 'Duty', type: 'select', placeholder: "Please choose type", options: ['Light', 'Medium', 'Heavy'] },
             { name: 'no_of_axis', label: 'No. Of Axis', type: 'text', placeholder: "Enter in number", pattern: /^(?:[1-9]|10)$/ },
@@ -88,8 +88,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         HorizontalMachiningCenters: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'duty', label: 'Duty', type: 'select', placeholder: "Please choose type", options: ['Light', 'Medium', 'Heavy'] },
             { name: 'no_of_axis', label: 'No. Of Axis', type: 'text', placeholder: "Enter in number", pattern: /^(?:[1-9]|10)$/ },
@@ -109,8 +109,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         DrillTapMachiningCenters: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'duty', label: 'Duty', type: 'select', placeholder: "Please choose type", options: ['Light', 'Medium', 'Heavy'] },
             { name: 'no_of_axis', label: 'No. Of Axis', type: 'text', placeholder: "Enter in number", pattern: /^(?:[1-9]|10)$/ },
@@ -132,8 +132,8 @@ export const machineFields = {
     },
     Turning: {
         ConventionalLathe: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'duty', label: 'Duty', type: 'select', placeholder: "Please choose type", options: ['Light', 'Medium', 'Heavy'] },
             { name: 'max_diameter_in_mm', label: 'Max Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -146,8 +146,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         CncLathe: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Fanuc', 'Siemens', 'Others'] },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -161,8 +161,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         TurretLathe: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Fanuc', 'Siemens', 'Others'] },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -177,8 +177,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         CapstanLathe: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Fanuc', 'Siemens', 'Others'] },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -193,8 +193,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         Automat: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'max_turning_length_in_mm', label: 'Max Turning Length', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -209,8 +209,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         SlidingHeadAutomat: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'max_turning_length_in_mm', label: 'Max Turning Length', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -225,8 +225,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         MultispindleAutomat: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'max_turning_length_in_mm', label: 'Max Turning Length', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -239,8 +239,8 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         VerticalTurningLathe: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Ram Type', 'Turret type'] },
             { name: 'max_turning_diameter_in_mm', label: 'Max Turning Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -260,9 +260,9 @@ export const machineFields = {
     },
     Grinding: {
         CylindricalGrindingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'CNC'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'swing_diameter_in_mm', label: 'Swing Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'distance_between_centers_in_mm', label: 'Distance Between Centers', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -277,9 +277,9 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         InternalGrindingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'CNC'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'swing_diameter_in_mm', label: 'Swing Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'distance_between_centers_in_mm', label: 'Distance Between Centers', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -293,9 +293,9 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         CenterlessGrindingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Manual', 'CNC'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'max_grinding_dia_in_mm', label: 'Max Grinding Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'min_grinding_dia_in_mm', label: 'Min Grinding Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -310,9 +310,9 @@ export const machineFields = {
     },
     Milling: {
         ConventionalMillingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Horizontal', 'Vertical'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'table_size_in_mm', label: 'Table Size', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
             { name: 'no_of_t_slots', label: 'No of T slots', type: 'text', placeholder: "Enter in number", pattern: /^(?:[1-9]|10)$/ },
@@ -331,10 +331,10 @@ export const machineFields = {
     },
     Plastics: {
         InjectionMoulding: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Horizontal', 'Vertical', 'Two Shot', 'Multi Shot', 'Micro'] },
             { name: 'clamping_unit', label: 'Clamping Unit', type: 'select', placeholder: "Please choose type", options: ['Hydraulic', 'Electric', 'Hybrid'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'shot_weight_in_gms', label: 'Shot Weight (in gms)', type: 'text', placeholder: "Enter in gms", pattern: 'real' },
             { name: 'screw_dia_in_mm', label: 'Screw Diameter', type: 'text', placeholder: "Dimension in mm", pattern: 'real' },
@@ -350,9 +350,9 @@ export const machineFields = {
             { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]|10)$/ },
         ],
         BlowMouldingMachine: [
-            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: ['Accumulator Type', 'Ring Drum'] },
-            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9]+$/, maxLength: 50 },
+            { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
             { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
             { name: 'no_layers_possible', label: 'No of Layers Possible', type: 'text', placeholder: "Enter in number", pattern: /^(?:[1-9]|10)$/ },
             { name: 'cosextrusion_possible', label: 'Coextrusion Possible', type: 'select', placeholder: "Please choose type", options: ['Yes', 'No'] },
