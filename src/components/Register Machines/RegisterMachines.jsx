@@ -47,17 +47,19 @@ function RegisterMachines() {
     const [isChecked, setIsChecked] = useState(false);
     // summary Page
     const [openSummary, setOpenSummary] = useState(false);
+    // others input field during select option
+    const [selectedType, setSelectedType] = useState('');
 
     console.log("machineInputsyo: ", machineInputs["Machining"]);
 
     const machineFieldsFromApi = async () => {
         try {
             const data = await getMachinesByCatAndType();
-            console.log("machineFieldsFromApi: ", data);
+            // console.log("machineFieldsFromApi: ", data);
             setMachineFieldsApi(data);
             const keys = Object.keys(data);
-            setOptionsCategory(keys);
-            console.log("setOptionsCategory fields:", keys);
+            setOptionsCategory(keys.sort());
+            // console.log("setOptionsCategory fields:", keys);
 
         } catch (error) {
             console.log("error fields:", error);
@@ -76,7 +78,8 @@ function RegisterMachines() {
         console.log("inputVal: ", inputVal);
         const values = Object.keys(machineInputs[inputVal]);
         if (values) {
-            setOptionsTypeMachine(values);
+            console.log("inputVa valuesl: ", values);
+            setOptionsTypeMachine(values.sort());
         }
     }
 
@@ -200,7 +203,15 @@ function RegisterMachines() {
     );
 
     const handleInputChange = (e) => {
-        // console.log("e.target: ", e);
+        console.log("e.target: ", e);
+        // if (e.target.id == "brand") {
+        //     const regex = /^[a-zA-Z0-9\s]*$/;
+        //     if(regex.test(e.target.value)){
+        //         return true;
+        //     }else{
+        //         alert("provide valid brand")
+        //     }
+        // }
         if (e.target.id == "noOfMachines") {
             if (e.target.value > 1) {
                 setOpenIdenticalCheck(true);
@@ -226,6 +237,7 @@ function RegisterMachines() {
         // Ex: BandSaw -> Band Saw or ConventionalLathe -> Conventional Lathe
         return input.replace(/([a-z])([A-Z])/g, '$1 $2');
     }
+
 
     return (
         <>
@@ -272,20 +284,24 @@ function RegisterMachines() {
                                 <Col span={24}>
                                     <Form.Item key={field.name} label={field.label} name={field.name} rules={[
                                         { required: true, message: `Please input ${field.label}` },
-                                        { pattern: field.pattern == 'real' ? /^(?=.*\d)\d+(\.\d{1,2})?$/ : field.pattern ? field.pattern : '', message: `Please provide a valid ${field.label}` }
+                                        { pattern: field.pattern == 'real' ? /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/ : 'rate' ? /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/ : field.pattern ? field.pattern : null, message: `Please provide a valid ${field.label}` }
                                     ]}>
                                         {field.type === 'select' ? (
-                                            <Select name={field.name} placeholder={field.placeholder}>
-                                                {field.options.map((option) => (
-                                                    <Select.Option key={option} value={option}>{option}</Select.Option>
-                                                ))}
-                                            </Select>
+                                            <>
+                                                <Select name={field.name} placeholder={field.placeholder}>
+                                                    {field.options.map((option) => (
+                                                        <Select.Option key={option} value={option}>{option}</Select.Option>
+                                                    ))}
+                                                </Select>
+                                            </>
+
                                         ) : (
                                             <>
 
-                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength ? field.maxLength : 6} />
+                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.pattern == 'real' ? 8 : field.maxLength ? field.maxLength : 6} />
                                             </>
                                         )}
+
                                     </Form.Item>
                                 </Col>
                             </Row>
