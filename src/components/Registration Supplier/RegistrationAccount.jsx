@@ -122,9 +122,9 @@ const RegistrationAccount = () => {
         { id: 4, value: "Proprietary" }
     ];
 
-    const onChangeOwnership = (e) => {
-        setSelectedOwnership(e.target.value)
-        console.log("onChangeOwnership: ", e);
+    const onChangeOwnership = (value) => {
+        setSelectedOwnership(value)
+        console.log("onChangeOwnership: ", value);
     }
 
     const beforeUpload = (file) => {
@@ -1196,12 +1196,13 @@ const RegistrationAccount = () => {
                                     placeholder="Select your ownership pattern"
                                     onChange={onChangeOwnership}
                                     style={{ width: "90%" }}
+                                    options={ownership}
                                 >
-                                    {ownership.map((owner) => (
+                                    {/* {ownership.map((owner) => (
                                         <Select.Option key={owner.id} value={owner.value}>
                                             {owner.value}
                                         </Select.Option>
-                                    ))}
+                                    ))} */}
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -1382,7 +1383,7 @@ const RegistrationAccount = () => {
                                     message: "Please provide a valid bank account number"
                                 }
                             ]}>
-                                <Input placeholder="Enter bank account number" />
+                                <Input placeholder="Enter bank account number" maxLength={16}/>
                             </Form.Item>
                         </Col>
 
@@ -1453,7 +1454,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch MICR Code (Ex: 600002025)" />
+                                <Input placeholder="Enter your bank branch MICR Code (Ex: 600002025)" maxLength={9} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1471,7 +1472,7 @@ const RegistrationAccount = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" />
+                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" maxLength={10} />
                             </Form.Item>
                         </Col>
                     </Row>
