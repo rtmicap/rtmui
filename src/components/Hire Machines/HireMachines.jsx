@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result, Empty } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result, Empty, Divider } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
@@ -10,6 +10,9 @@ const { Option } = Select;
 import Config from '../../env.json'
 import { useAuth } from '../../contexts/AuthContext';
 import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import { Avatar, List } from 'antd';
+import "./style.css";
 
 function HireMachines() {
     const { authUser } = useAuth();
@@ -198,6 +201,13 @@ function HireMachines() {
     //     )
     // }
 
+    const IconText = ({ icon, text }) => (
+        <Space>
+            {React.createElement(icon)}
+            {text}
+        </Space>
+    );
+
     return (
         <>
             <HeaderTitle title={'Hire a Machine'} />
@@ -276,86 +286,61 @@ function HireMachines() {
             }} /></Spin>}
 
             {/* Display All Machines */}
-            <Row gutter={[16, 16]}>
-                {!loading && totalPages > 0 &&
-                    showAllMachines.map((machine) => (
-                        <Col Col key={machine.id} xs={24} sm={12} md={8} lg={6}>
-                            <Badge.Ribbon text={formatUpperCase(machine.Category)} color='red'>
-                                {/* <Card
-                                    hoverable
-                                    cover={<img alt="example" src={`https://picsum.photos/200/300?random=${machine.id}`} style={{ objectFit: 'cover', maxHeight: 200 }} />}
+            {!loading && totalPages > 0 &&
+                <List
+                    itemLayout="vertical"
+                    size="large"
+                    pagination={{
+                        onChange: (page) => handlePageChange(page),
+                        total: totalPages,
+                        defaultCurrent: pages,
+                        // pageSize: 3,
+                    }}
+                    dataSource={showAllMachines}
+                    renderItem={(item) => (
+                        <>
+                            <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
+                                <List.Item
+                                    key={item.CompanyName}
                                     actions={[
-                                        <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
-                                        <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
+                                        <Button type='link' icon={<WechatOutlined />}>Chat with Supplier</Button>,
+                                        <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
+                                        <Button type="primary" onClick={() => navigate(`booking/${item.id}`)}>Book Machine</Button>,
                                     ]}
-                                    style={{ width: '100%' }}
-                                    title={machine.companyName}
+                                    extra={
+                                        <img
+                                            width={280}
+                                            alt="logo"
+                                            src={`https://picsum.photos/280/190?random=${item.id}`}
+                                        />
+                                    }
                                 >
-                                    <Meta style={{ fontWeight: "bold", textAlign: "left" }} description={machine.Machine_Type} />
-                                    <Meta
-                                        description={
-                                            <ul style={{ fontWeight: "bold", listStyle: 'none', textAlign: "left" }}>
-                                                <li>{formatUpperCase('Brand')}: {machine.Brand}</li>
-                                                <li>{formatUpperCase('Year')}: {machine.Year_of_Purchase}</li>
-                                                <li>{formatUpperCase('Model')}: {machine.Model}</li>
-                                                <li>{formatUpperCase('Score')}: {machine.Score}</li>
-                                            </ul>
-                                        }
-
+                                    <List.Item.Meta
+                                        // avatar={<Avatar src={item.avatar} />}
+                                        title={<a>{item.CompanyName}</a>}
+                                        description={<span style={{ fontWeight: 'bold', color: 'blue' }}>Type: {item.Machine_Type}</span>}
                                     />
-                                </Card> */}
-                                <Card
-                                    style={{ width: '100%', marginTop: 16 }}
-                                    cover={<img alt="example" src="https://via.placeholder.com/150" style={{ objectFit: 'cover', maxHeight: 200 }} />}
-                                    actions={[
-                                        <Button onClick={() => handleViewDetail(machine)}>View Details</Button>,
-                                        <Button type="primary" onClick={() => navigate(`booking/${machine.id}`)}>Book</Button>,
-                                    ]}
-                                    hoverable
-                                >
-                                    <Meta
-                                        title={formatUpperCase(machine.CompanyName)}
-                                        description={
-                                            <div>
-                                                {/* <p>Category: {machine.Category}</p> */}
-                                                <p>Machine Type: {machine.Machine_Type}</p>
-                                                <p>Machine Hour Rate: {machine.Machine_Hour_Rate}</p>
-                                                <p>Year: {machine.Year_of_Purchase}</p>
-                                                <p>Rating: {machine.Score}</p>
-                                                <Button type="link" icon={<WechatOutlined />} onClick={() => handleViewDetail(machine)} size='small'>Chat with Supplier</Button>,
+                                    <ul id='ul'>
+                                        <li>{formatUpperCase('Brand')}: <strong>{item.Brand}</strong></li>
+                                        <li>{formatUpperCase('Year')}: <strong>{item.Year_of_Purchase}</strong></li>
+                                        <li>{formatUpperCase('Model')}: <strong>{item.Model}</strong></li>
+                                        <li>{formatUpperCase('Score')}: <strong>{item.Score}</strong></li>
+                                    </ul>
 
-                                            </div>
-                                        }
-                                    />
-                                </Card>
+                                </List.Item>
                             </Badge.Ribbon>
-                        </Col>
+                            <Divider />
+                        </>
+                    )}
+                />
+            }
 
-                    ))
-                }
-            </Row>
             {/* No Machines */}
             {totalPages == 0 &&
                 <>{noData}</>
             }
 
             <br />
-            {/* Machines Pagination */}
-
-            {!loading && totalPages > 0 &&
-                <Row gutter={[16, 16]}>
-                    <Pagination
-                        // showSizeChanger
-                        // onShowSizeChange={onShowSizeChange}
-                        defaultCurrent={pages}
-                        total={totalPages}
-                        onChange={handlePageChange}
-                        showTitle
-                    />
-                </Row>
-            }
-
-
             {/* // View Details */}
             {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
         </>
