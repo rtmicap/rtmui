@@ -11,6 +11,8 @@ import { generateId } from "../../utils/GenerateRandomId";
 
 import { useAuth } from "../../contexts/AuthContext";
 const { TextArea } = Input;
+import config from "../../env.json";
+import axios from 'axios';
 
 const getBase64 = (img) => {
     const reader = new FileReader();
@@ -107,14 +109,29 @@ function RegisterMachines() {
         setPreviewOpen(true);
         setPreviewTitle(file.name);
     };
-    const handleChange = ({ fileList: newFileList }) => {
-        console.log("newFileList: ", newFileList[0]);
-        console.log("newFileList: ", newFileList[0].uid);
-        console.log("newFileList: ", newFileList[0].thumbUrl);
-        if (newFileList && newFileList.length > 0) {
-            setImageBase64(newFileList[0].uid);
+    const handleImageChange = async ({ fileList: newFileList }) => {
+        // console.log("newFileList: ", newFileList[0]);
+        // console.log("newFileList: ", newFileList[0].uid);
+        try {
+            if (newFileList && newFileList.length > 0) {
+                const configHeaders = {
+                    headers: { "content-type": "multipart/form-data" },
+                };
+                const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
+                const formData = new FormData();
+                formData.append("Machine_Photo", newFileList[0].originFileObj);
+                var response = await axios.post(baseUrl, formData, configHeaders);
+                console.log("responseData: ", response);
+                setImageBase64(response.data)
+            }
+            setFileList(newFileList);
+
+        } catch (error) {
+            console.log("responseData error: ", error);
+            message.error(`Error while uploading the Image ${error.message}`);
         }
-        setFileList(newFileList);
+
+
     }
 
 
@@ -204,14 +221,7 @@ function RegisterMachines() {
 
     const handleInputChange = (e) => {
         console.log("e.target: ", e);
-        // if (e.target.id == "brand") {
-        //     const regex = /^[a-zA-Z0-9\s]*$/;
-        //     if(regex.test(e.target.value)){
-        //         return true;
-        //     }else{
-        //         alert("provide valid brand")
-        //     }
-        // }
+      
         if (e.target.id == "noOfMachines") {
             if (e.target.value > 1) {
                 setOpenIdenticalCheck(true);
@@ -284,7 +294,7 @@ function RegisterMachines() {
                                 <Col span={24}>
                                     <Form.Item key={field.name} label={field.label} name={field.name} rules={[
                                         { required: true, message: `Please input ${field.label}` },
-                                        { pattern: field.pattern == 'real' ? /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/ : 'rate' ? /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/ : field.pattern ? field.pattern : null, message: `Please provide a valid ${field.label}` }
+                                        { pattern: field.pattern, message: `Please provide a valid ${field.label}` }
                                     ]}>
                                         {field.type === 'select' ? (
                                             <>
@@ -298,7 +308,7 @@ function RegisterMachines() {
                                         ) : (
                                             <>
 
-                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.pattern == 'real' ? 8 : field.maxLength ? field.maxLength : 6} />
+                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength} />
                                             </>
                                         )}
 
@@ -354,7 +364,7 @@ function RegisterMachines() {
                                     listType="picture-card"
                                     fileList={fileList}
                                     onPreview={handlePreview}
-                                    onChange={handleChange}
+                                    onChange={handleImageChange}
                                     beforeUpload={() => false}
                                     accept=".png,.jpeg,.jpg"
                                 >
