@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, AutoComplete, Spin, Form, Modal, Badge, Pagination, message, Result, Empty, Divider } from 'antd';
+import { Card, Col, Row, Button, Input, Space, Select, Statistic, Spin, Form, Modal, Badge, Dropdown, message, Result, Empty, Divider, Typography } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
@@ -10,9 +10,11 @@ const { Option } = Select;
 import Config from '../../env.json'
 import { useAuth } from '../../contexts/AuthContext';
 import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, DownOutlined } from '@ant-design/icons';
 import { Avatar, List } from 'antd';
 import "./style.css";
+
+const { Title, Text } = Typography;
 
 function HireMachines() {
     const { authUser } = useAuth();
@@ -146,13 +148,21 @@ function HireMachines() {
         setPassData(machine);
     }
 
+    const viewImageFile = (fileName) => {
+        // check app.js file in server side for reference (app.use static)
+        const baseUrl = `${Config.localEndpoint}/others/${fileName}`;
+        return baseUrl;
+    }
+
     useEffect(() => {
         getAllMachinesCategoryAndType();
         // getAllMachines();
     }, []);
 
+
+
     const formatUpperCase = (text) => {
-        return text.toUpperCase();
+        return <strong>{text.toUpperCase()}</strong>;
     }
 
     const onShowSizeChange = (current, pageSize) => {
@@ -207,6 +217,13 @@ function HireMachines() {
             {text}
         </Space>
     );
+
+    const items = [
+        {
+            key: '1',
+            label: 'Nearest to Farthest',
+        }
+    ];
 
     return (
         <>
@@ -270,6 +287,19 @@ function HireMachines() {
                         <Button type="primary" onClick={fetchData} style={{ marginTop: "30px" }}>Search</Button>
                     </Col>
                     <Col>
+                        <Select
+                            placeholder="Sort By"
+                            defaultActiveFirstOption
+                            style={{
+                                width: 170,
+                                marginTop: "30px"
+                            }}
+                            options={[
+                                { value: 'location', label: 'Nearest to Farthest' },
+                            ]}
+                        />
+                    </Col>
+                    <Col>
                         <Button onClick={clearSearch} style={{ marginTop: "30px" }}>Clear search</Button>
                     </Col>
                 </Row>
@@ -290,6 +320,7 @@ function HireMachines() {
                 <List
                     itemLayout="vertical"
                     size="large"
+                    bordered
                     pagination={{
                         onChange: (page) => handlePageChange(page),
                         total: totalPages,
@@ -297,10 +328,11 @@ function HireMachines() {
                         // pageSize: 3,
                     }}
                     dataSource={showAllMachines}
-                    renderItem={(item) => (
+                    renderItem={(item, index) => (
                         <>
                             <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
                                 <List.Item
+                                    style={{ background: index % 2 === 0 ? '#ffffff' : '#EEE2DE' }}
                                     key={item.CompanyName}
                                     actions={[
                                         <Button type='link' icon={<WechatOutlined />}>Chat with Supplier</Button>,
@@ -309,27 +341,36 @@ function HireMachines() {
                                     ]}
                                     extra={
                                         <img
-                                            width={280}
-                                            alt="logo"
-                                            src={`https://picsum.photos/280/190?random=${item.id}`}
+                                            width={200}
+                                            alt="machine image"
+                                            // src={`https://picsum.photos/280/190?random=${item.id}`}
+                                            src={viewImageFile(item.Machine_Photo)}
                                         />
                                     }
                                 >
                                     <List.Item.Meta
-                                        // avatar={<Avatar src={item.avatar} />}
+                                        bordered={true}
+                                        avatar={<Title level={5}>Machine ID: <a>{item.id}</a></Title>}
                                         title={<a>{item.CompanyName}</a>}
-                                        description={<span style={{ fontWeight: 'bold', color: 'blue' }}>Type: {item.Machine_Type}</span>}
+                                        description={<><Text strong>{formatUpperCase("Type of Machine")}:</Text>&nbsp;<span style={{ fontWeight: 'bold', color: 'blue' }}>{item.Machine_Type}</span></>}
                                     />
-                                    <ul id='ul'>
-                                        <li>{formatUpperCase('Brand')}: <strong>{item.Brand}</strong></li>
-                                        <li>{formatUpperCase('Year')}: <strong>{item.Year_of_Purchase}</strong></li>
-                                        <li>{formatUpperCase('Model')}: <strong>{item.Model}</strong></li>
-                                        <li>{formatUpperCase('Score')}: <strong>{item.Score}</strong></li>
-                                    </ul>
-
+                                    <Row gutter={16}>
+                                        <Col span={12}>
+                                            <Statistic title={formatUpperCase('Brand')} value={item.Brand} />
+                                        </Col>
+                                        <Col span={12}>
+                                            <Statistic title={formatUpperCase('Machine Hour Rate')} value={item.Machine_Hour_Rate} />
+                                        </Col>
+                                        <Col span={12}>
+                                            <Statistic title={formatUpperCase('Model')} value={item.Model} />
+                                        </Col>
+                                        <Col span={12}>
+                                            <Statistic title={formatUpperCase('Score')} value={item.Score} />
+                                        </Col>
+                                    </Row>
                                 </List.Item>
                             </Badge.Ribbon>
-                            <Divider />
+                            {/* <Divider orientation="left">Small Size</Divider> */}
                         </>
                     )}
                 />

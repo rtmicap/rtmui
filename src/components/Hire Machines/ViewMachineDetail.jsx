@@ -10,6 +10,13 @@ function ViewMachineDetail({ open, setOpen, machine }) {
         return input.replace(/([a-z])([A-Z])/g, '$1 $2');
     }
 
+    function formatVariableFieldsString(str) {
+        return str
+            .split('_')                // Split the string by underscores
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))  // Capitalize the first letter of each word
+            .join(' ');                // Join the words back into a string with spaces
+    }
+
     const items = [
         {
             label: 'Machine Name',
@@ -89,9 +96,38 @@ function ViewMachineDetail({ open, setOpen, machine }) {
                 <img alt="example" src={`https://picsum.photos/250/200?random=${machine.id}`} />
             ),
         },
+        {
+            label: 'Other Details',
+            span: {
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 2,
+                xxl: 2,
+            },
+            children: (
+                <>
+                    <ul style={{ listStyle: 'none' }}>
+                        {Object.keys(machine.Variable_fields).map((key, index) => {
+                            return (
+                                <li key={index}>{formatVariableFieldsString(key)}-&nbsp;&nbsp;<strong>{machine.Variable_fields[key]}</strong></li>
+                            )
+                        })}
+                    </ul>
+                </>
+            )
+        },
     ];
 
-  
+
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+    const handleOk = () => {
+        setOpen(false);
+    };
 
     return (
         <>
@@ -101,20 +137,13 @@ function ViewMachineDetail({ open, setOpen, machine }) {
                 open={open}
                 width={1300}
                 footer={[
-                    <Button type='primary' onClick={() => setOpen(false)}>
+                    <Button type='primary' onClick={handleOk}>
                         Okay
                     </Button>
                 ]}
-                onCancel={() => setOpen(false)}
+                // onOk={handleOk}
+                onCancel={() => { setOpen(false) }}
             >
-                {/* <ul>
-                    {Object.entries(machines).map((key) => (
-                        <li key={key}>
-                            <strong>{key}:</strong> {machines[key]}
-                        </li>
-                    ))}
-                    <li>{machine.Machine_Name}</li>
-                </ul> */}
                 <Descriptions
                     // title="Responsive Descriptions"
                     bordered
