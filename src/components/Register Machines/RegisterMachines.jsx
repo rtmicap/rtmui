@@ -117,12 +117,13 @@ function RegisterMachines() {
                 const configHeaders = {
                     headers: { "content-type": "multipart/form-data" },
                 };
-                const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
+                // const baseUrl = `${config.localEndpoint}/api/machines/uploadMachineImage`;
+                const baseUrl = `${config.rtmWsEndpoint}/api/uploadfile/uploadToB2`;
                 const formData = new FormData();
-                formData.append("Machine_Photo", newFileList[0].originFileObj);
+                formData.append("fileName", newFileList[0].originFileObj);
                 var response = await axios.post(baseUrl, formData, configHeaders);
                 console.log("responseData: ", response);
-                setImageBase64(response.data)
+                setImageBase64(response.data.fileUrl)
             }
             setFileList(newFileList);
 
@@ -221,7 +222,7 @@ function RegisterMachines() {
 
     const handleInputChange = (e) => {
         console.log("e.target: ", e);
-      
+
         if (e.target.id == "noOfMachines") {
             if (e.target.value > 1) {
                 setOpenIdenticalCheck(true);

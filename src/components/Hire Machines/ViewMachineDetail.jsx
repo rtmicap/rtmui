@@ -93,7 +93,8 @@ function ViewMachineDetail({ open, setOpen, machine }) {
                 xxl: 2,
             },
             children: (
-                <img alt="example" src={`https://picsum.photos/250/200?random=${machine.id}`} />
+                // <img alt="example" src={`https://picsum.photos/250/200?random=${machine.id}`} />
+                <img alt="Machine Image" src={machine.Machine_Photo} />
             ),
         },
         {

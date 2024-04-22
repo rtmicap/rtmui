@@ -44,9 +44,9 @@ function Booking() {
         <>
             <h2>Machine Booking Process {machineId}</h2>
             <div style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                <Tooltip title="Go Back">
-                    <Button type="dashed" shape="circle" icon={<CaretLeftOutlined />} onClick={() => navigate(-1)} />
-                </Tooltip>
+                <Button type="primary" shape="round" icon={<CaretLeftOutlined />} onClick={() => navigate(-1)}>
+                    Go Back
+                </Button>
             </div>
             <Divider plain></Divider>
             <Form

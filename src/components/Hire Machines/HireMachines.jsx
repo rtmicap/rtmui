@@ -148,12 +148,6 @@ function HireMachines() {
         setPassData(machine);
     }
 
-    const viewImageFile = (fileName) => {
-        // check app.js file in server side for reference (app.use static)
-        const baseUrl = `${Config.localEndpoint}/others/${fileName}`;
-        return baseUrl;
-    }
-
     useEffect(() => {
         getAllMachinesCategoryAndType();
         // getAllMachines();
@@ -344,7 +338,7 @@ function HireMachines() {
                                             width={200}
                                             alt="machine image"
                                             // src={`https://picsum.photos/280/190?random=${item.id}`}
-                                            src={viewImageFile(item.Machine_Photo)}
+                                            src={item.Machine_Photo}
                                         />
                                     }
                                 >
