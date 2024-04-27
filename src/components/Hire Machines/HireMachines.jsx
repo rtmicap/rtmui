@@ -44,7 +44,7 @@ function HireMachines() {
     const fetchData = async (pages) => {
         try {
             setLoading(true);
-            const baseUrl = `${Config.localEndpoint}/api/booking/searchMachines`;
+            const baseUrl = `${Config.rtmWsEndpoint}/api/booking/searchMachines`;
 
             // query parameters
             const queryParams = {
@@ -75,7 +75,7 @@ function HireMachines() {
 
     const getAllMachinesCategoryAndType = async () => {
         try {
-            const baseUrl = `${Config.localEndpoint}/api/machines/getMachinesByCatAndType`;
+            const baseUrl = `${Config.rtmWsEndpoint}/api/machines/getMachinesByCatAndType`;
             // const baseUrl = 'http://localhost:5100/api/machines/getMachinesByCatAndType';
             const response = await axios.get(baseUrl);
             const machineCategories = response.data;
@@ -93,7 +93,7 @@ function HireMachines() {
     const getAllMachines = async (pages) => {
         try {
             setLoading(true);
-            const apiUrl = `${Config.localEndpoint}/api/machines/getAllMachines`;
+            const apiUrl = `${Config.rtmWsEndpoint}/api/machines/getAllMachines`;
             // const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
             const params = {
                 page: pages,
