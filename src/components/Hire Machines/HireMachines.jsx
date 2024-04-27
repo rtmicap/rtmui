@@ -44,7 +44,7 @@ function HireMachines() {
     const fetchData = async (pages) => {
         try {
             setLoading(true);
-            const baseUrl = `${Config.rtmWsEndpoint}/api/booking/searchMachines`;
+            const baseUrl = `${Config.localEndpoint}/api/booking/searchMachines`;
 
             // query parameters
             const queryParams = {
@@ -75,7 +75,7 @@ function HireMachines() {
 
     const getAllMachinesCategoryAndType = async () => {
         try {
-            const baseUrl = `${Config.rtmWsEndpoint}/api/machines/getMachinesByCatAndType`;
+            const baseUrl = `${Config.localEndpoint}/api/machines/getMachinesByCatAndType`;
             // const baseUrl = 'http://localhost:5100/api/machines/getMachinesByCatAndType';
             const response = await axios.get(baseUrl);
             const machineCategories = response.data;
@@ -93,7 +93,7 @@ function HireMachines() {
     const getAllMachines = async (pages) => {
         try {
             setLoading(true);
-            const apiUrl = `${Config.rtmWsEndpoint}/api/machines/getAllMachines`;
+            const apiUrl = `${Config.localEndpoint}/api/machines/getAllMachines`;
             // const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
             const params = {
                 page: pages,
@@ -284,6 +284,7 @@ function HireMachines() {
                         <Select
                             placeholder="Sort By"
                             defaultActiveFirstOption
+                            defaultValue={'Nearest to Farthest'}
                             style={{
                                 width: 170,
                                 marginTop: "30px"
@@ -335,13 +336,16 @@ function HireMachines() {
                                         <Button type="primary" onClick={() => navigate(`booking/${item.id}`)}>Book Machine</Button>,
                                     ]}
                                     extra={
-                                        <img
-                                            width={260}
-                                            height={210}
-                                            alt="machine image"
-                                            // src={`https://picsum.photos/280/190?random=${item.id}`}
-                                            src={item.Machine_Photo}
-                                        />
+                                        <>
+                                            <img
+                                                width={260}
+                                                height={210}
+                                                alt="machine image"
+                                                // src={`https://picsum.photos/280/190?random=${item.id}`}
+                                                src={item.Machine_Photo}
+                                            />,
+                                            <Title level={5}>Distance(Kms): <a>{item.distance}</a></Title>
+                                        </>
                                     }
                                 >
                                     <List.Item.Meta

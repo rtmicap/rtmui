@@ -82,21 +82,21 @@ function ViewMachineDetail({ open, setOpen, machine }) {
             },
             children: machine.Score,
         },
-        {
-            label: 'Machine Photo',
-            span: {
-                xs: 1,
-                sm: 2,
-                md: 3,
-                lg: 3,
-                xl: 2,
-                xxl: 2,
-            },
-            children: (
-                // <img alt="example" src={`https://picsum.photos/250/200?random=${machine.id}`} />
-                <img alt="Machine Image" src={machine.Machine_Photo} />
-            ),
-        },
+        // {
+        //     label: 'Machine Photo',
+        //     span: {
+        //         xs: 1,
+        //         sm: 2,
+        //         md: 3,
+        //         lg: 3,
+        //         xl: 2,
+        //         xxl: 2,
+        //     },
+        //     children: (
+        //         // <img alt="example" src={`https://picsum.photos/250/200?random=${machine.id}`} />
+        //         <img alt="Machine Image" src={machine.Machine_Photo} />
+        //     ),
+        // },
         {
             label: 'Other Details',
             span: {
