@@ -336,7 +336,8 @@ function HireMachines() {
                                     ]}
                                     extra={
                                         <img
-                                            width={200}
+                                            width={260}
+                                            height={210}
                                             alt="machine image"
                                             // src={`https://picsum.photos/280/190?random=${item.id}`}
                                             src={item.Machine_Photo}

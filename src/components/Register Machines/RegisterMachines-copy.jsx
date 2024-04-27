@@ -13,13 +13,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const { TextArea } = Input;
 import config from "../../env.json";
 import axios from 'axios';
-import { Cutting } from '../Machine Variable Fields/Cutting';
-import { Turning } from '../Machine Variable Fields/Turning';
-import { MachiningCenters } from '../Machine Variable Fields/MachiningCenters';
-import { PlasticsMoulding } from '../Machine Variable Fields/PlasticsMoulding';
-import { Drilling } from '../Machine Variable Fields/Drilling';
-import { Grinding } from '../Machine Variable Fields/Grinding';
-import { Milling } from '../Machine Variable Fields/Milling';
+
 const getBase64 = (img) => {
     const reader = new FileReader();
     reader.readAsDataURL(img);
@@ -57,20 +51,8 @@ function RegisterMachines() {
     const [openSummary, setOpenSummary] = useState(false);
     // others input field during select option
     const [selectedType, setSelectedType] = useState('');
-    //input fields bind
-    const [machineInputFields, setMachineInputFields] = useState([]);
-    //others select
-    const [selectedOption, setSelectedOption] = useState('');
-    const [othersInput, setOthersInput] = useState(false);
 
-
-    const resetForm = () => {
-        form.resetFields();
-        setType('');
-        setCategory('');
-        setOpenIdenticalCheck(false);
-        setMachineInputFields([]);
-    }
+    // console.log("machineInputsyo: ", machineInputs["Machining"]);
 
     const machineFieldsFromApi = async () => {
         try {
@@ -91,88 +73,35 @@ function RegisterMachines() {
 
     const handleMachineCategory = async (e) => {
         console.log("handleMachineCategory: ", e);
-        setType('');
+        if (e) {
+            setType('');
+        }
         setCategory(e);
-        // console.log("machineInputs: ", machineFieldsApi)
-        const values = Object.values(machineFieldsApi[e]);
-        // console.log("values: ", values)
+        console.log("machineInputs: ", e);
+        const inputVal = e == "Plastics Moulding Machines" ? "Plastics" : e == "Machining Centers" ? "Machining" : e;
+        console.log("inputVal: ", inputVal);
+        const values = Object.keys(machineInputs[inputVal]);
         if (values) {
+            console.log("inputVa valuesl: ", values);
             setOptionsTypeMachine(values.sort());
         }
     }
 
-    const formatPascalCase = (input) => {
-        //Vertical Machining Centers to VerticalMachiningCenters
-        const res = input.replace(/\b(\w)(\w*)/g, function (match, firstChar, restChars) {
-            return firstChar.toUpperCase() + restChars;
-        }).replace(/\s/g, '');
-
-        return res;
-    }
-
-
     const onChangeTypeMachine = async (value) => {
         console.log(`selected ${value}`);
         // const setValue = value == "BlowMouldingMachine" ? "BlowMoulding" : value == "InjectionMoulding" ? "InjectionMoulding" : value;
-        setType(value);
-        // console.log("category: ", category);
-        if (category == "Cutting") {
-            const cutting = Cutting[value];
-            console.log("cutting fields: ", cutting);
-            setMachineInputFields(cutting);
-        } else if (category == "Turning") {
-            const turning = Turning[value];
-            setMachineInputFields(turning);
-        } else if (category == "Machining Centers") {
-            const machining = MachiningCenters[formatPascalCase(value)]
-            setMachineInputFields(machining);
-        } else if (category == "Plastics Moulding Machines") {
-            const plastics = PlasticsMoulding[formatPascalCase(value)]
-            setMachineInputFields(plastics);
-        } else if (category == "Drilling") {
-            const drilling = Drilling[formatPascalCase(value)]
-            setMachineInputFields(drilling);
-        } else if (category == "Grinding") {
-            const grinding = Grinding[formatPascalCase(value)]
-            setMachineInputFields(grinding);
-        } else if (category == "Milling") {
-            const milling = Milling[formatPascalCase(value)]
-            setMachineInputFields(milling);
-        }
-        else {
-            setCategory('');
-            setType('');
-            setMachineInputFields([]);
-        }
+        const setValue = value == "BlowMouldingMachine" ? "BlowMouldingMachine" : value == "InjectionMoulding" ? "InjectionMoulding" : value;
+        console.log(`setValue ${setValue}`);
+        setType(setValue);
+        console.log("final: ", machineInputs[category][setValue]);
     };
 
-
-    function formatString(input) {
-        // Replace occurrences of '([a-z])([A-Z])' with '$1 $2'
-        // Ex: BandSaw -> Band Saw or ConventionalLathe -> Conventional Lathe
-        return input.replace(/([a-z])([A-Z])/g, '$1 $2');
-    }
-
-    const handleInputChange = (e) => {
-        console.log("e.target: ", e);
-
-        if (e.target.id == "noOfMachines") {
-            if (e.target.value > 1) {
-                setOpenIdenticalCheck(true);
-            } else {
-                setOpenIdenticalCheck(false);
-            }
+    const beforeUpload = (file) => {
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+            message.error('You can only upload image files!');
         }
-    }
-
-    const handleSelectChange = (value) => {
-        console.log("handleSelectCHange: ", value);
-        setSelectedOption(value);
-    }
-
-    const handleCheckboxChange = (e) => {
-        console.log("e.target: ", e.target);
-        setIsChecked(e.target.checked);
+        return isImage;
     };
 
     const handlePreview = async (file) => {
@@ -185,7 +114,6 @@ function RegisterMachines() {
         setPreviewOpen(true);
         setPreviewTitle(file.name);
     };
-
     const handleImageChange = async ({ fileList: newFileList }) => {
         // console.log("newFileList: ", newFileList[0]);
         // console.log("newFileList: ", newFileList[0].uid);
@@ -210,7 +138,26 @@ function RegisterMachines() {
         }
 
 
-    };
+    }
+
+
+    const handleCancel = () => setPreviewOpen(false);
+
+
+
+
+    const handleToSummary = () => {
+        form.validateFields.then((values) => {
+            console.log("handleToSummary: ", values);
+        })
+    }
+
+    const resetForm = () => {
+        form.resetFields();
+        setType('');
+        setCategory('');
+        setOpenIdenticalCheck(false);
+    }
 
     const onFinish = async (values) => {
         // Handle form submission here
@@ -245,7 +192,7 @@ function RegisterMachines() {
         localStorage.setItem('machines', JSON.stringify(existingFormDataArray));
         if (existingFormDataArray && existingFormDataArray.length > 0) {
             setOpenSummary(true);
-            message.success("Wooh! Your data has been submitted.")
+            message.success("Woah! Your data has been submitted.")
         }
 
     };
@@ -277,17 +224,78 @@ function RegisterMachines() {
             </div>
         </button>
     );
-    const handleCancel = () => setPreviewOpen(false);
+
+    const handleInputChange = (e) => {
+        console.log("e.target: ", e);
+
+        if (e.target.id == "noOfMachines") {
+            if (e.target.value > 1) {
+                setOpenIdenticalCheck(true);
+            } else {
+                setOpenIdenticalCheck(false);
+            }
+        }
+    }
+
+    const handleCheckboxChange = (e) => {
+        console.log("e.target: ", e.target);
+        setIsChecked(e.target.checked);
+    };
 
     if (openSummary) {
         return (
             <SummaryPage openSummary={openSummary} setOpenSummary={setOpenSummary} resetForm={resetForm} />
         )
     }
+
+    function formatString(input) {
+        // Replace occurrences of '([a-z])([A-Z])' with '$1 $2'
+        // Ex: BandSaw -> Band Saw or ConventionalLathe -> Conventional Lathe
+        return input.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
+    const machining = () => {
+        if (category == "Plastics" && type == "InjectionMoulding") {
+            return (
+                <>
+                    {machineInputs[Plastics][InjectionMoulding].map((field) => (
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                <Form.Item key={field.name} label={field.label} name={field.name} rules={[
+                                    { required: true, message: `Please input ${field.label}` },
+                                    { pattern: field.pattern, message: `Please provide a valid ${field.label}` }
+                                ]}>
+                                    {field.type === 'select' ? (
+                                        <>
+                                            <Select name={field.name} placeholder={field.placeholder}>
+                                                {field.options.map((option) => (
+                                                    <Select.Option key={option} value={option}>{option}</Select.Option>
+                                                ))}
+                                            </Select>
+                                        </>
+
+                                    ) : (
+                                        <>
+
+                                            <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength} />
+                                        </>
+                                    )}
+
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    ))}
+                </>
+            )
+        }
+    }
+
+
     return (
         <>
             <HeaderTitle title={'Register Machine'} />
-            <Form form={form} layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
+            <Form form={form} onFinish={onFinish}
+                onFinishFailed={onFinishFailed} layout="vertical">
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                         <Form.Item name={"category"} label="Machine Category" rules={[
@@ -295,7 +303,6 @@ function RegisterMachines() {
                             <Select
                                 placeholder="Please choose the machine category"
                                 onChange={handleMachineCategory}
-                                value={category}
                             >
                                 {optionsCategory.map((item, index) => (
                                     <Select.Option key={index} value={item}>{item}</Select.Option>
@@ -310,10 +317,9 @@ function RegisterMachines() {
                             <Select
                                 placeholder="Please choose the machine type"
                                 onChange={onChangeTypeMachine}
-                                value={type}
                             >
                                 {optionsTypeMachine.map((item, index) => (
-                                    <Select.Option key={index} value={item}>{item}</Select.Option>
+                                    <Select.Option key={index} value={item}>{formatString(item)}</Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
@@ -323,46 +329,39 @@ function RegisterMachines() {
                 {/* Update Machine Forms Fields here */}
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                        {/* Machines Fields goes here */}
-                        {machineInputFields.map((field) => (
-                            <Row gutter={[16, 16]} key={field.label}>
+                        {console.log("logogogog car: ", category)}
+                        {console.log("logogogog: ", type)}
+                        {console.log("logog machineInputs: ", category && type && machineInputs[category][type])}
+                        {category && type && machineInputs[category][type].map((field) => (
+                            <Row gutter={[16, 16]}>
                                 <Col span={24}>
+                                    <Form.Item key={field.name} label={field.label} name={field.name} rules={[
+                                        { required: true, message: `Please input ${field.label}` },
+                                        { pattern: field.pattern, message: `Please provide a valid ${field.label}` }
+                                    ]}>
+                                        {field.type === 'select' ? (
+                                            <>
+                                                <Select name={field.name} placeholder={field.placeholder}>
+                                                    {field.options.map((option) => (
+                                                        <Select.Option key={option} value={option}>{option}</Select.Option>
+                                                    ))}
+                                                </Select>
+                                            </>
 
-                                    {field.type === 'select' ? (
-                                        <>
-                                            <Form.Item label={field.label} name={field.name} rules={[
-                                                { required: true, message: `Please input ${field.label}` },
-                                                { pattern: field.pattern, message: `Please provide a valid ${field.label}` }
-                                            ]}>
-                                                <Select placeholder={field.placeholder} onChange={handleSelectChange} options={field.options} />
-                                            </Form.Item>
-                                            {selectedOption === 'Others' && (
-                                                <Form.Item name={field.name + ' ' + 'Others'} label={field.label + ' ' + 'Others'} rules={[{ required: true, message: 'Please specify others name!' }]}>
-                                                    <Input
-                                                        // name={field.name}
-                                                        placeholder="Please specify"
-                                                        onChange={handleInputChange}
-                                                        maxLength={20}
-                                                    />
-                                                </Form.Item>
-                                            )}
-                                        </>
+                                        ) : (
+                                            <>
 
-                                    ) : (
-                                        <>
-                                            <Form.Item label={field.label} name={field.name} rules={[
-                                                { required: true, message: `Please input ${field.label}` },
-                                                { pattern: field.pattern, message: `Please provide a valid ${field.label}` }
-                                            ]}>
-                                                <Input placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength} />
-                                            </Form.Item>
-                                        </>
-                                    )}
+                                                <Input name={field.name} placeholder={field.placeholder} onChange={handleInputChange} maxLength={field.maxLength} />
+                                            </>
+                                        )}
+
+                                    </Form.Item>
                                 </Col>
                             </Row>
                         ))}
 
-                        {/* If no.of machine is more than 1 */}
+                        {machining}
+
                         {openIdenticalCheck ?
                             <>
                                 <Form.Item name={'identical'} valuePropName='checked' rules={[{ required: true, message: `Please check the box for identical or not` }]}>
@@ -392,6 +391,9 @@ function RegisterMachines() {
                                 </Col>
                             </Row>
                         }
+
+
+
                     </Col>
                     {category && type &&
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -436,7 +438,7 @@ function RegisterMachines() {
                         </Col>
                     }
                 </Row>
-            </Form >
+            </Form>
         </>
     )
 }
