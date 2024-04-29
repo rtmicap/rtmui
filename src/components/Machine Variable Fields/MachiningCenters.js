@@ -20,7 +20,7 @@ export const MachiningCenters = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3  },
     ],
     HorizontalMachiningCenters: [
         { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
@@ -47,7 +47,7 @@ export const MachiningCenters = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
     ],
     DrillTapMachiningCenters: [
         { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
@@ -69,7 +69,7 @@ export const MachiningCenters = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
     ],
     TurnMillMachiningCenters: [
         { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
@@ -90,6 +90,6 @@ export const MachiningCenters = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
     ],
 }

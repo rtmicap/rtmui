@@ -16,7 +16,7 @@ export const PlasticsMoulding = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
     ],
     BlowMouldingMachine: [
         { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
@@ -25,7 +25,7 @@ export const PlasticsMoulding = {
         { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
         { name: 'no_layers_possible', label: 'No of Layers Possible', type: 'text', placeholder: "Enter in number", pattern: /^[0-9]{0,4}$/, maxLength: 4 },
         { name: 'cosextrusion_possible', label: 'Coextrusion Possible', type: 'select', placeholder: "Please choose type", options: [{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }] },
-        { name: 'arctic_max_size_in_litres', label: 'Arctic Max Size', type: 'text', placeholder: "Enter in litres", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
+        { name: 'article_max_size_in_litres', label: 'Article Max Size', type: 'text', placeholder: "Enter in litres", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'production_range_in_litres', label: 'Production Range', type: 'text', placeholder: "Enter in litres", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'max_weight_in_kg', label: 'Maximum Weight', type: 'text', placeholder: "Enter in kg", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'clamping_force_in_kn', label: 'Clamping Force (in KN)', type: 'text', placeholder: "Enter in KN", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
@@ -35,6 +35,6 @@ export const PlasticsMoulding = {
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+        { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
     ]
 }
