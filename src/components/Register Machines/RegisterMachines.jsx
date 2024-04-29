@@ -117,11 +117,11 @@ function RegisterMachines() {
         setType(value);
         // console.log("category: ", category);
         if (category == "Cutting") {
-            const cutting = Cutting[value];
+            const cutting = Cutting[formatPascalCase(value)];
             console.log("cutting fields: ", cutting);
             setMachineInputFields(cutting);
         } else if (category == "Turning") {
-            const turning = Turning[value];
+            const turning = Turning[formatPascalCase(value)];
             setMachineInputFields(turning);
         } else if (category == "Machining Centers") {
             const machining = MachiningCenters[formatPascalCase(value)]
@@ -194,8 +194,8 @@ function RegisterMachines() {
                 const configHeaders = {
                     headers: { "content-type": "multipart/form-data" },
                 };
-                // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
-                const baseUrl = `${config.rtmWsEndpoint}/api/uploadfile/uploadToB2`;
+                // const baseUrl = `${config.localEndpoint}/api/machines/uploadMachineImage`;
+                const baseUrl = `${config.localEndpoint}/api/uploadfile/uploadToB2`;
                 const formData = new FormData();
                 formData.append("fileName", newFileList[0].originFileObj);
                 var response = await axios.post(baseUrl, formData, configHeaders);
