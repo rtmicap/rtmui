@@ -103,9 +103,9 @@ function RegisterMachines() {
 
     const formatPascalCase = (input) => {
         //Vertical Machining Centers to VerticalMachiningCenters
-        const res = input.replace(/\b(\w)(\w*)/g, function (match, firstChar, restChars) {
+        const res = input.replace(/\b(\w)(\w*)/g, function(match, firstChar, restChars) {
             return firstChar.toUpperCase() + restChars;
-        }).replace(/\s/g, '');
+        }).replace(/\s+/g, '');
 
         return res;
     }
@@ -194,8 +194,8 @@ function RegisterMachines() {
                 const configHeaders = {
                     headers: { "content-type": "multipart/form-data" },
                 };
-                // const baseUrl = `${config.localEndpoint}/api/machines/uploadMachineImage`;
-                const baseUrl = `${config.localEndpoint}/api/uploadfile/uploadToB2`;
+                // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
+                const baseUrl = `${config.rtmWsEndpoint}/api/uploadfile/uploadToB2`;
                 const formData = new FormData();
                 formData.append("fileName", newFileList[0].originFileObj);
                 var response = await axios.post(baseUrl, formData, configHeaders);
@@ -324,7 +324,7 @@ function RegisterMachines() {
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                         {/* Machines Fields goes here */}
-                        {machineInputFields.map((field) => (
+                        {machineInputFields && machineInputFields.length > 0 && machineInputFields.map((field) => (
                             <Row gutter={[16, 16]} key={field.label}>
                                 <Col span={24}>
 
@@ -383,7 +383,7 @@ function RegisterMachines() {
                         }
 
                         {/* Comments */}
-                        {category && type &&
+                        {category && type && machineInputFields && machineInputFields.length > 0 &&
                             <Row gutter={[16, 16]}>
                                 <Col span={24}>
                                     <Form.Item label={'Comments (optional)'} name={'comments'} rules={[{ message: `Please input the comments` }]}>
@@ -393,7 +393,7 @@ function RegisterMachines() {
                             </Row>
                         }
                     </Col>
-                    {category && type &&
+                    {category && type && machineInputFields && machineInputFields.length > 0 &&
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item
                                 label="Upload Your Machine Image"
@@ -430,7 +430,7 @@ function RegisterMachines() {
                 </Row>
                 {/* Submit Button */}
                 <Row gutter={[16, 16]}>
-                    {category && type &&
+                    {category && type && machineInputFields && machineInputFields.length > 0 &&
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Button type="primary" htmlType='submit'>Proceed to Submit</Button>
                         </Col>
