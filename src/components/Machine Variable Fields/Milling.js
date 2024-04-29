@@ -1,8 +1,8 @@
 export const Milling = {
     ConventionalMillingMachine: [
-        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: [{ value: 'Horizontal', label: 'Horizontal' }, { value: 'Vertical', label: 'Vertical' }] },
-        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
         { name: 'table_size_in_mm', label: 'Table Size', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'no_of_t_slots', label: 'No of T slots', type: 'text', placeholder: "Enter in number", pattern: /^[0-9]{0,4}$/, maxLength: 4 },

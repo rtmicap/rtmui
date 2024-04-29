@@ -1,9 +1,9 @@
 export const PlasticsMoulding = {
     InjectionMouldingMachine: [
-        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: [{ value: 'Horizontal', label: 'Horizontal' }, { value: 'Vertical', label: 'Vertical' }, { value: 'Two Shot', label: 'Two Shot' }, { value: 'Multi Shot', label: 'Multi Shot' }, { value: 'Micro', label: 'Micro' }] },
         { name: 'clamping_unit', label: 'Clamping Unit', type: 'select', placeholder: "Please choose type", options: [{ value: 'Hydraulic', label: 'Hydraulic' }, { value: 'Electric', label: 'Electric' }, { value: 'Hybrid', label: 'Hybrid' }] },
-        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
         { name: 'shot_weight_in_gms', label: 'Shot Weight (in gms)', type: 'text', placeholder: "Enter in gms", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'screw_dia_in_mm', label: 'Screw Diameter', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
@@ -19,9 +19,9 @@ export const PlasticsMoulding = {
         { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
     ],
     BlowMouldingMachine: [
-        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: [{ value: 'Accumulator Type', label: 'Accumulator Type' }, { value: 'Ring Drum', label: 'Ring Drum' }] },
-        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
+        { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
         { name: 'no_layers_possible', label: 'No of Layers Possible', type: 'text', placeholder: "Enter in number", pattern: /^[0-9]{0,4}$/, maxLength: 4 },
         { name: 'cosextrusion_possible', label: 'Coextrusion Possible', type: 'select', placeholder: "Please choose type", options: [{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }] },
