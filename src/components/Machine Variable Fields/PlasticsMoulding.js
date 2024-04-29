@@ -1,10 +1,10 @@
 export const PlasticsMoulding = {
     InjectionMouldingMachine: [
         { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
-        { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: [{ value: 'Horizontal', label: 'Horizontal' }, { value: 'Vertical', label: 'Vertical' }, { value: 'Two Shot', label: 'Two Shot' }, { value: 'Multi Shot', label: 'Multi Shot' }, { value: 'Micro', label: 'Micro' }] },
-        { name: 'clamping_unit', label: 'Clamping Unit', type: 'select', placeholder: "Please choose type", options: [{ value: 'Hydraulic', label: 'Hydraulic' }, { value: 'Electric', label: 'Electric' }, { value: 'Hybrid', label: 'Hybrid' }] },
         { name: 'model', label: 'Model', type: 'text', placeholder: 'Enter Model', pattern: /^[a-zA-Z0-9-\s]*$/, maxLength: 50 },
         { name: 'yearOfPurchase', label: 'Year of Purchase', type: 'text', placeholder: 'Enter year of purchase', pattern: /^[0-9]{4}$/, maxLength: 4 },
+        { name: 'type', label: 'Type', type: 'select', placeholder: "Please choose type", options: [{ value: 'Horizontal', label: 'Horizontal' }, { value: 'Vertical', label: 'Vertical' }, { value: 'Two Shot', label: 'Two Shot' }, { value: 'Multi Shot', label: 'Multi Shot' }, { value: 'Micro', label: 'Micro' }] },
+        { name: 'clamping_unit', label: 'Clamping Unit', type: 'select', placeholder: "Please choose type", options: [{ value: 'Hydraulic', label: 'Hydraulic' }, { value: 'Electric', label: 'Electric' }, { value: 'Hybrid', label: 'Hybrid' }] },
         { name: 'shot_weight_in_gms', label: 'Shot Weight (in gms)', type: 'text', placeholder: "Enter in gms", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'screw_dia_in_mm', label: 'Screw Diameter', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'injection_rate_in_cc/s', label: 'Injection Rate', type: 'text', placeholder: "Enter in cc/s", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
@@ -30,8 +30,8 @@ export const PlasticsMoulding = {
         { name: 'max_weight_in_kg', label: 'Maximum Weight', type: 'text', placeholder: "Enter in kg", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'clamping_force_in_kn', label: 'Clamping Force (in KN)', type: 'text', placeholder: "Enter in KN", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'mold_envelope_height_in_mm', label: 'Mold Envelope Height', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-        { name: 'width_in_mm', label: 'Width', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-        { name: 'thickness_in_mm', label: 'Thickness', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
+        { name: 'mold_envelope_width_in_mm', label: 'Mold Envelope Width', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
+        { name: 'mold_envelope_thickness_in_mm', label: 'Mold Envelope Thickness', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
         { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
         { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
