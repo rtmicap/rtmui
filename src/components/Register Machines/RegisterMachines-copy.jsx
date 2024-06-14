@@ -27,7 +27,7 @@ const getBase64 = (img) => {
 };
 
 
-function RegisterMachines() {
+function RegistrationMachines() {
     const { authUser } = useAuth();
     const [form] = Form.useForm();
     const machineInputs = machineFields;
@@ -122,8 +122,8 @@ function RegisterMachines() {
                 const configHeaders = {
                     headers: { "content-type": "multipart/form-data" },
                 };
-                // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
-                const baseUrl = `${config.rtmWsEndpoint}/api/uploadfile/uploadToB2`;
+                // const baseUrl = `${config.localEndpoint}/api/machines/uploadMachineImage`;
+                const baseUrl = `${config.localEndpoint}/api/uploadfile/uploadToB2`;
                 const formData = new FormData();
                 formData.append("fileName", newFileList[0].originFileObj);
                 var response = await axios.post(baseUrl, formData, configHeaders);
@@ -443,4 +443,4 @@ function RegisterMachines() {
     )
 }
 
-export default RegisterMachines
+export default RegistrationMachines

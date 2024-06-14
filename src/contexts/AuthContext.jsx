@@ -1,18 +1,20 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import config from "../env.json";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { currentUser, login } from "../components/Api/apiServices";
 import Cookies from "js-cookie";
+import axios from "../api/axios";
 
 const AuthContext = createContext();
-
 
 export const AuthContextProvider = ({ children }) => {
     const [authUser, setAuthUser] = useState(null);
     const [error, setError] = useState('');
     const [isLoadingUser, setLoadingUser] = useState(true);
     const [isLoading, setLoading] = useState(false);
+    // api url
+    const LOGIN_URL = "/users/login";
+    const CURRENT_USER_URL = "/users/currentUser";
 
     const navigate = useNavigate();
 
@@ -34,14 +36,14 @@ export const AuthContextProvider = ({ children }) => {
     const userLogin = (user, callbackFun) => {
         // console.log("userLogin: ", user);
         fetchStart();
-        login(user).then((loginResponse) => {
+        axios.post(LOGIN_URL, user).then((loginResponse) => {
             console.log("loginResponse: ", loginResponse);
             const { data } = loginResponse;
             if (data && data.authStatus && data.userData) { // supplier account
                 fetchSuccess();
                 axios.defaults.headers.common['authorization'] = 'Bearer ' + data.token;
                 // Cookies.set('authToken', data.token);
-                localStorage.setItem('userToken', data.token);
+                localStorage.setItem('authToken', data.token);
                 getAuthUser();
                 if (callbackFun) {
                     callbackFun({ status: 1, admin: false })
@@ -49,7 +51,7 @@ export const AuthContextProvider = ({ children }) => {
             } else if (data && data.authStatus && data.userType == 'admin') { // admin account
                 fetchSuccess();
                 axios.defaults.headers.common['authorization'] = 'Bearer ' + data.token;
-                localStorage.setItem('userToken', data.token);
+                localStorage.setItem('authToken', data.token);
                 getAuthUser();
                 if (callbackFun) {
                     callbackFun({ status: 1, admin: true })
@@ -70,7 +72,7 @@ export const AuthContextProvider = ({ children }) => {
     const userSignOut = (callbackFun) => {
         fetchStart();
         axios.defaults.headers.common['authorization'] = '';
-        localStorage.removeItem('userToken');
+        localStorage.removeItem('authToken');
         setAuthUser(false);
         fetchSuccess();
         if (callbackFun) callbackFun({ status: true, message: "Logout Successfully" });
@@ -78,7 +80,7 @@ export const AuthContextProvider = ({ children }) => {
 
     const getAuthUser = () => {
         fetchStart();
-        currentUser()
+        axios.post(CURRENT_USER_URL)
             .then(({ data }) => {
                 console.log("currentUser: ", data);
                 if (data) {
@@ -100,12 +102,12 @@ export const AuthContextProvider = ({ children }) => {
     // Subscribe to user on mount
     // component that utilizes this hook to re-render with the latest auth object.
     useEffect(() => {
-        const token = localStorage.getItem('userToken');
+        const token = localStorage.getItem('authToken');
         if (token) {
             axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
         }
 
-        currentUser()
+        axios.post(CURRENT_USER_URL)
             .then(({ data }) => {
                 if (data) {
                     setAuthUser(data);
@@ -113,7 +115,7 @@ export const AuthContextProvider = ({ children }) => {
                 setLoadingUser(false);
             })
             .catch(function () {
-                localStorage.removeItem('userToken');
+                localStorage.removeItem('authToken');
                 axios.defaults.headers.common['authorization'] = '';
                 setLoadingUser(false);
             });

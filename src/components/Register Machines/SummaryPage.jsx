@@ -3,6 +3,7 @@ import { Button, Drawer, Form, Input, message, Space, Table, Tag } from 'antd';
 import HeaderTitle from '../../utils/HeaderTitle';
 import { registerMachine } from '../Api/apiServices';
 import { useNavigate } from 'react-router-dom';
+import axios from '../../api/axios';
 
 function SummaryPage({ setOpenSummary, resetForm }) {
     const [open, setOpen] = useState(false);
@@ -12,6 +13,8 @@ function SummaryPage({ setOpenSummary, resetForm }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [machines, setMachines] = useState([]);
+
+    const REGISTER_MACHINE_URL = "/machines/registerMachine";
 
     const navigate = useNavigate();
 
@@ -176,7 +179,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
                 machines: outputArray
             }
             setIsLoading(true);
-            const response = await registerMachine(reqItem, configHeaders);
+            const response = await axios.post(REGISTER_MACHINE_URL, reqItem, configHeaders);
             console.log("response 200: ", response);
             if (response && (response.status == 200 || response.status == 201)) {
                 localStorage.removeItem("machines");

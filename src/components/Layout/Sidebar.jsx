@@ -1,9 +1,9 @@
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu, message, theme, Spin } from 'antd';
 import React from 'react'
 import { Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const { Header, Content, Footer, Sider } = Layout;
-import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined } from '@ant-design/icons';
+import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 
@@ -20,8 +20,15 @@ function getItem(label, key, icon, children) {
 
 const items = [
     getItem('Dashboard', '/', <DashboardOutlined />),
-    getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
-    getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
+    // getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
+    // getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
+    getItem('Machine(s)', 'machines', <ToolOutlined />, [
+        getItem('Register a Machine(s)', 'register-machine', <FileAddOutlined />),
+        getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
+    ]),
+    getItem('My Quotes', 'quotes', <ContactsOutlined />),
+    getItem('My Orders', 'orders', <UnorderedListOutlined />),
+    getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
         getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),
@@ -44,7 +51,7 @@ const items = [
 ]
 
 function Sidebar() {
-    const { userSignOut } = useAuth();
+    const { userSignOut, isLoading } = useAuth();
 
     const navigate = useNavigate();
 
@@ -54,11 +61,17 @@ function Sidebar() {
             userSignOut((response) => {
                 console.log("logout: ", response);
                 if (response && response.status) {
-                    navigate('/login')
+                    navigate('/login');
+                    message.success("Thank you! Please visit again")
                 }
             });
         } else { // navigate to other component
             navigate(value.key)
+            // if any side menu clicked then registered machines will be removed
+            var existingFormDataArray = JSON.parse(localStorage.getItem('machines')) || [];
+            if (existingFormDataArray && existingFormDataArray.length > 0) {
+                localStorage.removeItem('machines');
+            }
         }
     }
 
@@ -80,7 +93,7 @@ function Sidebar() {
                     }}
                 >
                     <div className="demo-logo-vertical">
-                        <h3 style={{ color: 'white', textAlign: 'center' }}>Company Logo</h3>
+                        <h3 style={{ color: 'white', textAlign: 'center' }}>Logo</h3>
                     </div>
                     <Menu theme="dark" mode="inline" defaultSelectedKeys={window.location.pathname} onClick={navigateMenuItems} items={items} />
                 </Sider>

@@ -4,7 +4,7 @@ import { Menu, theme } from 'antd';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './components/Login/Login';
 import PrivateRoutes from './utils/PrivateRoutes';
-import HirerDashboard from './components/Layout/HirerDashboard';
+import Dashboard from './components/Layout/Dashboard';
 import Navbar from './components/Navbar/Navbar';
 import { Footer } from 'antd/es/layout/layout';
 import Layout from './components/Layout/Layout';
@@ -24,13 +24,17 @@ import RawMaterial from './components/RawMaterial/RawMaterial';
 import SellScrap from './components/Scrap/SellScrap';
 import Settings from './components/Settings/Settings';
 import RegistrationAccount from './components/Registration Supplier/RegistrationAccount';
-import Booking from './components/Booking/Booking';
-import RegisterMachines from './components/Register Machines/RegisterMachines';
+import RegistrationMachines from './components/Register Machines/RegistrationMachines';
 import SuccessMessage from './components/Registration Supplier/SuccessMessage';
 import { useAuth } from './contexts/AuthContext';
 import AdminLayout from './components/Admin/AdminLayout';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import ListOfUsers from './components/Admin/Users/ListOfUsers';
+import Missing from './components/Missing';
+import Quotes from './components/Quotes/Quotes';
+import Orders from './components/Orders/Orders';
+import MyBookings from './components/My Bookings/MyBookings';
+import BookingMachines from './components/Booking Machines/BookingMachines';
 
 const App = () => {
   // const {
@@ -38,62 +42,61 @@ const App = () => {
   // } = theme.useToken();
 
 
-  // const token = localStorage.getItem('userToken');
-  // console.log("localStorage.getItem('userToken'): ", token);
+  // const token = localStorage.getItem('authToken');
+  // console.log("localStorage.getItem('authToken'): ", token);
 
   return (
     <>
       {/* <AppHeader /> */}
-
       <Routes>
         {/* With Auth */}
         <Route element={<PrivateRoutes />}>
           <Route path="/*" element={<Layout />}>
-            <Route index element={<HirerDashboard />} />
+            <Route index element={<Dashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
-            <Route path="register-machine" element={<RegisterMachines />} />
+            <Route path="register-machine" element={<RegistrationMachines />} />
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
-            <Route path="hire-machine/booking/:machineId" element={<Booking />} />
-          </Route>
-          {/* Tools */}
-          <Route path="/*" element={<Layout />}>
+            {/* <Route path="hire-machine/booking/:machineId" element={<Booking />} /> */}
+            <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
+            {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
             <Route path="rent-tools" element={<RentTools />} />
             <Route path="sell-tools" element={<SellTools />} />
-          </Route>
-          {/* Gauges */}
-          <Route path="/*" element={<Layout />}>
+
+            {/* Quotes */}
+            <Route path='quotes' element={<Quotes />} />
+
+            {/* Orders */}
+            <Route path='orders' element={<Orders />} />
+
+            {/* My Bookings */}
+            <Route path='my-bookings' element={<MyBookings />} />
+
+            {/* Gauges */}
             <Route path='buy-gauges' element={<BuyGauges />} />
             <Route path="rent-gauges" element={<RentGauges />} />
             <Route path="sell-gauges" element={<SellGauges />} />
-          </Route>
-          {/* Raw Material */}
-          <Route path="/*" element={<Layout />}>
+            {/* Raw Material */}
             <Route path='sell-raw-materials' element={<RawMaterial />} />
-          </Route>
-          {/* Scrap */}
-          <Route path="/*" element={<Layout />}>
-            <Route path='sell-scrap' element={<SellScrap />} />
-          </Route>
-          {/* Settings */}
-          <Route path="/*" element={<Layout />}>
-            <Route path='settings' element={<Settings />} />
-          </Route>
 
-          {/* Documents */}
-          <Route path="/*" element={<Layout />}>
+            {/* Scrap */}
+            <Route path='sell-scrap' element={<SellScrap />} />
+            {/* Settings */}
+            <Route path='settings' element={<Settings />} />
+            {/* Documents */}
             <Route path="view-legal-docs" element={<RentGauges />} />
             <Route path="view-code-conduct" element={<SellGauges />} />
             <Route path="view-company-guidelines" element={<SellGauges />} />
-          </Route>
 
+          </Route>
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>
             <Route index path="dashboard" element={<AdminDashboard />} />
             <Route path="list-users" element={<ListOfUsers />} />
           </Route>
+          <Route path="*" element={<Missing />} />
         </Route>
 
         {/* Without Auth */}
@@ -101,11 +104,9 @@ const App = () => {
         <Route path="/register-account" element={<RegistrationAccount />} />
         <Route path="/login" element={<Login />} />
         <Route path="/success" element={<SuccessMessage />} />
+        <Route path="*" element={<Missing />} />
       </Routes>
-
-
     </>
-
 
   );
 };

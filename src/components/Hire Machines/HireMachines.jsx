@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useId } from 'react'
 import HeaderTitle from '../../utils/HeaderTitle';
-import { Card, Col, Row, Button, Input, Space, Select, Statistic, Spin, Form, Modal, Badge, Dropdown, message, Result, Empty, Divider, Typography } from 'antd';
-import axios from 'axios';
+import { Card, Col, Row, Button, Input, Space, Select, Statistic, Spin, Form, Modal, Badge, Dropdown, message, Result, Empty, Divider, Typography, Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import ViewMachineDetail from './ViewMachineDetail';
 const { Search } = Input;
@@ -13,6 +12,7 @@ import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
 import { LikeOutlined, MessageOutlined, DownOutlined } from '@ant-design/icons';
 import { Avatar, List } from 'antd';
 import "./style.css";
+import axios from '../../api/axios';
 
 const { Title, Text } = Typography;
 
@@ -40,12 +40,13 @@ function HireMachines() {
     const [passData, setPassData] = useState(null);
 
     const navigate = useNavigate();
+    const SEARCH_MACHINES = "/booking/searchMachines";
+    const GET_MACHINE_CAT_TYPE = "/machines/getMachinesByCatAndType";
+    const GET_ALL_MACHINES = "/machines/getAllMachines";
 
     const fetchData = async (pages) => {
         try {
             setLoading(true);
-            const baseUrl = `${Config.rtmWsEndpoint}/api/booking/searchMachines`;
-
             // query parameters
             const queryParams = {
                 category: selectedMachineCategory,
@@ -53,7 +54,7 @@ function HireMachines() {
                 page: pages
             };
 
-            const response = await axios.get(baseUrl, {
+            const response = await axios.get(SEARCH_MACHINES, {
                 params: queryParams,
             });
 
@@ -75,15 +76,18 @@ function HireMachines() {
 
     const getAllMachinesCategoryAndType = async () => {
         try {
-            const baseUrl = `${Config.rtmWsEndpoint}/api/machines/getMachinesByCatAndType`;
-            // const baseUrl = 'http://localhost:5100/api/machines/getMachinesByCatAndType';
-            const response = await axios.get(baseUrl);
+            const response = await axios.get(GET_MACHINE_CAT_TYPE);
             const machineCategories = response.data;
             console.log("categoryNames: ", machineCategories);
             const machinesKey = Object.keys(machineCategories);
             setCategoryAndType(machineCategories);
-            setCategories(machinesKey);
+            const options = machinesKey.map(category => ({
+                value: category,
+                label: <span>{category}</span>
+            }));
+            setCategories(options);
             console.log("machinesKey log: ", machinesKey);
+            console.log("options: ", options);
         } catch (error) {
             // Handle errors
             console.error('Error getAllMachinesCategory data:', error);
@@ -93,12 +97,10 @@ function HireMachines() {
     const getAllMachines = async (pages) => {
         try {
             setLoading(true);
-            const apiUrl = `${Config.rtmWsEndpoint}/api/machines/getAllMachines`;
-            // const apiUrl = `http://localhost:5100/api/machines/getAllMachines`; // Replace with your actual API endpoint
             const params = {
                 page: pages,
             };
-            const machinesData = await axios.get(apiUrl, { params });
+            const machinesData = await axios.get(GET_ALL_MACHINES, { params });
             setShowAllMachines(machinesData.data.paginatedResults);
             setPages(machinesData.data.page);
             setPageSize(machinesData.data.pageSize);
@@ -118,10 +120,17 @@ function HireMachines() {
         setCategoryValue(value);
         if (value) {
             const values = categoryAndType[value];
-            setMachineTypes(values);
+            const transformedOptions = values.map((item, index) => ({
+                value: item,
+                label: <span>{item}</span>,
+            }));
+            setMachineTypes(transformedOptions);
+            // setMachineTypes(values);
             console.log("setMachineTypes: ", values);
+            setSelectedMachineCategory(value);
+        } else {
+            setMachineTypes([]);
         }
-        setSelectedMachineCategory(value);
     };
 
     const handleTypeChange = (value) => {
@@ -221,169 +230,157 @@ function HireMachines() {
 
     return (
         <>
-            <HeaderTitle title={'Hire a Machine'} />
-            <Form form={form} layout='vertical'>
-                <h4 style={{ textAlign: "left" }}>Search your machines</h4>
-                <Row gutter={16}>
-                    <Col>
-                        <Form.Item name={'categoryInput'} label="Choose Machine Category" rules={[
-                            { required: true, message: "You must choose the machine category" }
-                        ]}>
-
-                            <Select
-                                style={{ width: '100%' }}
-                                placeholder="Select Category"
-                                onChange={handleCategoryChange}
-                                value={selectedMachineCategory}
+            <div className="container-fluid">
+                <div className="row">
+                    <HeaderTitle title={'Hire a Machine'} />
+                </div>
+                <Form form={form} layout='vertical'>
+                    <div className="row">
+                        <div className="col-auto">
+                            <Form.Item
+                                name='categoryInput'
+                                label="Choose Machine Category"
+                                rules={[{ required: true, message: "You must choose the machine category" }]}
                             >
-                                {loading ? (
-                                    <Select.Option key="loading" disabled>
-                                        <Spin tip='Loading...' />
-                                    </Select.Option>
-                                ) : (
-                                    categories.map((item, index) => (
-                                        <Select.Option key={index} value={item}>
-                                            {item}
-                                        </Select.Option>
-                                    ))
-                                )}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col>
-                        <Form.Item name={'typeInput'} label="Choose Machine Type" rules={[
-                            { required: true, message: "You must choose the machine type" }
-                        ]}>
-                            <Select
-
-                                style={{ width: '100%' }}
-                                placeholder="Select Machine Type"
-                                onChange={handleTypeChange}
-                                value={selectedMachineType}
-                            >
-                                {loading ? (
-                                    <Select.Option key="loading" disabled>
-                                        <Spin tip='Loading2...' />
-                                    </Select.Option>
-                                ) : (
-                                    machineTypes.map((item, index) => (
-                                        <Select.Option key={index} value={item}>
-                                            {item}
-                                        </Select.Option>
-                                    ))
-                                )}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col>
-                        <Button type="primary" onClick={fetchData} style={{ marginTop: "30px" }}>Search</Button>
-                    </Col>
-                    {totalPages > 0 && <Col>
-                        <Select
-                            placeholder="Sort By"
-                            defaultActiveFirstOption
-                            defaultValue={'Nearest to Farthest'}
-                            style={{
-                                width: 170,
-                                marginTop: "30px"
-                            }}
-                            options={[
-                                { value: 'location', label: 'Nearest to Farthest' },
-                            ]}
-                        />
-                    </Col>}
-
-                    <Col>
-                        <Button onClick={clearSearch} style={{ marginTop: "30px" }}>Clear search</Button>
-                    </Col>
-                </Row>
-            </Form>
-            <br />
-            {/* Search Message */}
-            {(!selectedMachineCategory || !selectedMachineType) && <>{searchData}</>}
-
-            {/* Loading */}
-            {loading && <Spin tip='Loading updated machines' size='large'><div style={{
-                padding: '50px',
-                background: 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '4px',
-            }} /></Spin>}
-
-            {/* Display All Machines */}
-            {!loading && totalPages > 0 &&
-                <List
-                    itemLayout="vertical"
-                    size="large"
-                    bordered
-                    pagination={{
-                        onChange: (page) => handlePageChange(page),
-                        total: totalPages,
-                        defaultCurrent: pages,
-                        // pageSize: 3,
-                    }}
-                    dataSource={showAllMachines}
-                    renderItem={(item, index) => (
-                        <>
-                            <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
-                                <List.Item
-                                    style={{ background: index % 2 === 0 ? '#ffffff' : '#EEE2DE' }}
-                                    key={item.CompanyName}
-                                    actions={[
-                                        <Button type='link' icon={<WechatOutlined />}>Chat with Supplier</Button>,
-                                        <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
-                                        <Button type="primary" onClick={() => navigate(`booking/${item.id}`)}>Book Machine</Button>,
-                                    ]}
-                                    extra={
-                                        <>
-                                            <img
-                                                width={260}
-                                                height={210}
-                                                alt="machine image"
-                                                // src={`https://picsum.photos/280/190?random=${item.id}`}
-                                                src={item.Machine_Photo}
-                                            />,
-                                            <Title level={5}>Distance(Kms): <a>{item.distance}</a></Title>
-                                        </>
+                                <Select
+                                    style={{ width: '100%' }}
+                                    placeholder="Select Category"
+                                    onChange={handleCategoryChange}
+                                    options={categories}
+                                />
+                                {/* {
+                                        categories.map((item, index) => (
+                                            <Select.Option key={item} value={item}>
+                                                {item}
+                                            </Select.Option>
+                                        ))
                                     }
-                                >
-                                    <List.Item.Meta
-                                        bordered={true}
-                                        avatar={<Title level={5}>Machine ID: <a>{item.id}</a></Title>}
-                                        title={<a>{item.CompanyName}</a>}
-                                        description={<><Text strong>{formatUpperCase("Type of Machine")}:</Text>&nbsp;<span style={{ fontWeight: 'bold', color: 'blue' }}>{item.Machine_Type}</span></>}
-                                    />
-                                    <Row gutter={16}>
-                                        <Col span={12}>
-                                            <Statistic title={formatUpperCase('Brand')} value={item.Brand} />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic title={formatUpperCase('Machine Hour Rate')} value={item.Machine_Hour_Rate} />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic title={formatUpperCase('Model')} value={item.Model} />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic title={formatUpperCase('Score')} value={item.Score} />
-                                        </Col>
-                                    </Row>
-                                </List.Item>
-                            </Badge.Ribbon>
-                            {/* <Divider orientation="left">Small Size</Divider> */}
-                        </>
-                    )}
-                />
-            }
+                                </Select> */}
+                            </Form.Item>
+                        </div>
+                        <div className="col-auto">
+                            <Form.Item
+                                name='typeInput'
+                                label="Choose Machine Type"
+                                rules={[{ required: true, message: "You must choose the machine type" }]}
+                            >
+                                <Select
+                                    style={{ width: '100%' }}
+                                    placeholder="Select Type"
+                                    onChange={handleTypeChange}
+                                    options={machineTypes}
+                                />
+                            </Form.Item>
+                        </div>
+                        {!loading && totalPages > 0 &&
+                            <div className='col-auto'>
+                                <Select
+                                    placeholder="Sort By"
+                                    defaultActiveFirstOption
+                                    defaultValue={'Nearest to Farthest'}
+                                    style={{
+                                        width: '100%',
+                                        marginTop: "30px"
+                                    }}
+                                    options={[
+                                        { value: 'location', label: 'Nearest to Farthest' },
+                                    ]}
+                                />
+                            </div>}
 
-            {/* No Machines */}
-            {totalPages == 0 &&
-                <>{noData}</>
-            }
+                        <div className="col-auto">
+                            <Button style={{ marginTop: '30px' }} onClick={clearSearch}>Clear Search</Button>
+                        </div>
+                        <div className="col-auto">
+                            <Button type='primary' onClick={fetchData} style={{ marginTop: '30px' }}>Submit</Button>
+                        </div>
+                    </div>
+                    <Divider />
 
-            <br />
-            {/* // View Details */}
-            {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
+                    {/* Search Message */}
+                    {(!selectedMachineCategory || !selectedMachineType) && <>{searchData}</>}
+
+                    {/* Loading */}
+                    {loading && <Spin tip='Loading updated machines' size='large'><div style={{
+                        padding: '50px',
+                        background: 'rgba(0, 0, 0, 0.05)',
+                        borderRadius: '4px',
+                    }} /></Spin>}
+
+                    {/* Display All Machines */}
+                    {!loading && totalPages > 0 &&
+                        <List
+                            itemLayout="vertical"
+                            size="large"
+                            bordered
+                            pagination={{
+                                onChange: (page) => handlePageChange(page),
+                                total: totalPages,
+                                defaultCurrent: pages,
+                                // pageSize: 3,
+                            }}
+                            dataSource={showAllMachines}
+                            renderItem={(item, index) => (
+                                <>
+                                    <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
+                                        <List.Item
+                                            style={{ background: index % 2 === 0 ? '#ffffff' : '#EEE2DE' }}
+                                            key={item.CompanyName}
+                                            actions={[
+                                                <Button type='link' icon={<WechatOutlined />}>Chat with Supplier</Button>,
+                                                <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
+                                                <Button type="primary" onClick={() => navigate(`book-machine/${item.id}`)}>Book Machine</Button>,
+                                            ]}
+                                            extra={
+                                                <>
+                                                    <img
+                                                        width={260}
+                                                        height={210}
+                                                        alt="machine image"
+                                                        // src={`https://picsum.photos/280/190?random=${item.id}`}
+                                                        src={item.Machine_Photo}
+                                                    />,
+                                                    <Title level={5}>Distance(Kms): <a>{item.distance}</a></Title>
+                                                </>
+                                            }
+                                        >
+                                            <List.Item.Meta
+                                                bordered={true}
+                                                avatar={<Title level={5}>Machine ID: <a>{item.id}</a></Title>}
+                                                title={<a>{item.CompanyName}</a>}
+                                                description={<><Text strong>{formatUpperCase("Type of Machine")}:</Text>&nbsp;<span style={{ fontWeight: 'bold', color: 'blue' }}>{item.Machine_Type}</span></>}
+                                            />
+                                            <Row gutter={16}>
+                                                <Col span={12}>
+                                                    <Statistic title={formatUpperCase('Brand')} value={item.Brand} />
+                                                </Col>
+                                                <Col span={12}>
+                                                    <Statistic title={formatUpperCase('Machine Hour Rate')} value={item.Machine_Hour_Rate} />
+                                                </Col>
+                                                <Col span={12}>
+                                                    <Statistic title={formatUpperCase('Model')} value={item.Model} />
+                                                </Col>
+                                                <Col span={12}>
+                                                    <Statistic title={formatUpperCase('Score')} value={item.Score} />
+                                                </Col>
+                                            </Row>
+                                        </List.Item>
+                                    </Badge.Ribbon>
+                                    {/* <Divider orientation="left">Small Size</Divider> */}
+                                </>
+                            )}
+                        />
+                    }
+
+                    {/* No Machines */}
+                    {totalPages == 0 &&
+                        <>{noData}</>
+                    }
+
+                </Form>
+                {/* // View Details */}
+                {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
+            </div>
         </>
     )
 }
