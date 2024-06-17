@@ -25,6 +25,7 @@ const items = [
     getItem('Machine(s)', 'machines', <ToolOutlined />, [
         getItem('Register a Machine(s)', 'register-machine', <FileAddOutlined />),
         getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
+        getItem('My Registered Machines', 'my-registered-machines', <CalendarOutlined />),
     ]),
     getItem('My Quotes', 'quotes', <ContactsOutlined />),
     getItem('My Orders', 'orders', <UnorderedListOutlined />),

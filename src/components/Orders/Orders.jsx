@@ -78,13 +78,14 @@ function Orders() {
       title: 'Good Status',
       key: 'goods_status',
       dataIndex: 'goods_status',
-      render: (_, { quote_status }) => {
+      render: (_, { goods_status }) => {
+        console.log("goods_status: ", goods_status);
         let color;
         let icon;
-        if (quote_status === "pending") {
+        if (goods_status === "production_in_progress") {
           color = "geekblue";
           icon = <SyncOutlined />
-        } else if (quote_status === "production_complete") {
+        } else if (goods_status === "production_complete") {
           color = "green";
           icon = <CheckCircleOutlined />
         } else {
@@ -93,8 +94,8 @@ function Orders() {
         }
         return (
           <>
-            <Tag color={color} icon={icon} key={quote_status}>
-              <b>{quote_status ? quote_status.toUpperCase() : '-'}</b>
+            <Tag color={color} icon={icon} key={goods_status}>
+              <b>{goods_status ? goods_status.toUpperCase() : '-'}</b>
             </Tag>
           </>
         )
@@ -213,6 +214,17 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
         </>
       )
     },
+    {
+      label: 'Goods Status',
+      children: (
+        <>
+          <Tag color={color} icon={icon} key={items.goods_status}>
+            <b>{items.goods_status.toUpperCase()}</b>
+          </Tag>
+        </>
+      )
+    },
+    
     {
       label: 'Order Quantity',
       children: items.quantity,

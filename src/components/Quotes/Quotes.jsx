@@ -182,7 +182,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
         icon = <CloseCircleOutlined />
     }
 
-    const acceptOrder = async () => {
+    const acceptAndRejectOrder = async (value) => {
         try {
             setIsLoading(true);
             var reqItem = {
@@ -195,12 +195,13 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                 orderdrawing: items.order_drawing,
                 orderprogramsheet: items.order_program_sheet,
                 otherattachments: items.other_attachments,
-                quotestatus: 'accepted',
-                quantity: items.quantity
+                quotestatus: value,
+                quantity: items.quantity,
+                hirer_company_id: items.hirer_company_id
             }
 
 
-            const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
+            const response = await axios.patch(UPDATE_QUOTE_URL, (reqItem));
             console.log("accepted: ", response);
             message.success("Quote Accepted!");
             // setItems(response.data);
@@ -280,17 +281,21 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
         authUser.CompanyId == items.renter_company_id && items.quote_status == "pending" &&
         {
             label: 'Action',
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: (
                 <>
                     <div className='row'>
                         <div className="col">
-                            <Button type='primary' onClick={acceptOrder}>{isLoading ? 'Accepting your quote...' : 'Accept Order'}</Button>
+                            <Button type='primary' onClick={() => acceptAndRejectOrder('accepted')}>{isLoading ? 'Accepting your quote...' : 'Accept Order'}</Button>
                         </div>
                         <div className="col">
                             <Button type="dashed">Change Booking Dates</Button>
                         </div>
                         <div className="col">
-                            <Button type="primary" danger>Reject Order</Button>
+                            <Button type="primary" danger onClick={() => acceptAndRejectOrder('rejected')}>Reject Order</Button>
                         </div>
                     </div>
                 </>

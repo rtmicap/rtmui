@@ -35,6 +35,7 @@ import Quotes from './components/Quotes/Quotes';
 import Orders from './components/Orders/Orders';
 import MyBookings from './components/My Bookings/MyBookings';
 import BookingMachines from './components/Booking Machines/BookingMachines';
+import MyRegisteredMachines from './components/MyRegisteredMachines/MyRegisteredMachines';
 
 const App = () => {
   // const {
@@ -55,6 +56,7 @@ const App = () => {
             <Route index element={<Dashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
             <Route path="register-machine" element={<RegistrationMachines />} />
+            <Route path="my-registered-machines" element={<MyRegisteredMachines />} />
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
