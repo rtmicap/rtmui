@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Radio, Tag, Table, message } from 'antd';
-import { getCompanyDetails } from '../../Api/adminApiServices';
+import axios from '../../../api/axios';
+import { GET_COMPANY_DETAILS } from '../../../api/apiUrls';
 const { Search } = Input;
 
 function ListOfUsers() {
@@ -15,7 +16,7 @@ function ListOfUsers() {
             factoryEmail: email
         };
         try {
-            const response = await getCompanyDetails(params);
+            const response = await axios.post(GET_COMPANY_DETAILS, params);
             message.success(`${response.data.result}`);
             setData(response.data);
             console.log("getCompanyDetailsFN: ", response);

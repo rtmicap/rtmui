@@ -5,6 +5,7 @@ import { LeftCircleOutlined, InfoCircleOutlined, UploadOutlined } from '@ant-des
 const { RangePicker } = DatePicker;
 import axios from "../../api/axios";
 import HeaderTitle from '../../utils/HeaderTitle';
+import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
 
 function BookingMachines() {
     const location = useLocation();
@@ -38,8 +39,6 @@ function BookingMachines() {
     const [quoteResponse, setQuoteResponse] = useState({});
     // steps 
     const [step, setStep] = useState(1);
-    const fileUploadUrl = "/uploadfile/uploadToB2";
-    const quoteSaveUrl = "/booking/savequote";
 
     const fileUpload = async (file) => {
         try {
@@ -53,7 +52,7 @@ function BookingMachines() {
             };
             const formData = new FormData();
             formData.append("fileName", file.originFileObj);
-            var response = await axios.post(fileUploadUrl, formData, configHeaders);
+            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
             console.log("responseFileData: ", response);
             // setFileLoading(false);
             // setProcessFileLoading(false);
@@ -83,7 +82,7 @@ function BookingMachines() {
             values.orderspec = viewSpecsFile;
             values.otherattachments = viewOthersFile;
 
-            const response = await axios.post(quoteSaveUrl, values);
+            const response = await axios.post(QUOTE_SAVE_URL, values);
             // console.log("save quote: ", response);
             message.success(`${response.data.message}`);
             setQuoteResponse(response.data.result);

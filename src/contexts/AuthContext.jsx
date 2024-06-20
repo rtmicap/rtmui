@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { currentUser, login } from "../components/Api/apiServices";
 import Cookies from "js-cookie";
 import axios from "../api/axios";
+import { LOGIN_URL, CURRENT_USER_URL } from "../api/apiUrls";
 
 const AuthContext = createContext();
 
@@ -12,9 +13,6 @@ export const AuthContextProvider = ({ children }) => {
     const [error, setError] = useState('');
     const [isLoadingUser, setLoadingUser] = useState(true);
     const [isLoading, setLoading] = useState(false);
-    // api url
-    const LOGIN_URL = "/users/login";
-    const CURRENT_USER_URL = "/users/currentUser";
 
     const navigate = useNavigate();
 

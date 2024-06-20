@@ -12,8 +12,9 @@ import {
     ReloadOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import moment from 'moment/moment';
 import { useAuth } from '../../contexts/AuthContext';
+import { formattedDateTime } from '../../utils/utils';
+import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
 
 const dummyData = [
     {
@@ -40,7 +41,6 @@ const dummyData = [
 ];
 
 function Quotes() {
-    const getAllQuotesUrl = "/booking/getallquotes";
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [passData, setPassData] = useState(null);
     const showModal = (data) => {
@@ -55,7 +55,7 @@ function Quotes() {
     };
 
     const getAllQuotes = async () => {
-        const response = await axios.get(getAllQuotesUrl);
+        const response = await axios.get(GET_ALL_QUOTES_URL);
         return response.data.result;
     };
 
@@ -160,14 +160,8 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
 
     const { authUser } = useAuth();
     console.log("items authUser", authUser);
-    const formattedDateTime = (data) => {
-        return moment(data).format('MMMM Do YYYY, h:mm a');
-    }
-
     const [isLoading, setIsLoading] = useState(false);
     // const [items, setItems] = useState(items);
-
-    const UPDATE_QUOTE_URL = "/booking/updatequote";
 
     let color;
     let icon;

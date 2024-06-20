@@ -3,14 +3,14 @@ import { Steps, Button, message, Form, Input, Alert, List, Layout, Row, Col, Sel
 import { UploadOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
-
-import axios from 'axios';
 import Countries from '../../utils/Countries and States/countries.json';
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 // import { saveUser } from '../Api/apiServices';
 import config from "../../env.json";
+import { REGISTER_ACCOUNT_URL } from '../../api/apiUrls';
 const { Text } = Typography;
+import axios from "../../api/axios";
 
 const RegistrationAccount = () => {
     const navigate = useNavigate();
@@ -1383,7 +1383,7 @@ const RegistrationAccount = () => {
                                     message: "Please provide a valid bank account number"
                                 }
                             ]}>
-                                <Input placeholder="Enter bank account number" maxLength={16}/>
+                                <Input placeholder="Enter bank account number" maxLength={16} />
                             </Form.Item>
                         </Col>
 
@@ -1526,7 +1526,6 @@ const RegistrationAccount = () => {
         //     console.log("form field error: ", error);
         // })
         // Process form submission
-        const baseUrl = `${config.rtmWsEndpoint}/api/registration/saveuser`;
         formData.cinPdf = cinPdfFileList;
         formData.gstInPdf = gstPdfFileList;
         formData.panPdf = panPdfFileList;
@@ -1564,7 +1563,7 @@ const RegistrationAccount = () => {
         //     message.error(`There is some error while submitting`);
         // }
 
-        axios.post(baseUrl, formData, configHeaders).then((response, err) => {
+        axios.post(REGISTER_ACCOUNT_URL, formData, configHeaders).then((response, err) => {
             if (err) {
                 console.log("Form Error1: ", err);
                 message.error(`There is some error while submitting! ${err.message}`);

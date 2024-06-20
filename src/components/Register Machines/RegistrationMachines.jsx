@@ -14,6 +14,7 @@ import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import HeaderTitle from '../../utils/HeaderTitle';
 import SummaryPage from './SummaryPage';
+import { FILE_UPLOAD_URL, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 const getBase64 = (img) => {
     const reader = new FileReader();
     reader.readAsDataURL(img);
@@ -54,9 +55,6 @@ function RegistrationMachines() {
     const [machineInputFields, setMachineInputFields] = useState([]);
     //others select
     const [selectedOption, setSelectedOption] = useState('');
-    // axios uel
-    const imageUploadUrl = '/uploadfile/uploadToB2';
-    const getMachinesByCatAndTypeUrl = '/machines/getMachinesByCatAndType';
 
     const resetForm = () => {
         form.resetFields();
@@ -68,7 +66,7 @@ function RegistrationMachines() {
 
     const machineFieldsFromApi = async () => {
         try {
-            const response = await axios.get(getMachinesByCatAndTypeUrl);
+            const response = await axios.get(GET_MACHINES_BY_CAT_AND_TYPE_URL);
             // console.log("machineFieldsFromApi: ", data);
             setMachineFieldsApi(response.data);
             const keys = Object.keys(response.data);
@@ -181,7 +179,7 @@ function RegistrationMachines() {
                     headers: { "content-type": "multipart/form-data" },
                 };
                 // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
-                const baseUrl = imageUploadUrl;
+                const baseUrl = FILE_UPLOAD_URL;
                 const formData = new FormData();
                 formData.append("fileName", newFileList[0].originFileObj);
                 var response = await axios.post(baseUrl, formData, configHeaders);

@@ -14,9 +14,9 @@ import {
     CloseOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import moment from 'moment/moment';
 import { useAuth } from '../../contexts/AuthContext';
-import { typesOfGoods, uomChoices } from './utils';
+import { typesOfGoods, uomChoices } from '../Orders/OrderUtils';
+import { formattedDateTime } from '../../utils/utils';
 const { TextArea } = Input;
 
 function MyBookings() {
@@ -36,11 +36,11 @@ function MyBookings() {
 
     const getAllBookings = async () => {
         const response = await axios.get(getAllBookingsUrl);
-        console.log("res", response);
+        console.log("res", response.data);
         return response.data.results;
     };
 
-    const { isPending, error, data } = useQuery({
+    const { isPending, error, data, refetch } = useQuery({
         queryKey: ['allBookings'], queryFn: getAllBookings
     })
 
@@ -51,9 +51,7 @@ function MyBookings() {
     if (isPending) return 'Loading Your Bookings...'
 
     if (error) return message.error('An error has occurred: ' + error.message);
-    const formattedDateTime = (data) => {
-        return moment(data).format('MMMM Do YYYY, h:mm a');
-    }
+
     const columns = [
         {
             title: 'Booking ID',
@@ -117,7 +115,7 @@ function MyBookings() {
     ];
 
     const refreshData = () => {
-        getAllBookings();
+        refetch();
     }
 
 
@@ -152,10 +150,6 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
 
     const { authUser } = useAuth();
     console.log("items authUser", authUser);
-    const formattedDateTime = (data) => {
-        return moment(data).format('MMMM Do YYYY, h:mm a');
-    }
-
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [size, setSize] = useState();
@@ -286,25 +280,25 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             },
             children: items.rescheduled_reason
         },
-        authUser.CompanyId == items.hirer_company_id &&
-        {
-            label: 'Action',
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
-            children: (
-                <>
-                    <div className="row">
-                        <div className="col">
-                            <Button type="primary" onClick={showLargeDrawer}>
-                                Add My Materials
-                            </Button>
-                        </div>
-                    </div>
-                </>
-            )
-        }
+        // authUser.CompanyId == items.hirer_company_id &&
+        // {
+        //     label: 'Action',
+        //     span: {
+        //         xl: 2,
+        //         xxl: 2,
+        //     },
+        //     children: (
+        //         <>
+        //             <div className="row">
+        //                 <div className="col">
+        //                     <Button type="primary" onClick={showLargeDrawer}>
+        //                         Add My Materials
+        //                     </Button>
+        //                 </div>
+        //             </div>
+        //         </>
+        //     )
+        // }
 
     ];
 
@@ -337,14 +331,6 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
     const onFinish = (values) => {
         values.shipment_datetime = shipmentDateTime;
         values.goods_status = "goods_in_transit";
-        var data = [{
-            quantity: values.quantity,
-            description: values.description,
-            uom: values.uom,
-            typeofgoods: values.typeofgoods
-        }];
-        // values.shipment_details.push(data)
-
         console.log('Success:', values);
     };
     const onFinishFailed = (errorInfo) => {
@@ -396,247 +382,6 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                     items={quoteItems}
                 />
             </Modal>
-
-            <Drawer
-                title={`Shipment Details Update Sheet - (Hirer) - Order ID: `}
-                placement="top"
-                size={size}
-                onClose={onClose}
-                open={open}
-                extra={
-                    <Space>
-                        <Button onClick={onClose}>Cancel</Button>
-                        <Button type="primary" onClick={onClose}>
-                            Add
-                        </Button>
-                    </Space>
-                }
-            >
-                <Form
-                    name="basic"
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                    layout='vertical'
-                    form={form}
-                >
-                    <div className='row'>
-                        <div className="col">
-                            <Form.Item
-                                label="Shipment Date Time"
-                                name="shipment_datetime"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your shipment date & time!',
-                                    },
-                                ]}
-                            >
-                                <DatePicker
-                                    showTime
-                                    onChange={(value, dateString) => {
-                                        console.log('Selected Time: ', value);
-                                        console.log('Formatted Selected Time: ', dateString);
-                                        setShipmentDateTime(dateString);
-                                    }}
-                                    onOk={onOk}
-                                    required
-                                />
-                            </Form.Item>
-                        </div>
-                    </div>
-
-                    <div className='row'>
-                        <div className="col">
-                            <Form.Item
-                                label="Type of Goods"
-                                name="typeofgoods"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your type of goods!',
-                                    },
-                                ]}
-                            >
-                                <Select placeholder='Choose type of goods' style={{ width: '100%' }} options={typesOfGoods} />
-                            </Form.Item>
-                        </div>
-
-                        <div className="col">
-                            <Form.Item
-                                label="Description"
-                                name="description"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your description!',
-                                    },
-                                ]}
-                            >
-                                {/* <Input /> */}
-                                <TextArea rows={3} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
-                            </Form.Item>
-                        </div>
-
-                        <div className="col">
-                            <Form.Item
-                                label="Shipment Qty"
-                                name="quantity"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your shipment quantity!',
-                                    },
-                                ]}
-                            >
-                                <Input placeholder='Enter shipment quantity' required />
-                            </Form.Item>
-                        </div>
-
-                        <div className="col">
-                            <Form.Item
-                                label="UOM"
-                                name="uom"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your UOM!',
-                                    },
-                                ]}
-                            >
-                                <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                            </Form.Item>
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="col">
-                            <Form.List name="shipment_details">
-                                {(fields, { add, remove }) => (
-                                    <>
-                                        {fields.map(({ key, name, ...restField }) => {
-                                            console.log("key: ", key);
-                                            console.log("name: ", name);
-                                            return (
-                                                <>
-                                                    <h6>Shipment Details - {name + 1}</h6>
-                                                    <div className='row' key={key}>
-                                                        <div className="col">
-                                                            <Form.Item
-                                                                label="Type of Goods"
-                                                                // name="typeofgoods"
-                                                                {...restField}
-                                                                name={[name, 'typeofgoods']}
-                                                                rules={[
-                                                                    {
-                                                                        required: true,
-                                                                        message: 'Please input your type of goods!',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Select placeholder='Choose type of goods' style={{ width: '100%' }} options={typesOfGoods} />
-                                                            </Form.Item>
-                                                        </div>
-
-                                                        <div className="col">
-                                                            <Form.Item
-                                                                label="Description"
-                                                                // name="description"
-                                                                {...restField}
-                                                                name={[name, 'description']}
-                                                                rules={[
-                                                                    {
-                                                                        required: true,
-                                                                        message: 'Please input your description!',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                {/* <Input /> */}
-                                                                <TextArea rows={3} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
-                                                            </Form.Item>
-                                                        </div>
-
-                                                        <div className="col">
-                                                            <Form.Item
-                                                                label="Shipment Qty"
-                                                                // name="quantity"
-                                                                {...restField}
-                                                                name={[name, 'quantity']}
-                                                                rules={[
-                                                                    {
-                                                                        required: true,
-                                                                        message: 'Please input your shipment quantity!',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder='Enter shipment quantity' required />
-                                                            </Form.Item>
-                                                        </div>
-
-                                                        <div className="col">
-                                                            <Form.Item
-                                                                label="UOM"
-                                                                // name="uom"
-                                                                {...restField}
-                                                                name={[name, 'uom']}
-                                                                rules={[
-                                                                    {
-                                                                        required: true,
-                                                                        message: 'Please input your UOM!',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='col-auto mt-4'>
-                                                            <Tooltip title={`Remove Shipment - ${name + 1}`}>
-                                                                <Button danger shape="circle" onClick={() => remove(name)} icon={<CloseOutlined />} />
-                                                            </Tooltip>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )
-                                        }
-
-                                        )}
-                                        {/* maximum four fields can be use so total 5 details */}
-                                        {fields.length < 4 && (
-                                            <div className='row'>
-                                                <div className="col-auto">
-                                                    <Form.Item>
-                                                        <Button type="primary" onClick={() => add()} block icon={<PlusOutlined />}>
-                                                            Add more shipment details
-                                                        </Button>
-                                                        {/* <button className='btn btn-secondary'>+ Add more shipment details</button> */}
-                                                    </Form.Item>
-                                                </div>
-                                            </div>
-
-                                        )}
-                                    </>
-                                )}
-                            </Form.List>
-                            {/* <Button type='secondary' icon={<PlusOutlined />}>Add More Shipment Details</Button> */}
-                        </div>
-                    </div>
-                    <hr />
-                    <div className="row">
-                        <div className="col text-center">
-                            <Upload {...props}>
-                                <Button type='primary' icon={<PlusCircleOutlined />}>Attach Invoice</Button>
-                                <p>Max: 2 MB (Only PDF Format)</p>
-                            </Upload>
-                        </div>
-                    </div>
-                    <hr />
-                    <div className="row">
-                        <div className="col text-center">
-                            <Button htmlType='submit' type='primary'>Submit</Button>
-                        </div>
-                    </div>
-                </Form>
-            </Drawer>
         </>
     )
 }
