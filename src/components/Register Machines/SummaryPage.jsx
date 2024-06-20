@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Drawer, Form, Input, message, Space, Table, Tag } from 'antd';
 import HeaderTitle from '../../utils/HeaderTitle';
-import { registerMachine } from '../Api/apiServices';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 

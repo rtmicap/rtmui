@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Col, Row, Select, Form, Input, Upload, Button, Space, message, Image, Modal, Checkbox } from 'antd'
 import HeaderTitle from '../../utils/HeaderTitle';
 import { machineFields } from '../Machine Variable Fields/MachineFiellds';
-import { getMachinesByCatAndType, registerMachine } from '../Api/apiServices';
 import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 
 import query from "india-pincode-search";

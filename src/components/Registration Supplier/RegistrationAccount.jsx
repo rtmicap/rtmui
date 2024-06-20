@@ -6,7 +6,6 @@ const { Content } = Layout;
 import Countries from '../../utils/Countries and States/countries.json';
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
-// import { saveUser } from '../Api/apiServices';
 import config from "../../env.json";
 import { REGISTER_ACCOUNT_URL } from '../../api/apiUrls';
 const { Text } = Typography;

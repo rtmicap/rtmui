@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import config from "../env.json";
 import { useNavigate } from "react-router-dom";
-import { currentUser, login } from "../components/Api/apiServices";
 import Cookies from "js-cookie";
 import axios from "../api/axios";
 import { LOGIN_URL, CURRENT_USER_URL } from "../api/apiUrls";
