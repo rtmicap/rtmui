@@ -191,7 +191,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                 otherattachments: items.other_attachments,
                 quotestatus: value,
                 quantity: items.quantity,
-                hirer_company_id: items.hirer_company_id
+                hirerCompanyId: items.hirer_company_id
             }
 
 
@@ -285,9 +285,9 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                         <div className="col">
                             <Button type='primary' onClick={() => acceptAndRejectOrder('accepted')}>{isLoading ? 'Accepting your quote...' : 'Accept Order'}</Button>
                         </div>
-                        <div className="col">
+                        {/* <div className="col">
                             <Button type="dashed">Change Booking Dates</Button>
-                        </div>
+                        </div> */}
                         <div className="col">
                             <Button type="primary" danger onClick={() => acceptAndRejectOrder('rejected')}>Reject Order</Button>
                         </div>

@@ -190,6 +190,8 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
   const [shipmentDateTime, setShipmentDateTime] = useState('');
   const [fileUrls, setFileUrls] = useState({});
   // Note: fileUrls will be [url1, url2 ....]
+  // edit the materials
+  const [editOpen, setEditOpen] = useState(false);
 
   const UPDATE_QUOTE_URL = "/booking/updatequote";
   let color;
@@ -211,7 +213,13 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
   };
   const onClose = () => {
     setOpen(false);
+    setEditOpen(false);
   };
+
+  const editMaterialDrawer = () => {
+    setSize('large');
+    setEditOpen(true);
+  }
 
   const quoteItems = [
     {
@@ -371,7 +379,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
         <>
           <div className="row">
             <div className="col">
-              <Button type="primary">
+              <Button type="primary" onClick={editMaterialDrawer}>
                 Edit Materials
               </Button>
             </div>
@@ -513,11 +521,11 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
       </Modal>
 
       <Drawer
-        title={`Shipment Details Update Sheet - ${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id}`}
+        title={` ${editOpen ? 'Edit Shipment' : ''} Shipment Details Update Sheet - ${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id}`}
         placement="top"
         size={size}
         onClose={onClose}
-        open={open}
+        open={editOpen ? editOpen : open}
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
@@ -734,6 +742,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
           </div>
         </Form>
       </Drawer>
+
     </>
   )
 }
