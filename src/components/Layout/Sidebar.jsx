@@ -27,6 +27,7 @@ const items = [
         getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
         getItem('My Registered Machines', 'my-registered-machines', <CalendarOutlined />),
     ]),
+    getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('My Quotes', 'quotes', <ContactsOutlined />),
     getItem('My Orders', 'orders', <UnorderedListOutlined />),
     getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),

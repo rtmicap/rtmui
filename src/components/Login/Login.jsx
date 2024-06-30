@@ -96,7 +96,7 @@ function Login() {
                                     span: 16,
                                 }}
                             >
-                                <Button type="primary" htmlType="submit" disabled={isLoading ? true : false}>
+                                <Button type="primary" htmlType="submit">
                                     {isLoading ? 'Logging...' : 'Submit'}
                                 </Button>
                             </Form.Item>

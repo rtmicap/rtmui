@@ -43,7 +43,8 @@ function Orders() {
   };
   const getAllOrders = async () => {
     const response = await axios.get(GET_ALL_ORDERS_URL);
-    return response.data.results;
+    const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
+    return filteredData;
   };
 
   const { isPending, error, data, refetch } = useQuery({
@@ -165,23 +166,22 @@ function Orders() {
           <div className="col-auto">
             <Table columns={columns} dataSource={data} />
             {
-              isModalOpen && <ViewModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} items={passData} />
+              isModalOpen && <ViewModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} handleOk={handleOk} handleCancel={handleCancel} items={passData} />
             }
           </div>
 
         </div>
-
-
       </div>
     </>
   )
 }
 
 
-const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
+const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items }) => {
   console.log("items vie", items);
   const { authUser } = useAuth();
   // console.log("items authUser", authUser);
+  const [imageFileIsLoading, setImageFileIsLoading] = useState(false);
   const [fileIsLoading, setFileIsLoading] = useState(false);
   // const [items, setItems] = useState(items);
   const [open, setOpen] = useState(false);
@@ -346,6 +346,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
       },
       children: items.delay_reason,
     },
+    // when hirer checks
     authUser.CompanyId == items.hirer_company_id &&
     {
       label: 'Shipment Action',
@@ -359,7 +360,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             <div className="col">
               <Popover content={items.goods_status == 'goods_in_transit' ? 'Please wait for renter response' : ''} trigger="hover">
                 <Button type="primary" onClick={showLargeDrawer} disabled={items.goods_status == 'goods_in_transit' ? true : false}>
-                  Add My Materials
+                  Ship Materials To Renter
                 </Button>
               </Popover>
             </div>
@@ -380,7 +381,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
           <div className="row">
             <div className="col">
               <Button type="primary" onClick={editMaterialDrawer}>
-                Edit Materials
+                Review Received Materials
               </Button>
             </div>
           </div>
@@ -426,20 +427,29 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
     try {
       const updatedShipmentDetails = await Promise.all(
         values.shipment_details.map(async (detail, index) => {
+          let updatedDetail = { ...detail };
           if (fileUrls[index]) {
-            return { ...detail, invoice: fileUrls[index] };
+            updatedDetail.image = fileUrls[index];
           }
+          if (updatedDetail.typeofgoods === 'invoice') {
+            updatedDetail = { typeofgoods: 'invoice', invoice: updatedDetail.image };
+          }
+          return updatedDetail;
         })
       );
       const finalValues = { ...values, shipment_details: updatedShipmentDetails };
-      // console.log('Success:', finalValues);
-      const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, (finalValues));
-      // console.log("shipmentRes: ", shipmentRes);
+      console.log('Success:', finalValues);
+      const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
+      console.log("shipmentRes: ", shipmentRes);
       message.success(shipmentRes.data.message);
       setOpen(false); // drawer close
+      setIsModalOpen(false) // view modal close
+      resetForm(); // clear the form data
+
     } catch (error) {
       console.error('Shipment error:', error);
       message.error('Shipment failed. Please try again.');
+      resetForm(); // clear the form data
     }
   };
 
@@ -488,6 +498,39 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
     }
   };
 
+  const handleImageChange = async (info, name) => {
+    console.log("handleInvoiceChange: ", info);
+    try {
+      setImageFileIsLoading(true);
+      const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj);
+      const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
+      const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
+
+      if (!isImageFormat) {
+        // Show error message for non-PDF files
+        message.warning('You can only upload PDF file!');
+        console.warn('You can only upload PDF file!');
+        setImageFileIsLoading(false);
+      } else if (!isLt2M) {
+        // Show error message for files larger than 2MB
+        message.warning('File must be smaller than 2MB!');
+        console.warn('File must be smaller than 2MB!');
+        setImageFileIsLoading(false);
+      } else {
+        setFileUrls((prev) => ({
+          ...prev,
+          [name]: fileUrl,
+        }));
+        setImageFileIsLoading(false);
+      }
+
+    } catch (error) {
+      console.error('File upload error:', error);
+      message.error('File upload failed. Please try again.');
+      setImageFileIsLoading(false);
+    }
+  };
+
   const handleFileRemove = (name) => {
     setFileUrls((prev) => {
       const updatedUrls = { ...prev };
@@ -495,6 +538,16 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
       return updatedUrls;
     });
   };
+
+  const handleSelectChange = (value, name) => {
+    console.log("handleSelectChange name: ", name);
+    console.log("handleSelectChange value: ", value);
+    form.setFieldsValue({ [name]: value });
+  };
+
+  const resetForm = () => {
+    form.resetFields();
+  }
 
 
   return (
@@ -596,101 +649,136 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                                   },
                                 ]}
                               >
-                                <Select placeholder='Choose type of goods' style={{ width: '100%' }} options={typesOfGoods} />
+                                <Select placeholder='Choose type of goods' style={{ width: '100%' }} onChange={handleSelectChange} options={typesOfGoods} />
                               </Form.Item>
                             </div>
 
-                            <div className="col">
-                              <Form.Item
-                                label="Description"
-                                // name="description"
-                                {...restField}
-                                name={[name, 'description']}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: 'Please input your description!',
-                                  },
-                                ]}
-                              >
-                                {/* <Input /> */}
-                                <TextArea rows={3} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
-                              </Form.Item>
-                            </div>
+                            {form.getFieldValue(['shipment_details', name, 'typeofgoods']) !== 'invoice' && (
+                              <>
+                                <div className="col">
+                                  <Form.Item
+                                    label="Description"
+                                    // name="description"
+                                    {...restField}
+                                    name={[name, 'description']}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: 'Please input your description!',
+                                      },
+                                    ]}
+                                  >
+                                    {/* <Input /> */}
+                                    <TextArea rows={3} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
+                                  </Form.Item>
+                                </div>
 
-                            <div className="col">
-                              <Form.Item
-                                label="Shipment Qty"
-                                // name="quantity"
-                                {...restField}
-                                name={[name, 'quantity']}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: 'Please input your shipment quantity!',
-                                  },
-                                ]}
-                              >
-                                <Input placeholder='Enter shipment quantity' required />
-                              </Form.Item>
-                            </div>
+                                <div className="col">
+                                  <Form.Item
+                                    label="Shipment Qty"
+                                    // name="quantity"
+                                    {...restField}
+                                    name={[name, 'quantity']}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: 'Please input your shipment quantity!',
+                                      },
+                                    ]}
+                                  >
+                                    <Input placeholder='Enter shipment quantity' required />
+                                  </Form.Item>
+                                </div>
 
-                            <div className="col">
-                              <Form.Item
-                                label="UOM"
-                                // name="uom"
-                                {...restField}
-                                name={[name, 'uom']}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: 'Please input your UOM!',
-                                  },
-                                ]}
-                              >
-                                <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                              </Form.Item>
-                            </div>
+                                <div className="col">
+                                  <Form.Item
+                                    label="UOM"
+                                    // name="uom"
+                                    {...restField}
+                                    name={[name, 'uom']}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: 'Please input your UOM!',
+                                      },
+                                    ]}
+                                  >
+                                    <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
+                                  </Form.Item>
+                                </div>
 
-                            {!fileUrls[name] && <div className="col-auto mt-4">
-                              <Form.Item
-                                // name="uom"
-                                {...restField}
-                                name={[name, 'invoice']}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: 'Please upload your invoice!',
-                                  },
-                                ]}
-                              >
-                                <Upload
-                                  valuePropName="file"
-                                  getValueFromEvent={(e) => {
-                                    if (Array.isArray(e)) {
-                                      return e;
-                                    }
-                                    return e && e.file;
-                                  }}
-                                  onChange={(info) => handleInvoiceChange(info, name)}
-                                  beforeUpload={() => false}
-                                  accept=".pdf"
-                                  maxCount={1}
-                                  showUploadList={false}
-                                >
-                                  {fileIsLoading ? <>
-                                    <Spin indicator={<LoadingOutlined spin />} />
-                                  </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{fileIsLoading ? 'Uploading...' : 'Attach Invoice'} </Button>}
-                                  <p>Max: 2 MB (Only PDF Format)</p>
-                                </Upload>
-                              </Form.Item>
+                                {!fileUrls[name] && <div className="col-auto mt-4">
+                                  <Form.Item
+                                    // name="uom"
+                                    {...restField}
+                                    name={[name, 'image']}
+                                  >
+                                    <Upload
+                                      valuePropName="file"
+                                      getValueFromEvent={(e) => {
+                                        if (Array.isArray(e)) {
+                                          return e;
+                                        }
+                                        return e && e.file;
+                                      }}
+                                      onChange={(info) => handleImageChange(info, name)}
+                                      beforeUpload={() => false}
+                                      accept=".jpg,.jpeg,.png"
+                                      maxCount={1}
+                                      showUploadList={false}
+                                    >
+                                      {imageFileIsLoading ? <>
+                                        <Spin indicator={<LoadingOutlined spin />} />
+                                      </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>}
+                                      <p>Max: 2 MB (Only PDF Format)</p>
+                                    </Upload>
+                                  </Form.Item>
 
-                            </div>}
+                                </div>
+                                }
+                              </>
+                            )}
+
+                            {form.getFieldValue(['shipment_details', name, 'typeofgoods']) === 'invoice' && (
+                              <>
+                                {!fileUrls[name] && <div className="col-auto mt-4">
+                                  <Form.Item
+                                    // name="uom"
+                                    {...restField}
+                                    name={[name, 'invoice']}
+                                  >
+                                    <Upload
+                                      valuePropName="file"
+                                      getValueFromEvent={(e) => {
+                                        if (Array.isArray(e)) {
+                                          return e;
+                                        }
+                                        return e && e.file;
+                                      }}
+                                      onChange={(info) => handleInvoiceChange(info, name)}
+                                      beforeUpload={() => false}
+                                      accept=".pdf"
+                                      maxCount={1}
+                                      showUploadList={false}
+                                    >
+                                      {fileIsLoading ? <>
+                                        <Spin indicator={<LoadingOutlined spin />} />
+                                      </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{fileIsLoading ? 'Uploading...' : 'Attach invoice'} </Button>}
+                                      <p>Max: 2 MB (Only PDF Format)</p>
+                                    </Upload>
+                                  </Form.Item>
+
+                                </div>
+                                }
+                              </>
+                            )}
+
+
 
                             {fileUrls[name] && (
                               <div className='col-auto mt-4'>
                                 <div>
-                                  <a href={fileUrls[name]} target="_blank" rel="noopener noreferrer">View {'Shipment ' + (name + 1)} Invoice</a>
+                                  <a href={fileUrls[name]} target="_blank" rel="noopener noreferrer">View File</a>
                                   <Button
                                     type="link"
                                     danger

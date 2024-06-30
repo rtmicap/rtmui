@@ -20,6 +20,7 @@ import { formattedDateTime } from '../../utils/utils';
 const { TextArea } = Input;
 
 function MyBookings() {
+    const { authUser } = useAuth();
     const getAllBookingsUrl = "/booking/getAllBooking";
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [passData, setPassData] = useState(null);
@@ -37,7 +38,8 @@ function MyBookings() {
     const getAllBookings = async () => {
         const response = await axios.get(getAllBookingsUrl);
         console.log("res", response.data);
-        return response.data.results;
+        const filteredData = response.data.results.filter((item) => item.hirer_company_id == authUser.CompanyId)
+        return filteredData;
     };
 
     const { isPending, error, data, refetch } = useQuery({

@@ -36,6 +36,7 @@ import Orders from './components/Orders/Orders';
 import MyBookings from './components/My Bookings/MyBookings';
 import BookingMachines from './components/Booking Machines/BookingMachines';
 import MyRegisteredMachines from './components/MyRegisteredMachines/MyRegisteredMachines';
+import ReviewBooking from './components/Review Booking/ReviewBooking';
 
 const App = () => {
   // const {
@@ -69,6 +70,9 @@ const App = () => {
 
             {/* Quotes */}
             <Route path='quotes' element={<Quotes />} />
+
+            {/* review-booking */}
+            <Route path='review-booking' element={<ReviewBooking />} />
 
             {/* Orders */}
             <Route path='orders' element={<Orders />} />

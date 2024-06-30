@@ -197,8 +197,9 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
 
             const response = await axios.patch(UPDATE_QUOTE_URL, (reqItem));
             console.log("accepted: ", response);
-            message.success("Quote Accepted!");
+            message.success(`${items.quote_id} Quote Accepted!`);
             // setItems(response.data);
+            handleOk();
             setIsLoading(false);
         } catch (error) {
             console.log("accepted error: ", error);
@@ -282,6 +283,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             children: (
                 <>
                     <div className='row'>
+                        {/* display accept order button when pending status */}
                         <div className="col">
                             <Button type='primary' onClick={() => acceptAndRejectOrder('accepted')}>{isLoading ? 'Accepting your quote...' : 'Accept Order'}</Button>
                         </div>
@@ -306,7 +308,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                 <>
                     <div className='row'>
                         <div className="col">
-                            <p>You can check your bookings <Link to={'my-bookings'}>here</Link></p>
+                            <strong>You can check your bookings page <Link to={'my-bookings'}>here</Link></strong>
                         </div>
                     </div>
                 </>
