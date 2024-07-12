@@ -12,3 +12,9 @@ export const uomChoices = [
     { value: 'meters', label: 'Meters' },
     { value: 'pieces', label: 'Pieces' }
 ];
+
+export const sampleDisposition = [
+    { value: 'accepted', label: 'Accepted' },
+    { value: 'deviation_request', label: 'Deviation Request' },
+    { value: 'rejected', label: 'Rejected' }
+];

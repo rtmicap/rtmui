@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, DatePicker, Descriptions, Drawer, Form, Input, message, Modal, Popover, Select, Space, Spin, Table, Tag, Tooltip, Typography, Upload } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, DatePicker, Descriptions, Drawer, Flex, Form, Input, message, Modal, Popover, Select, Space, Spin, Table, Tag, Tooltip, Typography, Upload } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import axios from "../../api/axios";
 import {
@@ -21,8 +21,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatUpperCase } from '../../utils/utils';
 import dayjs from 'dayjs';
-import { typesOfGoods, uomChoices } from './OrderUtils';
-import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL } from '../../api/apiUrls';
+import { sampleDisposition, typesOfGoods, uomChoices } from './OrderUtils';
+import { CREATE_FIRST_SAMPLE_REPORT_URL, CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL, GET_SHIPMENT_BY_ORDERID_URL } from '../../api/apiUrls';
 const { TextArea } = Input;
 
 function Orders() {
@@ -43,8 +43,8 @@ function Orders() {
   };
   const getAllOrders = async () => {
     const response = await axios.get(GET_ALL_ORDERS_URL);
-    const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
-    return filteredData;
+    // const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
+    return response.data.results;
   };
 
   const { isPending, error, data, refetch } = useQuery({
@@ -192,8 +192,27 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   // Note: fileUrls will be [url1, url2 ....]
   // edit the materials
   const [editOpen, setEditOpen] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  // shipment data
+  const [shipmentData, setShipmentData] = useState({});
+  // inspection report
+  const [openReport, setOpenReport] = useState(false);
+  const [inspectionDateTime, setInspectionDateTime] = useState('');
+  const [inspectionReportFileList, setInspectionReportFileList] = useState([]);
+  const [fileReportLoading, setFileReportLoading] = useState(false);
+  const [viewInspectionReportFile, setViewInspectionReportFile] = useState('');
+  const getShipmentByOrderId = async () => {
+    const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${items.order_id}`);
+    console.log("getShipmentByOrderId: ", response);
+    setShipmentData(response.data.result);
+  }
 
-  const UPDATE_QUOTE_URL = "/booking/updatequote";
+  useEffect(() => {
+    getShipmentByOrderId();
+  }, [])
+
+  console.log("shipmentData: ", shipmentData);
+
   let color;
   let icon;
   if (items.order_status === "pending") {
@@ -220,6 +239,14 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     setSize('large');
     setEditOpen(true);
   }
+
+  const showInspectionReport = () => {
+    setOpenReport(true);
+  }
+
+  const onCloseReport = () => {
+    setOpenReport(false);
+  };
 
   const quoteItems = [
     {
@@ -346,6 +373,19 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       },
       children: items.delay_reason,
     },
+    // received shipment or not
+    {
+      label: 'Received Shipment',
+      span: {
+        xl: 2,
+        xxl: 2,
+      },
+      children: (
+        <>
+          {shipmentData.length > 0 ? "Yes" : "No"}
+        </>
+      ),
+    },
     // when hirer checks
     authUser.CompanyId == items.hirer_company_id &&
     {
@@ -369,7 +409,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       )
     },
     // when renter checks
-    authUser.CompanyId == items.renter_company_id &&
+    authUser.CompanyId == items.renter_company_id && shipmentData.length > 0 &&
     {
       label: 'Shipment Action',
       span: {
@@ -382,6 +422,27 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
             <div className="col">
               <Button type="primary" onClick={editMaterialDrawer}>
                 Review Received Materials
+              </Button>
+            </div>
+          </div>
+        </>
+      )
+    },
+
+    // when renter checks sample report
+    authUser.CompanyId == items.renter_company_id &&
+    {
+      label: 'Sample Inspection Report',
+      span: {
+        xl: 2,
+        xxl: 2,
+      },
+      children: (
+        <>
+          <div className="row">
+            <div className="col">
+              <Button type="primary" onClick={showInspectionReport}>
+                Share Report
               </Button>
             </div>
           </div>
@@ -549,6 +610,68 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     form.resetFields();
   }
 
+  const onFinishReport = async (values) => {
+    values.orderid = items.order_id;
+    values.inspection_date_time = inspectionDateTime;
+    values.first_sample_inspection_report = viewInspectionReportFile;
+    console.log('onFinishReport:', values);
+    const response = await axios.post(CREATE_FIRST_SAMPLE_REPORT_URL, values);
+    message.success(`${response.data.message}`);
+    // close drawer
+    setOpenReport(false);
+  }
+
+  const onFinishFailedReport = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+    errorInfo.errorFields.forEach(fieldError => {
+      message.error(fieldError.errors[0]);
+    });
+    setLoading(false);
+  };
+
+  const fileUpload = async (file) => {
+    try {
+      const configHeaders = {
+        headers: { "content-type": "multipart/form-data" },
+      };
+      const formData = new FormData();
+      formData.append("fileName", file.originFileObj);
+      var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  const handleInspectionReportFileChange = async (info) => {
+    let fileList = [...info.fileList];
+    // Limit to only one file
+    fileList = fileList.slice(-1);
+    // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+    // Display an error message if more than one file is uploaded
+    if (fileList.length > 1) {
+      message.error('You can only upload one file');
+    } else {
+      setInspectionReportFileList(fileList);
+      if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+        setFileReportLoading(true);
+        // update file upload api
+        const fileRes = await fileUpload(fileList[0]);
+        // console.log("fileRes: ", fileRes);
+        message.success("Inspection Report File Uploaded!")
+        setViewInspectionReportFile(fileRes.fileUrl);
+        setFileReportLoading(false);
+      } else {
+        message.error('File size must less than 2 MB');
+      }
+    }
+  }
+
+  const handleInspectionReportRemove = () => {
+    setInspectionReportFileList([]);
+    setViewInspectionReportFile('');
+  };
+
 
   return (
     <>
@@ -574,7 +697,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       </Modal>
 
       <Drawer
-        title={` ${editOpen ? 'Edit Shipment' : ''} Shipment Details Update Sheet - ${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id}`}
+        title={` ${editOpen ? 'Edit Shipment' : ''} Shipment Details Update Sheet - ${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id} `}
         placement="top"
         size={size}
         onClose={onClose}
@@ -642,6 +765,8 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                                 // name="typeofgoods"
                                 {...restField}
                                 name={[name, 'typeofgoods']}
+                                value={selectedItems}
+                                onChange={setSelectedItems}
                                 rules={[
                                   {
                                     required: true,
@@ -792,7 +917,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                             )}
 
                             <div className='col-auto mt-4'>
-                              <Tooltip title={`Remove Shipment - ${name + 1}`}>
+                              <Tooltip title={`Remove Shipment - ${name + 1} `}>
                                 <Button danger shape="circle" onClick={() => remove(name)} icon={<CloseOutlined />} />
                               </Tooltip>
                             </div>
@@ -829,6 +954,171 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
             </div>
           </div>
         </Form>
+      </Drawer>
+
+      <Drawer title="Share Inspection Report to Hirer" onClose={onCloseReport} open={openReport}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinishReport}
+          onFinishFailed={onFinishFailedReport}
+        >
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col">
+                <Form.Item
+                  label="Order ID"
+                  name={'orderid'}
+                >
+                  <Tooltip title={`Order ID is ${items.order_id}. You can't modify.`}>
+                    <Input placeholder="input placeholder" defaultValue={items.order_id} style={{ width: '100%' }} readOnly />
+                  </Tooltip>
+                </Form.Item>
+              </div>
+
+              <div className="col">
+                <Form.Item label="Inspection Date/Time" name={'inspection_date_time'} required tooltip={{
+                  title: 'This is a required field',
+                  // icon: <InfoCircleOutlined />,
+                }}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please choose inspection start date/time',
+                    },
+                  ]}
+                >
+                  <DatePicker
+                    disabledDate={disabledDate}
+                    showTime
+                    onChange={(value, dateString) => {
+                      console.log('Selected Time: ', value);
+                      console.log('Formatted Selected Time: ', dateString);
+                      setInspectionDateTime(dateString);
+                    }}
+                    onOk={onOk}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col">
+                <Form.Item label="Part Name" required name={'part_name'} tooltip={{
+                  title: 'This is a required field'
+                }}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please update the part name!',
+                    },
+                  ]}
+                >
+                  <Input placeholder="input placeholder" style={{ width: '100%' }} />
+                </Form.Item>
+              </div>
+              <div className="col">
+                <Form.Item label="Part Number" required name={'part_number'} tooltip={{
+                  title: 'This is a required field'
+                }}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please update the part number!',
+                    },
+                  ]}
+                >
+                  <Input placeholder="input placeholder" style={{ width: '100%' }} />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col">
+                <Form.Item label="Sample Quantity" required name={'first_sample_quantity'} tooltip={{
+                  title: 'This is a required field'
+                }}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please update the sample quantity!',
+                    },
+                  ]}
+                >
+                  <Input placeholder="input placeholder" style={{ width: '100%' }} />
+                </Form.Item>
+              </div>
+              <div className="col">
+                <Form.Item
+                  label="UOM"
+                  name="uom"
+                  required
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please update your UOM!',
+                    },
+                  ]}
+                >
+                  <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col">
+                <Form.Item
+                  label="Sample Disposition"
+                  name="first_sample_disposition"
+                  required
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please update your sample disposition!',
+                    },
+                  ]}
+                >
+                  <Select placeholder='Choose sample disposition' style={{ width: '100%' }} options={sampleDisposition} />
+                </Form.Item>
+              </div>
+              <div className="col">
+                <Form.Item label="Attach Inspection Report" required name={'first_sample_inspection_report'} tooltip={{
+                  title: 'This is a required field'
+                }}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please attach the inspection report!',
+                    },
+                  ]}
+                >
+                  <Flex gap="small" wrap>
+                    <Upload
+                      fileList={inspectionReportFileList}
+                      onChange={handleInspectionReportFileChange}
+                      maxCount={1}
+                      beforeUpload={() => false}
+                      onRemove={handleInspectionReportRemove}
+                    >
+                      <Button loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
+                    </Upload>
+                    {viewInspectionReportFile &&
+                      <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
+                    }
+                  </Flex>
+                </Form.Item>
+              </div>
+
+            </div>
+
+            <div className="row">
+              <div className="col">
+                <Button type='primary' htmlType="submit">Share FSIR to Hirer</Button>
+              </div>
+            </div>
+          </div>
+        </Form>
+
       </Drawer>
 
     </>

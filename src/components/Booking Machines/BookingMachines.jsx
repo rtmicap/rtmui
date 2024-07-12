@@ -6,6 +6,7 @@ const { RangePicker } = DatePicker;
 import axios from "../../api/axios";
 import HeaderTitle from '../../utils/HeaderTitle';
 import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
+import dayjs from 'dayjs';
 
 function BookingMachines() {
     const location = useLocation();
@@ -253,6 +254,11 @@ function BookingMachines() {
         setViewOthersFile('');
     };
 
+    const disabledDate = (current) => {
+        // Can not select days before today and today
+        return current && current < dayjs().endOf('day');
+    };
+
     return (
         <>
             <div className='container-fluid'>
@@ -284,6 +290,7 @@ function BookingMachines() {
                                         ]}
                                     >
                                         <DatePicker
+                                            disabledDate={disabledDate}
                                             showTime
                                             onChange={(value, dateString) => {
                                                 console.log('Selected Time: ', value);
@@ -307,6 +314,7 @@ function BookingMachines() {
                                         ]}
                                     >
                                         <DatePicker
+                                            disabledDate={disabledDate}
                                             showTime
                                             onChange={(value, dateString) => {
                                                 console.log('Selected End Time: ', value);
