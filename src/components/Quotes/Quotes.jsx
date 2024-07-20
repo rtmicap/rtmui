@@ -11,7 +11,7 @@ import {
     SyncOutlined,
     ReloadOutlined
 } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { formattedDateTime } from '../../utils/utils';
 import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
@@ -157,7 +157,7 @@ function Quotes() {
 
 const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
     console.log("items vie", items);
-
+    const navigate = useNavigate();
     const { authUser } = useAuth();
     console.log("items authUser", authUser);
     const [isLoading, setIsLoading] = useState(false);
@@ -206,6 +206,10 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             message.error("Something error while accepting the quote!");
             setIsLoading(false);
         }
+    }
+
+    const bookingPage = () => {
+        navigate("/my-bookings");
     }
 
     const quoteItems = [
@@ -308,7 +312,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                 <>
                     <div className='row'>
                         <div className="col">
-                            <strong>You can check your bookings page <Link to={'my-bookings'}>here</Link></strong>
+                            <strong>You can check your bookings page<Button type='link' onClick={bookingPage}>here</Button></strong>
                         </div>
                     </div>
                 </>
