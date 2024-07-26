@@ -96,7 +96,7 @@ function BookingMachines() {
                 clearTimeout(timer)
             };
         } catch (error) {
-            message.error("Error while updating the quote. Please try again!");
+            message.error(`${error.response.data && error.response.data.detailType ? error.response.data.detailType : 'Error while updating the quote. Please try again!'}`);
             console.log("quote error: ", error);
             setStep(1);
             setLoading(false);

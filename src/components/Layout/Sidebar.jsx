@@ -53,8 +53,7 @@ const items = [
 ]
 
 function Sidebar() {
-    const { userSignOut, isLoading } = useAuth();
-
+    const { userSignOut, authUser } = useAuth();
     const navigate = useNavigate();
 
     const navigateMenuItems = (value) => {
@@ -97,6 +96,7 @@ function Sidebar() {
                     <div className="demo-logo-vertical">
                         <h3 style={{ color: 'white', textAlign: 'center' }}>Logo</h3>
                     </div>
+                    <span style={{ color: 'white', textAlign: 'center' }}>{authUser && authUser.companyName}</span>
                     <Menu theme="dark" mode="inline" defaultSelectedKeys={window.location.pathname} onClick={navigateMenuItems} items={items} />
                 </Sider>
 

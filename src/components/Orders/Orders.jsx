@@ -21,8 +21,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import dayjs from 'dayjs';
-import { sampleDisposition, typesOfGoods, uomChoices } from './OrderUtils';
-import { CREATE_FIRST_SAMPLE_REPORT_URL, CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_FIRST_SAMPLE_REPORT_URL } from '../../api/apiUrls';
+import { receiptConfirmation, sampleDisposition, typesOfGoods, uomChoices } from './OrderUtils';
+import { CREATE_FINAL_REPORT_URL, CREATE_FIRST_SAMPLE_REPORT_URL, CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_FINAL_REPORT_URL, UPDATE_FIRST_SAMPLE_REPORT_URL, UPDATE_SHIPMENT_URL } from '../../api/apiUrls';
 import moment from 'moment/moment';
 const { TextArea } = Input;
 
@@ -207,6 +207,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   const [openFinalReport, setOpenFinalReport] = useState(false);
   const [orderCompletionDateTime, setOrderCompletionDateTime] = useState('');
   const [reviewFinalReportForHirer, setReviewFinalReportForHirer] = useState(false);
+  const [goodsPickUpDateTime, setGoodsPickUpDateTime] = useState('');
+  const [prodInspectionReportFileList, setProdInspectionReportFileList] = useState([]);
+  const [viewProdLotInspectionReportFile, setViewProdLotInspectionReportFile] = useState('');
+  const [fileFinalReportLoading, setFileFinalReportLoading] = useState(false);
 
   const getShipmentByOrderId = async () => {
     const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${items.order_id}`);
@@ -214,8 +218,24 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     setShipmentData(response.data.result);
   }
 
+  const fetchShipmentDetails = async (orderId) => {
+    const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${items.order_id}`);
+    console.log("fetchShipmentDetails: ", response);
+    if (response.data.message === "Successfully fetched shipment details for order id provided") {
+      const formattedDetails = response.data.result.map(detail => ({
+        ...detail,
+        typeofgoods: detail.type_of_goods,
+      }));
+      form.setFieldsValue({ shipment_details: formattedDetails });
+      form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) })
+      console.log("formattedDetails: ", formattedDetails);
+    }
+  };
+
   useEffect(() => {
     getShipmentByOrderId();
+    const orderId = items.order_id; // Replace with your dynamic order ID
+    fetchShipmentDetails(orderId);
   }, [])
 
   console.log("shipmentData: ", shipmentData);
@@ -245,6 +265,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   const editMaterialDrawer = () => {
     setSize('large');
     setEditOpen(true);
+    console.log("");
   }
 
   const reviewInspectionReport = async () => {
@@ -275,18 +296,48 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   };
 
 
-  const showFinalReport = () => {
+  const showFinalReport = async () => {
     setOpenFinalReport(true);
+    const response = await axios.get(`${GET_FIRST_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
+    console.log("reviewInspectionReport: ", response.data);
+    const values = response.data.results[0];
+    form.setFieldsValue({
+      part_number: values.part_number,
+      part_name: values.part_name,
+      uom: values.UOM,
+      first_sample_id: values.id,
+    });
   }
 
   const onCloseFinalReport = () => {
     setOpenFinalReport(false);
   }
 
-  const reviewFinalReport = () => {
+  const reviewFinalReport = async () => {
     setOpenFinalReport(true);
     setReviewFinalReportForHirer(true);
     // review related Data
+    const response = await axios.get(`${GET_FIRST_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
+    console.log("reviewInspectionReport: ", response.data);
+    const values = response.data.results[0];
+    const inspectionDateTime = moment(values.inspection_date_time);
+    const completionDateTime = moment(values.completion_date_time);
+    form.setFieldsValue({
+      inspection_date_time: inspectionDateTime, // assuming you are using moment.js for date handling
+      completion_date_time: completionDateTime,
+      part_number: values.part_number,
+      part_name: values.part_name,
+      uom: values.UOM,
+      first_sample_quantity: values.first_sample_quantity,
+      first_sample_inspection_report: values.first_sample_inspection_report,
+      first_sample_disposition: values.first_sample_disposition,
+      first_sample_id: values.id,
+      order_ok_quantity: values.order_ok_quantity,
+      final_product_disposition: values.final_product_disposition,
+      prod_lot_inspection_report: values.prod_lot_inspection_report,
+      order_completion_remarks: values.order_completion_remarks
+
+    });
   }
 
   const quoteItems = [
@@ -473,7 +524,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     // when renter checks sample report
     authUser.CompanyId == items.renter_company_id &&
     {
-      label: 'Sample Inspection Report',
+      label: 'First Sample Inspection Report',
       span: {
         xl: 2,
         xxl: 2,
@@ -483,7 +534,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
           <div className="row">
             <div className="col">
               <Button type="primary" onClick={showInspectionReport}>
-                Share Report
+                Create First Sample Report
               </Button>
             </div>
           </div>
@@ -494,7 +545,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     // when hirer checks sample report
     authUser.CompanyId == items.hirer_company_id &&
     {
-      label: 'Sample Inspection Report',
+      label: 'First Sample Inspection Report',
       span: {
         xl: 2,
         xxl: 2,
@@ -504,7 +555,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
           <div className="row">
             <div className="col">
               <Button type="primary" onClick={reviewInspectionReport}>
-                Review Sample Report
+                Review First Sample Report
               </Button>
             </div>
           </div>
@@ -525,7 +576,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
           <div className="row">
             <div className="col">
               <Button type="primary" onClick={showFinalReport}>
-                Update Final Report
+                Create Final Report
               </Button>
             </div>
           </div>
@@ -625,6 +676,22 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     });
   };
 
+  const updateShipmentFn = async () => {
+    try {
+      const data = form.getFieldsValue();
+      console.log("updateShipmentFn: ", data);
+      data.orderid = items.order_id;
+      const response = await axios.patch(UPDATE_SHIPMENT_URL, data);
+      console.log("response update ship: ", response);
+      message.success(response.data.message);
+      setEditOpen(false);
+    } catch (error) {
+      message.error("There is some error while updating the shipment!");
+      console.log("shipment update err: ", error);
+    }
+
+  }
+
   const disabledDate = (current) => {
     // Can not select days before today and today
     return current && current < dayjs().endOf('day');
@@ -714,7 +781,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     form.resetFields();
   }
 
-  // report related functions below
+  // sample report related functions below
 
   const onFinishReport = async (values) => {
     values.orderid = items.order_id;
@@ -803,8 +870,77 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
   }
 
-  const submitFinalReportStatus = async (value)=>{
+  // final report 
 
+  const handleProdLotInspectionReportFileChange = async (info) => {
+    let fileList = [...info.fileList];
+    // Limit to only one file
+    fileList = fileList.slice(-1);
+    // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+    // Display an error message if more than one file is uploaded
+    if (fileList.length > 1) {
+      message.error('You can only upload one file');
+    } else {
+      setProdInspectionReportFileList(fileList);
+      if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+        setFileFinalReportLoading(true);
+        // update file upload api
+        const fileRes = await fileUpload(fileList[0]);
+        // console.log("fileRes: ", fileRes);
+        message.success("Final Inspection Report File Uploaded!")
+        setViewProdLotInspectionReportFile(fileRes.fileUrl);
+        setFileFinalReportLoading(false);
+      } else {
+        message.error('File size must less than 2 MB');
+      }
+    }
+  }
+
+  const handleProdLotInspectionReportRemove = () => {
+    setProdInspectionReportFileList([]);
+    setViewProdLotInspectionReportFile('');
+  };
+
+  const onFinishFinalReport = async (values) => {
+    const data = form.getFieldsValue();
+    console.log("get Data: ", data);
+    values.orderid = items.order_id;
+    values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
+    values.completion_date_time = orderCompletionDateTime;
+    values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
+    values.final_product_disposition = "approved";
+    values.first_sample_id = form.getFieldValue("first_sample_id");
+    console.log('onFinishFinalReport:', values);
+    const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
+    message.success(`${response.data.message}`);
+    // close drawer
+    setOpenFinalReport(false);
+  }
+
+  const onFinishFailedFinalReport = (errorInfo) => {
+    console.log('onFinishFailedFinalReport Failed:', errorInfo);
+    errorInfo.errorFields.forEach(fieldError => {
+      message.error(fieldError.errors[0]);
+    });
+    setLoading(false);
+  };
+
+  const submitFinalReportStatus = async (value) => {
+    try {
+      const data = form.getFieldsValue();
+      data.final_product_disposition = value;
+      data.orderid = items.order_id;
+      data.first_sample_id = form.getFieldValue("first_sample_id")
+      console.log("final report datta: ", data);
+      // const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
+      // console.log("updated: ", response.data);
+      // message.success(response.data.message);
+      setOpenFinalReport(false);
+    } catch (error) {
+      console.log("error final report: ", error);
+      message.error("There is some error in final report!");
+      setOpenFinalReport(false);
+    }
   }
 
   return (
@@ -829,9 +965,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
           items={quoteItems}
         />
       </Modal>
-
+      {/* // create and review shipment materials */}
       <Drawer
-        title={` ${editOpen ? 'Edit Shipment' : ''} Shipment Details Update Sheet - ${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id} `}
+        title={` ${editOpen ? 'Edit Shipment' : `Shipment Details Update Sheet -${authUser.CompanyId == items.hirer_company_id ? '(Hirer)' : '(Renter)'} - Order ID: ${items.order_id}`} `}
         placement="top"
         size={size}
         onClose={onClose}
@@ -865,18 +1001,25 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   },
                 ]}
               >
-                <DatePicker
-                  disabledDate={disabledDate}
-                  showTime
-                  onChange={(value, dateString) => {
-                    console.log('Selected Time: ', value);
-                    console.log('Formatted Selected Time: ', dateString);
-                    setShipmentDateTime(dateString);
-                  }}
-                  onOk={onOk}
-                  placeholder="Select shipment date"
-                  required
-                />
+                {editOpen &&
+                  <DatePicker
+                    disabledDate={disabledDate}
+                    showTime
+                    name='shipment_date'
+                    onChange={(value, dateString) => {
+                      console.log('Selected Time: ', value);
+                      console.log('Formatted Selected Time: ', dateString);
+                      setShipmentDateTime(dateString);
+                    }}
+                    onOk={onOk}
+                    placeholder="Select shipment date"
+                    required
+                  />
+                }
+                {/* 
+                {editOpen && (
+                  <>{formattedDateTime(form.getFieldValue('shipment_date'))}</>
+                )} */}
               </Form.Item>
             </div>
           </div>
@@ -892,6 +1035,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       return (
                         <>
                           <h6>Shipment Details - {name + 1}</h6>
+                          {editOpen &&
+                            <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
+                          }
                           <div className='row' key={name}>
                             <div className="col">
                               <Form.Item
@@ -908,7 +1054,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                                   },
                                 ]}
                               >
-                                <Select placeholder='Choose type of goods' style={{ width: '100%' }} onChange={handleSelectChange} options={typesOfGoods} />
+                                <Select readOnly={editOpen} placeholder='Choose type of goods' style={{ width: '100%' }} onChange={handleSelectChange} options={typesOfGoods} />
                               </Form.Item>
                             </div>
 
@@ -928,7 +1074,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                                     ]}
                                   >
                                     {/* <Input /> */}
-                                    <TextArea rows={3} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
+                                    <TextArea rows={3} readOnly={editOpen} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
                                   </Form.Item>
                                 </div>
 
@@ -945,16 +1091,16 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                                       },
                                     ]}
                                   >
-                                    <Input placeholder='Enter shipment quantity' required />
+                                    <Input placeholder='Enter shipment quantity' readOnly={editOpen} required />
                                   </Form.Item>
                                 </div>
 
                                 <div className="col">
                                   <Form.Item
-                                    label="UOM"
+                                    label={"UOM"}
                                     // name="uom"
                                     {...restField}
-                                    name={[name, 'uom']}
+                                    name={[name, 'UOM']}
                                     rules={[
                                       {
                                         required: true,
@@ -965,6 +1111,25 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                                     <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
                                   </Form.Item>
                                 </div>
+
+                                {editOpen &&
+                                  <div className="col">
+                                    <Form.Item
+                                      label="Receipt Confirmation"
+                                      // name="uom"
+                                      {...restField}
+                                      name={[name, 'received_status']}
+                                      rules={[
+                                        {
+                                          required: true,
+                                          message: 'Please input receipt confirmation!',
+                                        },
+                                      ]}
+                                    >
+                                      <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
+                                    </Form.Item>
+                                  </div>
+                                }
 
                                 {!fileUrls[name] && <div className="col-auto mt-4">
                                   <Form.Item
@@ -1062,7 +1227,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
                     )}
                     {/* maximum four fields can be use so total 5 details */}
-                    {fields.length < 5 && (
+                    {fields.length < 5 && !editOpen && (
                       <div className='row'>
                         <div className="col-auto">
                           <Form.Item>
@@ -1083,14 +1248,22 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
           </div>
           <hr />
           <div className="row">
-            <div className="col text-center">
-              <Button htmlType='submit' type='primary'>Submit</Button>
-            </div>
+            {!editOpen &&
+              <div className="col text-center">
+                <Button htmlType='submit' type='primary'>Submit</Button>
+              </div>
+            }
+            {editOpen &&
+              <div className="col text-center">
+                <Button htmlType='button' type='primary' onClick={updateShipmentFn}>Update Shipment</Button>
+              </div>
+            }
           </div>
         </Form>
       </Drawer>
 
-      <Drawer title={`Sample Inspection Report to ${reviewSampleReport ? 'Renter' : 'Hirer'}`} onClose={onCloseSampleReport} open={openSampleReport} size='large'>
+      {/* // create and review sample Report */}
+      <Drawer title={`First Sample Inspection Report to ${reviewSampleReport ? 'Renter' : 'Hirer'}`} onClose={onCloseSampleReport} open={openSampleReport} size='large'>
         <Form
           form={form}
           layout="vertical"
@@ -1134,7 +1307,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   />}
 
                   {reviewSampleReport && (
-                    <>{form.getFieldValue('inspection_date_time') ? formattedDateTime(form.getFieldValue('inspection_date_time')) : "Date is not updated to inspect"}</>
+                    <>{formattedDateTime(form.getFieldValue('inspection_date_time'))}</>
                   )}
                 </Form.Item>
               </div>
@@ -1180,6 +1353,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                     {
                       required: true,
                       message: 'Please update the sample quantity!',
+                    },
+                    {
+                      pattern: /^[1-9]$/,
+                      message: 'Sample quantity must be between 1 and 9!',
                     },
                   ]}
                 >
@@ -1299,14 +1476,15 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         </Form>
 
       </Drawer>
+      {/* // end of create and review sample Report */}
 
-      // create and review Final Report
-      <Drawer title={`Final Order Report to ${reviewFinalReportForHirer ? 'Renter' : 'Hirer'}`} onClose={onCloseFinalReport} open={openFinalReport} size='large'>
+      {/* // create and review Final Report */}
+      <Drawer title={`Final Order Report`} onClose={onCloseFinalReport} open={openFinalReport} size='large'>
         <Form
           form={form}
           layout="vertical"
-          onFinish={onFinishReport}
-          onFinishFailed={onFinishFailedReport}
+          onFinish={onFinishFinalReport}
+          onFinishFailed={onFinishFailedFinalReport}
         >
           <div className="container-fluid">
             <div className="row">
@@ -1339,7 +1517,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                     onChange={(value, dateString) => {
                       console.log('Selected Time: ', value);
                       console.log('Formatted Selected Time: ', dateString);
-                      setInspectionDateTime(dateString);
+                      setOrderCompletionDateTime(dateString);
                     }}
                     onOk={onOk}
                   />}
@@ -1367,12 +1545,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                 </Form.Item>
               </div>
               <div className="col">
-                <Form.Item label="Part Number" required name={'part_number'} tooltip={{
-                  title: 'This is a required field'
-                }}
+                <Form.Item label="Part Number" name={'part_number'}
                   rules={[
                     {
-                      required: true,
                       message: 'Please update the part number!',
                     },
                   ]}
@@ -1446,16 +1621,16 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                 >
                   <Flex gap="small" wrap>
                     <Upload
-                      fileList={inspectionReportFileList}
-                      onChange={handleInspectionReportFileChange}
+                      fileList={prodInspectionReportFileList}
+                      onChange={handleProdLotInspectionReportFileChange}
                       maxCount={1}
                       beforeUpload={() => false}
-                      onRemove={handleInspectionReportRemove}
+                      onRemove={handleProdLotInspectionReportRemove}
                     >
-                      <Button loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
+                      <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
                     </Upload>
-                    {viewInspectionReportFile &&
-                      <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
+                    {viewProdLotInspectionReportFile &&
+                      <Link to={viewProdLotInspectionReportFile} target={'_blank'}>View File</Link>
                     }
 
                     {reviewFinalReportForHirer && form.getFieldValue('prod_lot_inspection_report') &&
@@ -1485,6 +1660,31 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       <TextArea rows={3} placeholder="Enter your remarks (max: 300 words)" maxLength={300} showCount required />
                     </Form.Item>
                   </div>
+                  <div className="col">
+                    <Form.Item label="Goods PickUp Date/Time" name={'final_goods_planned_pickup_datetime'} required tooltip={{
+                      title: 'This is a required field',
+                      // icon: <InfoCircleOutlined />,
+                    }}
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please choose goods pickup date/time',
+                        },
+                      ]}
+                    >
+
+                      <DatePicker
+                        disabledDate={disabledDate}
+                        showTime
+                        onChange={(value, dateString) => {
+                          console.log('Selected Time: ', value);
+                          console.log('Formatted goods pick Selected Time: ', dateString);
+                          setGoodsPickUpDateTime(dateString);
+                        }}
+                        onOk={onOk}
+                      />
+                    </Form.Item>
+                  </div>
                 </div>
 
                 <div className="row">
@@ -1497,6 +1697,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   <div className="col">
                     <Button type='primary' danger onClick={() => submitFinalReportStatus("rejected")}>Rejected</Button>
                   </div>
+
                 </div>
                 <hr />
               </>

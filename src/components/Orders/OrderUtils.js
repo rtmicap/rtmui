@@ -18,3 +18,10 @@ export const sampleDisposition = [
     { value: 'deviation_request', label: 'Deviation Request' },
     { value: 'rejected', label: 'Rejected' }
 ];
+
+export const receiptConfirmation = [
+    { value: 'received_in_full', label: 'Received in Full' },
+    { value: 'received_short', label: 'Received Short' },
+    { value: 'reject_goods_quality_issue', label: 'Rejected' },
+    { value: 'return_goods_wrong_parts', label: 'Return Goods Wrong Parts' }
+];

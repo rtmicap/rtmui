@@ -21,6 +21,7 @@ export const GET_ALL_ORDERS_URL = "/order/getAllOrders";
 
 //Shipment related Url
 export const CREATE_SHIPMENT_URL = "/order/shipment/createshipment";
+export const UPDATE_SHIPMENT_URL = "/order/shipment/updateshipment";
 export const GET_SHIPMENT_BY_ORDERID_URL = "/order/shipment/getshipmentbyorderid";
 export const GET_ALL_SHIPMENTS = "/order/shipment/getAllShipments";
 
