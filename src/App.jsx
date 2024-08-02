@@ -37,6 +37,7 @@ import MyBookings from './components/My Bookings/MyBookings';
 import BookingMachines from './components/Booking Machines/BookingMachines';
 import MyRegisteredMachines from './components/MyRegisteredMachines/MyRegisteredMachines';
 import ReviewBooking from './components/Review Booking/ReviewBooking';
+import Payment from './components/Payment/Payment';
 
 const App = () => {
   // const {
@@ -79,6 +80,9 @@ const App = () => {
 
             {/* My Bookings */}
             <Route path='my-bookings' element={<MyBookings />} />
+
+            {/* payment */}
+            <Route path='payment' element={<Payment />} />
 
             {/* Gauges */}
             <Route path='buy-gauges' element={<BuyGauges />} />

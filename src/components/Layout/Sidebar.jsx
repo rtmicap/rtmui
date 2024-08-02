@@ -3,7 +3,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const { Header, Content, Footer, Sider } = Layout;
-import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 
@@ -31,6 +31,7 @@ const items = [
     getItem('My Quotes', 'quotes', <ContactsOutlined />),
     getItem('My Orders', 'orders', <UnorderedListOutlined />),
     getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
+    getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
         getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),

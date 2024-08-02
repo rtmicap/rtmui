@@ -203,6 +203,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   const [fileReportLoading, setFileReportLoading] = useState(false);
   const [viewInspectionReportFile, setViewInspectionReportFile] = useState('');
   const [reviewSampleReport, setReviewSampleReport] = useState(false);
+  const [sampleReportStatus, setSampleReportStatus] = useState(null);
   // final report
   const [openFinalReport, setOpenFinalReport] = useState(false);
   const [orderCompletionDateTime, setOrderCompletionDateTime] = useState('');
@@ -211,6 +212,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   const [prodInspectionReportFileList, setProdInspectionReportFileList] = useState([]);
   const [viewProdLotInspectionReportFile, setViewProdLotInspectionReportFile] = useState('');
   const [fileFinalReportLoading, setFileFinalReportLoading] = useState(false);
+  const [finalReportDispositionStatus, setFinalReportDispositionStatus] = useState(null);
 
   const getShipmentByOrderId = async () => {
     const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${items.order_id}`);
@@ -234,8 +236,6 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
   useEffect(() => {
     getShipmentByOrderId();
-    const orderId = items.order_id; // Replace with your dynamic order ID
-    fetchShipmentDetails(orderId);
   }, [])
 
   console.log("shipmentData: ", shipmentData);
@@ -265,7 +265,8 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
   const editMaterialDrawer = () => {
     setSize('large');
     setEditOpen(true);
-    console.log("");
+    const orderId = items.order_id; // Replace with your dynamic order ID
+    fetchShipmentDetails(orderId);
   }
 
   const reviewInspectionReport = async () => {
@@ -274,15 +275,15 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     const response = await axios.get(`${GET_FIRST_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
     console.log("reviewInspectionReport: ", response.data);
     const values = response.data.results[0];
-    const inspectionDateTime = moment(values.inspection_date_time);
+    const getInspectionDateTime = moment(values.inspection_date_time);
     form.setFieldsValue({
-      inspection_date_time: inspectionDateTime, // assuming you are using moment.js for date handling
+      inspection_date_time: getInspectionDateTime ? getInspectionDateTime : '', // assuming you are using moment.js for date handling
       part_number: values.part_number,
       part_name: values.part_name,
       uom: values.UOM,
       first_sample_quantity: values.first_sample_quantity,
       first_sample_inspection_report: values.first_sample_inspection_report,
-      first_sample_disposition: values.first_sample_disposition,
+      // first_sample_disposition: values.first_sample_disposition,
       first_sample_id: values.id
     });
   }
@@ -783,11 +784,19 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
   // sample report related functions below
 
+  const handleSampleReportSubmit = async (values) => {
+    if (reviewSampleReport && sampleReportStatus) {
+      sampleReportStatusUpdate(sampleReportStatus);
+    } else {
+      onFinishReport(values);
+    }
+  }
+
   const onFinishReport = async (values) => {
     values.orderid = items.order_id;
     values.inspection_date_time = inspectionDateTime;
     values.first_sample_inspection_report = viewInspectionReportFile;
-    values.first_sample_disposition = "pending_approval";
+    // values.first_sample_disposition = "pending_approval";
     console.log('onFinishReport:', values);
     const response = await axios.post(CREATE_FIRST_SAMPLE_REPORT_URL, values);
     message.success(`${response.data.message}`);
@@ -827,7 +836,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       message.error('You can only upload one file');
     } else {
       setInspectionReportFileList(fileList);
-      if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+      if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
         setFileReportLoading(true);
         // update file upload api
         const fileRes = await fileUpload(fileList[0]);
@@ -836,7 +845,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         setViewInspectionReportFile(fileRes.fileUrl);
         setFileReportLoading(false);
       } else {
-        message.error('File size must less than 2 MB');
+        message.error('File size must less than 3 MB');
       }
     }
   }
@@ -882,7 +891,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       message.error('You can only upload one file');
     } else {
       setProdInspectionReportFileList(fileList);
-      if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+      if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
         setFileFinalReportLoading(true);
         // update file upload api
         const fileRes = await fileUpload(fileList[0]);
@@ -891,7 +900,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         setViewProdLotInspectionReportFile(fileRes.fileUrl);
         setFileFinalReportLoading(false);
       } else {
-        message.error('File size must less than 2 MB');
+        message.error('File size must less than 3 MB');
       }
     }
   }
@@ -900,6 +909,14 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     setProdInspectionReportFileList([]);
     setViewProdLotInspectionReportFile('');
   };
+
+  const handleFinalReportSubmit = async (values) => {
+    if (reviewFinalReportForHirer && finalReportDispositionStatus) {
+      submitFinalReportStatus(finalReportDispositionStatus);
+    } else {
+      onFinishFinalReport(values);
+    }
+  }
 
   const onFinishFinalReport = async (values) => {
     const data = form.getFieldsValue();
@@ -932,9 +949,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       data.orderid = items.order_id;
       data.first_sample_id = form.getFieldValue("first_sample_id")
       console.log("final report datta: ", data);
-      // const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
-      // console.log("updated: ", response.data);
-      // message.success(response.data.message);
+      const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
+      console.log("updated submitFinalReportStatus: ", response.data);
+      message.success(response.data.message);
       setOpenFinalReport(false);
     } catch (error) {
       console.log("error final report: ", error);
@@ -983,7 +1000,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       >
         <Form
           name="basic"
-          onFinish={onFinish}
+          onFinish={editOpen ? updateShipmentFn : onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout='vertical'
@@ -1255,7 +1272,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
             }
             {editOpen &&
               <div className="col text-center">
-                <Button htmlType='button' type='primary' onClick={updateShipmentFn}>Update Shipment</Button>
+                <Button htmlType='submit' type='primary'>Update Shipment</Button>
               </div>
             }
           </div>
@@ -1267,7 +1284,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         <Form
           form={form}
           layout="vertical"
-          onFinish={onFinishReport}
+          onFinish={handleSampleReportSubmit}
           onFinishFailed={onFinishFailedReport}
         >
           <div className="container-fluid">
@@ -1307,7 +1324,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   />}
 
                   {reviewSampleReport && (
-                    <>{formattedDateTime(form.getFieldValue('inspection_date_time'))}</>
+                    <>{form.getFieldValue('inspection_date_time') ? formattedDateTime(form.getFieldValue('inspection_date_time')) : 'Not updated by renter'}</>
                   )}
                 </Form.Item>
               </div>
@@ -1400,7 +1417,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
               }
 
               <div className="col">
-                <Form.Item label="Attach Inspection Report" required name={'first_sample_inspection_report'} tooltip={{
+                <Form.Item label="Attach Inspection Report (Max: 3 MB Size)" required name={'first_sample_inspection_report'} tooltip={{
                   title: 'This is a required field'
                 }}
                   rules={[
@@ -1448,30 +1465,40 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                         },
                       ]}
                     >
-                      <TextArea rows={3} placeholder="Enter your remarks (max: 300 words)" maxLength={300} showCount required />
+                      <TextArea rows={3} placeholder="Enter your remarks (max: 300 words)" maxLength={300} showCount />
                     </Form.Item>
                   </div>
                 </div>
+
+              </>
+            }
+            {/* only renter can create sample report */}
+            {authUser.CompanyId == items.renter_company_id &&
+              <div className="row">
+                <div className="col">
+                  <Button type='primary' htmlType="submit">Share FSIR to {reviewSampleReport ? 'Renter' : 'Hirer'}</Button>
+                </div>
+              </div>
+            }
+            {/* only hirer can review sample report */}
+            {reviewSampleReport &&
+              <>
                 <div className="row">
                   <div className="col">
-                    <Button type='primary' onClick={() => sampleReportStatusUpdate("approved")}>Approved & Proceed for Production</Button>
+                    <Button type='primary' htmlType="submit" onClick={() => setSampleReportStatus("approved")}>Approved & Proceed for Production</Button>
                   </div>
                   <div className="col">
-                    <Button onClick={() => sampleReportStatusUpdate("repeat_sample")}>Do Resample</Button>
+                    <Button htmlType="submit" onClick={() => setSampleReportStatus("repeat_sample")}>Do Resample</Button>
                   </div>
                   <div className="col">
-                    <Button type='primary' danger onClick={() => sampleReportStatusUpdate("rejected")}>Reject & Cancel Order</Button>
+                    <Button type='primary' htmlType="submit" danger onClick={() => setSampleReportStatus("rejected")}>Reject & Cancel Order</Button>
                   </div>
                 </div>
                 <hr />
               </>
+
             }
 
-            <div className="row">
-              <div className="col">
-                <Button type='primary' htmlType="submit">Share FSIR to {reviewSampleReport ? 'Renter' : 'Hirer'}</Button>
-              </div>
-            </div>
           </div>
         </Form>
 
@@ -1483,7 +1510,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         <Form
           form={form}
           layout="vertical"
-          onFinish={onFinishFinalReport}
+          onFinish={handleFinalReportSubmit}
           onFinishFailed={onFinishFailedFinalReport}
         >
           <div className="container-fluid">
@@ -1545,13 +1572,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                 </Form.Item>
               </div>
               <div className="col">
-                <Form.Item label="Part Number" name={'part_number'}
-                  rules={[
-                    {
-                      message: 'Please update the part number!',
-                    },
-                  ]}
-                >
+                <Form.Item label="Part Number" name={'part_number'}>
                   <Input placeholder="input placeholder" style={{ width: '100%' }} />
                 </Form.Item>
               </div>
@@ -1609,7 +1630,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
               }
 
               <div className="col">
-                <Form.Item label="Prod Lot Inspection Report" required name={'prod_lot_inspection_report'} tooltip={{
+                <Form.Item label="Prod Lot Inspection Report (Max: 3 MB Size)" required name={'prod_lot_inspection_report'} tooltip={{
                   title: 'This is a required field'
                 }}
                   rules={[
@@ -1686,28 +1707,34 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                     </Form.Item>
                   </div>
                 </div>
+                {reviewFinalReportForHirer &&
+                  <>
+                    <div className="row">
+                      <div className="col">
+                        <Button type='primary' htmlType="submit" onClick={() => setFinalReportDispositionStatus("approved")}>Approved</Button>
+                      </div>
+                      <div className="col">
+                        <Button htmlType="submit" onClick={() => setFinalReportDispositionStatus("rework")}>Rework needed</Button>
+                      </div>
+                      <div className="col">
+                        <Button type='primary' htmlType="submit" danger onClick={() => setFinalReportDispositionStatus("rejected")}>Rejected</Button>
+                      </div>
 
-                <div className="row">
-                  <div className="col">
-                    <Button type='primary' onClick={() => submitFinalReportStatus("approved")}>Approved</Button>
-                  </div>
-                  <div className="col">
-                    <Button onClick={() => submitFinalReportStatus("rework")}>Rework needed</Button>
-                  </div>
-                  <div className="col">
-                    <Button type='primary' danger onClick={() => submitFinalReportStatus("rejected")}>Rejected</Button>
-                  </div>
-
-                </div>
-                <hr />
+                    </div>
+                    <hr />
+                  </>
+                }
               </>
             }
 
-            <div className="row">
-              <div className="col text-center">
-                <Button type='primary' htmlType="submit">Send Order Completion Report</Button>
+            {!reviewFinalReportForHirer &&
+              <div className="row">
+                <div className="col text-center">
+                  <Button type='primary' htmlType="submit">Send Order Completion Report</Button>
+                </div>
               </div>
-            </div>
+            }
+
           </div>
         </Form>
       </Drawer>
