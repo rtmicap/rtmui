@@ -1434,6 +1434,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       maxCount={1}
                       beforeUpload={() => false}
                       onRemove={handleInspectionReportRemove}
+                      accept=".pdf,.csv"
                     >
                       <Button loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
                     </Upload>
@@ -1647,6 +1648,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       maxCount={1}
                       beforeUpload={() => false}
                       onRemove={handleProdLotInspectionReportRemove}
+                      accept=".pdf,.csv"
                     >
                       <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
                     </Upload>
