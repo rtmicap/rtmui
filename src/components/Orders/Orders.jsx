@@ -1001,7 +1001,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   },
                 ]}
               >
-                {editOpen &&
+                {!editOpen &&
                   <DatePicker
                     disabledDate={disabledDate}
                     showTime
@@ -1016,10 +1016,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                     required
                   />
                 }
-                {/* 
+
                 {editOpen && (
                   <>{formattedDateTime(form.getFieldValue('shipment_date'))}</>
-                )} */}
+                )}
               </Form.Item>
             </div>
           </div>
