@@ -320,9 +320,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     // review related Data
     const response = await axios.get(`${GET_FIRST_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
     console.log("reviewInspectionReport: ", response.data);
-    const values = response.data.results[0];
+    const filteredFinalReport = response.data.results.filter((data) => data.final_product_approved_quantity && data.final_product_disposition == "approved")
+    const values = filteredFinalReport[0];
     const inspectionDateTime = moment(values.inspection_date_time);
-    const completionDateTime = moment(values.completion_date_time);
+    const completionDateTime = moment(values.completion_date_time ? values.completion_date_time : values.final_completion_date_time);
     form.setFieldsValue({
       inspection_date_time: inspectionDateTime, // assuming you are using moment.js for date handling
       completion_date_time: completionDateTime,
@@ -333,10 +334,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       first_sample_inspection_report: values.first_sample_inspection_report,
       first_sample_disposition: values.first_sample_disposition,
       first_sample_id: values.id,
-      order_ok_quantity: values.order_ok_quantity,
+      order_ok_quantity: values.order_ok_quantity ? values.order_ok_quantity : values.final_product_approved_quantity,
       final_product_disposition: values.final_product_disposition,
-      prod_lot_inspection_report: values.prod_lot_inspection_report,
-      order_completion_remarks: values.order_completion_remarks
+      prod_lot_inspection_report: values.prod_lot_inspection_report ? values.prod_lot_inspection_report : values.final_inspection_report,
+      order_completion_remarks: values.order_completion_remarks ? values.order_completion_remarks : values.final_completion_remarks
 
     });
   }
@@ -457,6 +458,12 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       },
       children: items.order_rework_counter,
     },
+
+    {
+      label: 'First Sample Disposition Status',
+      children: form.getFieldValue('first_sample_disposition') ? form.getFieldValue('first_sample_disposition') : '-',
+    },
+
     items.delay_reason &&
     {
       label: 'Delay Reason',
@@ -946,12 +953,14 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     try {
       const data = form.getFieldsValue();
       data.final_product_disposition = value;
+      data.final_report_disposition = value;
       data.orderid = items.order_id;
-      data.first_sample_id = form.getFieldValue("first_sample_id")
+      data.first_sample_id = form.getFieldValue("first_sample_id");
+      data.final_report_id = form.getFieldValue("first_sample_id");
       console.log("final report datta: ", data);
       const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
       console.log("updated submitFinalReportStatus: ", response.data);
-      message.success(response.data.message);
+      message.success(response.data ? response.data.message : response.message);
       setOpenFinalReport(false);
     } catch (error) {
       console.log("error final report: ", error);
@@ -1680,7 +1689,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                         },
                       ]}
                     >
-                      <TextArea rows={3} placeholder="Enter your remarks (max: 300 words)" maxLength={300} showCount required />
+                      <TextArea rows={3} placeholder="Enter your remarks (max: 300 words)" maxLength={300} showCount />
                     </Form.Item>
                   </div>
                   <div className="col">
