@@ -22,9 +22,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import dayjs from 'dayjs';
 import { receiptConfirmation, sampleDisposition, typesOfGoods, uomChoices } from './OrderUtils';
-import { CREATE_FINAL_REPORT_URL, CREATE_FIRST_SAMPLE_REPORT_URL, CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_FINAL_REPORT_URL, UPDATE_FIRST_SAMPLE_REPORT_URL, UPDATE_SHIPMENT_URL } from '../../api/apiUrls';
+import { CREATE_FINAL_REPORT_URL, CREATE_FIRST_SAMPLE_REPORT_URL, CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_ALL_ORDERS_URL, GET_FINAL_SAMPLE_REPORT_ORDERID_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_FINAL_REPORT_URL, UPDATE_FIRST_SAMPLE_REPORT_URL, UPDATE_SHIPMENT_URL } from '../../api/apiUrls';
 import moment from 'moment/moment';
 const { TextArea } = Input;
+import { notification } from 'antd';
+
 
 function Orders() {
 
@@ -164,7 +166,7 @@ function Orders() {
           <div className="col text-end">
             <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Orders</Button>
           </div>
-          <div className="col-auto">
+          <div className="col-md-12">
             <Table columns={columns} dataSource={data} />
             {
               isModalOpen && <ViewModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} handleOk={handleOk} handleCancel={handleCancel} items={passData} />
@@ -224,12 +226,25 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${items.order_id}`);
     console.log("fetchShipmentDetails: ", response);
     if (response.data.message === "Successfully fetched shipment details for order id provided") {
-      const formattedDetails = response.data.result.map(detail => ({
-        ...detail,
-        typeofgoods: detail.type_of_goods,
-      }));
+      const formattedDetails = response.data.result.map((detail, index) => {
+        // Populate fileUrls with image and invoice URLs based on the current index
+        const newFileUrls = { ...fileUrls };
+        if (detail.image) {
+          newFileUrls[index] = detail.image;
+        }
+        if (detail.invoice) {
+          newFileUrls[index] = detail.invoice;
+        }
+        setFileUrls(newFileUrls);
+        console.log("newFileUrls: ", newFileUrls);
+        // Return the formatted detail
+        return {
+          ...detail,
+          typeofgoods: detail.type_of_goods,
+        };
+      });
       form.setFieldsValue({ shipment_details: formattedDetails });
-      form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) })
+      form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) });
       console.log("formattedDetails: ", formattedDetails);
     }
   };
@@ -318,7 +333,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     setOpenFinalReport(true);
     setReviewFinalReportForHirer(true);
     // review related Data
-    const response = await axios.get(`${GET_FIRST_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
+    const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${items.order_id}`)
     console.log("reviewInspectionReport: ", response.data);
     const filteredFinalReport = response.data.results.filter((data) => data.final_product_approved_quantity && data.final_product_disposition == "approved")
     const values = filteredFinalReport[0];
@@ -541,9 +556,11 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         <>
           <div className="row">
             <div className="col">
-              <Button type="primary" onClick={showInspectionReport}>
-                Create First Sample Report
-              </Button>
+              <Popover content={(items.goods_status == 'first_sample_preparation' || items.goods_status == 'first_sample_repeat') ? '' : 'Complete the shipment materials process'} trigger="hover">
+                <Button type="primary" onClick={showInspectionReport} disabled={(items.goods_status == 'first_sample_preparation' || items.goods_status == 'first_sample_repeat') ? false : true}>
+                  Create first sample report
+                </Button>
+              </Popover>
             </div>
           </div>
         </>
@@ -562,9 +579,11 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         <>
           <div className="row">
             <div className="col">
-              <Button type="primary" onClick={reviewInspectionReport}>
-                Review First Sample Report
-              </Button>
+              <Popover content={items.goods_status != "under_first_sample_approval" ? 'Please wait for renter response' : ''} trigger="hover">
+                <Button type="primary" onClick={reviewInspectionReport} disabled={items.goods_status != "under_first_sample_approval"}>
+                  Review First Sample Report
+                </Button>
+              </Popover>
             </div>
           </div>
         </>
@@ -583,9 +602,11 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         <>
           <div className="row">
             <div className="col">
-              <Button type="primary" onClick={showFinalReport}>
-                Create Final Report
-              </Button>
+              <Popover content={(items.goods_status == 'production_complete' || items.goods_status == 'production_in_progress') ? '' : 'Complete the production process'} trigger="hover">
+                <Button type="primary" onClick={showFinalReport} disabled={(items.goods_status == 'production_complete' || items.goods_status == 'production_in_progress') ? false : true}>
+                  Create Final Report
+                </Button>
+              </Popover>
             </div>
           </div>
         </>
@@ -643,32 +664,50 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     }
   };
 
+  const notifyMissingInvoice = () => {
+    notification.error({
+      message: 'Invoice is Required',
+      description: 'Please attach an invoice file when selecting "Invoice" as the type of goods.',
+      duration: 4,
+    });
+  };
+
   const onFinish = async (values) => {
     values.orderid = items.order_id;
     values.shipment_datetime = shipmentDateTime;
     values.goods_status = "goods_in_transit";
-    // console.log('Success:', values);
     try {
-      const updatedShipmentDetails = await Promise.all(
-        values.shipment_details.map(async (detail, index) => {
-          let updatedDetail = { ...detail };
-          if (fileUrls[index]) {
-            updatedDetail.image = fileUrls[index];
-          }
-          if (updatedDetail.typeofgoods === 'invoice') {
-            updatedDetail = { typeofgoods: 'invoice', invoice: updatedDetail.image };
-          }
-          return updatedDetail;
-        })
-      );
-      const finalValues = { ...values, shipment_details: updatedShipmentDetails };
-      console.log('Success:', finalValues);
-      const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
-      console.log("shipmentRes: ", shipmentRes);
-      message.success(shipmentRes.data.message);
-      setOpen(false); // drawer close
-      setIsModalOpen(false) // view modal close
-      resetForm(); // clear the form data
+      console.log('before Success:', values);
+      const checkInvoice = values.shipment_details.find((data) => data.typeofgoods === 'invoice');
+
+      if (!checkInvoice) {
+        notifyMissingInvoice();
+      } else {
+        // Proceed with form submission
+        // console.log('Form values:', values);
+        console.log('Success:', values);
+        // ... handle form submission
+        const updatedShipmentDetails = await Promise.all(
+          values.shipment_details.map(async (detail, index) => {
+            let updatedDetail = { ...detail };
+            if (fileUrls[index]) {
+              updatedDetail.image = fileUrls[index];
+            }
+            if (updatedDetail.typeofgoods === 'invoice') {
+              updatedDetail = { typeofgoods: 'invoice', invoice: updatedDetail.image };
+            }
+            return updatedDetail;
+          })
+        );
+        const finalValues = { ...values, shipment_details: updatedShipmentDetails };
+        console.log('Success22:', finalValues);
+        const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
+        console.log("shipmentRes: ", shipmentRes);
+        message.success(shipmentRes.data.message);
+        setOpen(false); // drawer close
+        setIsModalOpen(false) // view modal close
+        resetForm(); // clear the form data
+      }
 
     } catch (error) {
       console.error('Shipment error:', error);
@@ -702,7 +741,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < dayjs().endOf('day');
+    return current && current < dayjs().startOf('day');
   };
 
   const handleInvoiceChange = async (info, name) => {
@@ -946,7 +985,6 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     errorInfo.errorFields.forEach(fieldError => {
       message.error(fieldError.errors[0]);
     });
-    setLoading(false);
   };
 
   const submitFinalReportStatus = async (value) => {
@@ -968,6 +1006,13 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       setOpenFinalReport(false);
     }
   }
+
+  const validateOrderQuantity = (_, value) => {
+    if (value && items.quantity !== null && value > items.quantity) {
+      return Promise.reject(new Error(`Quantity must not be greater than ${items.quantity}`));
+    }
+    return Promise.resolve();
+  };
 
   return (
     <>
@@ -1001,291 +1046,304 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            {/* <Button type="primary" onClick={onClose}>
-              Add
-            </Button> */}
           </Space>
         }
       >
-        <Form
-          name="basic"
-          onFinish={editOpen ? updateShipmentFn : onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-          layout='vertical'
-          form={form}
-        >
-          <div className='row'>
-            <div className="col">
-              <Form.Item
-                label="Shipment Date Time"
-                name="shipment_datetime"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input your shipment date & time!',
-                  },
-                ]}
-              >
-                {!editOpen &&
-                  <DatePicker
-                    disabledDate={disabledDate}
-                    showTime
-                    name='shipment_date'
-                    onChange={(value, dateString) => {
-                      console.log('Selected Time: ', value);
-                      console.log('Formatted Selected Time: ', dateString);
-                      setShipmentDateTime(dateString);
-                    }}
-                    onOk={onOk}
-                    placeholder="Select shipment date"
-                    required
-                  />
-                }
+        <div className="container-fluid">
+          <Form
+            name="basic"
+            onFinish={editOpen ? updateShipmentFn : onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            layout='vertical'
+            form={form}
+            initialValues={{
+              shipment_details: [
+                {
+                  typeofgoods: 'raw_material', // Default type of goods
+                },
+              ],
+            }}
+          >
+            <div className='row'>
+              <div className="col">
+                <Form.Item
+                  label="Shipment Date Time"
+                  name="shipment_datetime"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input your shipment date & time!',
+                    },
+                  ]}
+                  required
+                >
+                  {!editOpen &&
+                    <DatePicker
+                      disabledDate={disabledDate}
+                      showTime={{
+                        format: 'hh:mm A',
+                        use12Hours: true,
+                      }}
+                      name='shipment_date'
+                      onChange={(value, dateString) => {
+                        console.log('Selected Time: ', value);
+                        console.log('Formatted Selected Time: ', dateString);
+                        setShipmentDateTime(dateString);
+                      }}
+                      onOk={onOk}
+                      placeholder="Select shipment date"
+                    />
+                  }
 
-                {editOpen && (
-                  <>{formattedDateTime(form.getFieldValue('shipment_date'))}</>
-                )}
-              </Form.Item>
+                  {editOpen && (
+                    <>{formattedDateTime(form.getFieldValue('shipment_date'))}</>
+                  )}
+                </Form.Item>
+              </div>
             </div>
-          </div>
+            <div className="row">
+              <div className="col">
+                <Form.List name="shipment_details">
+                  {(fields, { add, remove }) => {
+                    // const typeOfGoods = form.getFieldValue(['shipment_details', name, 'typeofgoods']);
+                    // const isInvoice = typeOfGoods === 'invoice';
+                    return (
+                      <>
+                        <div className="row">
+                          <div className="col">
+                            {editOpen &&
+                              <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
+                            }
+                          </div>
+                        </div>
+                        {fields.map(({ key, name, ...restField }) => {
+                          return (
+                            <div className='row' key={key}>
+                              <h6>Shipment Details - {name + 1}</h6>
+                              <div className="col">
+                                <Form.Item
+                                  label="Type of Goods"
+                                  {...restField}
+                                  name={[name, 'typeofgoods']}
+                                  value={selectedItems}
+                                  onChange={setSelectedItems}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: 'Please input your type of goods!',
+                                    },
+                                  ]}
+                                >
 
-          <div className="row">
-            <div className="col">
-              <Form.List name="shipment_details">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }, index) => {
-                      console.log("key: ", key);
-                      console.log("name: ", name);
-                      return (
-                        <>
-                          <h6>Shipment Details - {name + 1}</h6>
-                          {editOpen &&
-                            <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
-                          }
-                          <div className='row' key={name}>
-                            <div className="col">
-                              <Form.Item
-                                label="Type of Goods"
-                                // name="typeofgoods"
-                                {...restField}
-                                name={[name, 'typeofgoods']}
-                                value={selectedItems}
-                                onChange={setSelectedItems}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: 'Please input your type of goods!',
-                                  },
-                                ]}
-                              >
-                                <Select readOnly={editOpen} placeholder='Choose type of goods' style={{ width: '100%' }} onChange={handleSelectChange} options={typesOfGoods} />
-                              </Form.Item>
-                            </div>
+                                  {editOpen ? form.getFieldValue(['shipment_details', name, 'typeofgoods']) : <>
+                                    <Select
+                                      readOnly={editOpen}
+                                      placeholder='Choose type of goods'
+                                      style={{
+                                        width: 'auto'
+                                      }}
+                                      onChange={handleSelectChange}
+                                      options={typesOfGoods}
+                                    />
+                                  </>}
+                                </Form.Item>
+                              </div>
 
-                            {form.getFieldValue(['shipment_details', name, 'typeofgoods']) !== 'invoice' && (
-                              <>
-                                <div className="col">
-                                  <Form.Item
-                                    label="Description"
-                                    // name="description"
-                                    {...restField}
-                                    name={[name, 'description']}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: 'Please input your description!',
-                                      },
-                                    ]}
-                                  >
-                                    {/* <Input /> */}
-                                    <TextArea rows={3} readOnly={editOpen} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount required />
-                                  </Form.Item>
-                                </div>
-
-                                <div className="col">
-                                  <Form.Item
-                                    label="Shipment Qty"
-                                    // name="quantity"
-                                    {...restField}
-                                    name={[name, 'quantity']}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: 'Please input your shipment quantity!',
-                                      },
-                                    ]}
-                                  >
-                                    <Input placeholder='Enter shipment quantity' readOnly={editOpen} required />
-                                  </Form.Item>
-                                </div>
-
-                                <div className="col">
-                                  <Form.Item
-                                    label={"UOM"}
-                                    // name="uom"
-                                    {...restField}
-                                    name={[name, 'UOM']}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: 'Please input your UOM!',
-                                      },
-                                    ]}
-                                  >
-                                    <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                                  </Form.Item>
-                                </div>
-
-                                {editOpen &&
+                              {form.getFieldValue(['shipment_details', name, 'typeofgoods']) !== 'invoice' && (
+                                <>
                                   <div className="col">
                                     <Form.Item
-                                      label="Receipt Confirmation"
-                                      // name="uom"
+                                      label="Description"
                                       {...restField}
-                                      name={[name, 'received_status']}
+                                      name={[name, 'description']}
                                       rules={[
                                         {
                                           required: true,
-                                          message: 'Please input receipt confirmation!',
+                                          message: 'Please input your description!',
+                                        },
+                                      ]}
+                                      required
+                                    >
+                                      <TextArea rows={3} readOnly={editOpen} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount />
+                                    </Form.Item>
+                                  </div>
+
+                                  <div className="col">
+                                    <Form.Item
+                                      label="Shipment Qty"
+                                      {...restField}
+                                      name={[name, 'quantity']}
+                                      rules={[
+                                        {
+                                          required: true,
+                                          message: 'Please input your shipment quantity!',
+                                        },
+                                        {
+                                          pattern: /^\d{1,5}$/, // Regex pattern to match 10 digits
+                                          message: 'Please enter a valid number! (upto 5 digits)',
+                                        },
+                                      ]}
+                                      required
+                                    >
+                                      <Input placeholder='Enter shipment quantity' readOnly={editOpen} />
+                                    </Form.Item>
+                                  </div>
+
+                                  <div className="col">
+                                    <Form.Item
+                                      label={"UOM"}
+                                      {...restField}
+                                      name={[name, 'UOM']}
+                                      rules={[
+                                        {
+                                          required: true,
+                                          message: 'Please input your UOM!',
                                         },
                                       ]}
                                     >
-                                      <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
+                                      <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
                                     </Form.Item>
                                   </div>
-                                }
 
-                                {!fileUrls[name] && <div className="col-auto mt-4">
-                                  <Form.Item
-                                    // name="uom"
-                                    {...restField}
-                                    name={[name, 'image']}
-                                  >
-                                    <Upload
-                                      valuePropName="file"
-                                      getValueFromEvent={(e) => {
-                                        if (Array.isArray(e)) {
-                                          return e;
-                                        }
-                                        return e && e.file;
-                                      }}
-                                      onChange={(info) => handleImageChange(info, name)}
-                                      beforeUpload={() => false}
-                                      accept=".jpg,.jpeg,.png"
-                                      maxCount={1}
-                                      showUploadList={false}
+                                  {editOpen &&
+                                    <div className="col">
+                                      <Form.Item
+                                        label="Receipt Confirmation"
+                                        {...restField}
+                                        name={[name, 'received_status']}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: 'Please input receipt confirmation!',
+                                          },
+                                        ]}
+                                      >
+                                        <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
+                                      </Form.Item>
+                                    </div>
+                                  }
+
+                                  {!fileUrls[name] && <div className="col-auto mt-4">
+                                    <Form.Item
+                                      {...restField}
+                                      name={[name, 'image']}
                                     >
-                                      {imageFileIsLoading ? <>
-                                        <Spin indicator={<LoadingOutlined spin />} />
-                                      </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>}
-                                      <p>Max: 2 MB (Only PDF Format)</p>
-                                    </Upload>
-                                  </Form.Item>
+                                      <Upload
+                                        valuePropName="file"
+                                        getValueFromEvent={(e) => {
+                                          if (Array.isArray(e)) {
+                                            return e;
+                                          }
+                                          return e && e.file;
+                                        }}
+                                        onChange={(info) => handleImageChange(info, name)}
+                                        beforeUpload={() => false}
+                                        accept=".jpg,.jpeg,.png"
+                                        maxCount={1}
+                                        showUploadList={false}
+                                      >
+                                        {imageFileIsLoading ? <>
+                                          <Spin indicator={<LoadingOutlined spin />} />
+                                        </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>}
+                                        <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
+                                      </Upload>
+                                    </Form.Item>
 
-                                </div>
-                                }
-                              </>
-                            )}
+                                  </div>
+                                  }
+                                </>
+                              )}
 
-                            {form.getFieldValue(['shipment_details', name, 'typeofgoods']) === 'invoice' && (
-                              <>
-                                {!fileUrls[name] && <div className="col-auto mt-4">
-                                  <Form.Item
-                                    // name="uom"
-                                    {...restField}
-                                    name={[name, 'invoice']}
-                                  >
-                                    <Upload
-                                      valuePropName="file"
-                                      getValueFromEvent={(e) => {
-                                        if (Array.isArray(e)) {
-                                          return e;
-                                        }
-                                        return e && e.file;
-                                      }}
-                                      onChange={(info) => handleInvoiceChange(info, name)}
-                                      beforeUpload={() => false}
-                                      accept=".pdf"
-                                      maxCount={1}
-                                      showUploadList={false}
+                              {form.getFieldValue(['shipment_details', name, 'typeofgoods']) === 'invoice' && (
+                                <>
+                                  {!fileUrls[name] && <div className="col-auto mt-4">
+                                    <Form.Item
+                                      {...restField}
+                                      name={[name, 'invoice']}
+                                      rules={[
+                                        {
+                                          required: true,
+                                          message: 'Invoice file is required!',
+                                        },
+                                      ]}
                                     >
-                                      {fileIsLoading ? <>
-                                        <Spin indicator={<LoadingOutlined spin />} />
-                                      </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{fileIsLoading ? 'Uploading...' : 'Attach invoice'} </Button>}
-                                      <p>Max: 2 MB (Only PDF Format)</p>
-                                    </Upload>
-                                  </Form.Item>
+                                      <Upload
+                                        valuePropName="file"
+                                        getValueFromEvent={(e) => {
+                                          if (Array.isArray(e)) {
+                                            return e;
+                                          }
+                                          return e && e.file;
+                                        }}
+                                        onChange={(info) => handleInvoiceChange(info, name)}
+                                        beforeUpload={() => false}
+                                        accept=".pdf"
+                                        maxCount={1}
+                                        showUploadList={false}
+                                      >
+                                        {fileIsLoading ? <>
+                                          <Spin indicator={<LoadingOutlined spin />} />
+                                        </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{fileIsLoading ? 'Uploading...' : 'Attach invoice'} </Button>}
+                                        <p>Max: 2 MB (Only PDF Format)</p>
+                                      </Upload>
+                                    </Form.Item>
 
+                                  </div>
+                                  }
+                                </>
+                              )}
+
+                              {fileUrls[name] && (
+                                <div className='col-auto mt-4'>
+                                  <div>
+                                    <a href={fileUrls[name]} target="_blank" rel="noopener noreferrer">View File</a>
+                                    <Button type="link" onClick={() => handleFileRemove(name)}>Remove</Button>
+                                  </div>
                                 </div>
-                                }
-                              </>
-                            )}
+                              )}
 
-
-
-                            {fileUrls[name] && (
-                              <div className='col-auto mt-4'>
-                                <div>
-                                  <a href={fileUrls[name]} target="_blank" rel="noopener noreferrer">View File</a>
-                                  <Button
-                                    type="link"
-                                    danger
-                                    onClick={() => handleFileRemove(name)}
-                                  >
-                                    Remove
-                                  </Button>
-                                </div>
+                              <div className="col-auto mt-4">
+                                {!editOpen && fields.length > 1 ? (
+                                  <Tooltip title="Remove this shipment detail">
+                                    <Button type="primary" danger icon={<CloseOutlined />} onClick={() => remove(name)} />
+                                  </Tooltip>
+                                ) : null}
                               </div>
-
-                            )}
-
-                            <div className='col-auto mt-4'>
-                              <Tooltip title={`Remove Shipment - ${name + 1} `}>
-                                <Button danger shape="circle" onClick={() => remove(name)} icon={<CloseOutlined />} />
-                              </Tooltip>
                             </div>
-                          </div>
-                        </>
-                      )
-                    }
-
-                    )}
-                    {/* maximum four fields can be use so total 5 details */}
-                    {fields.length < 5 && !editOpen && (
-                      <div className='row'>
-                        <div className="col-auto">
-                          <Form.Item>
-                            <Button type="primary" onClick={() => add()} block icon={<PlusOutlined />}>
-                              Add more shipment details (Upto 5)
+                          );
+                        })}
+                        <Form.Item>
+                          {fields.length < 4 && !editOpen && (
+                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                              Add more shipment details (Upto 4)
                             </Button>
-                            {/* <button className='btn btn-secondary'>+ Add more shipment details</button> */}
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                    )}
-                  </>
-                )}
-              </Form.List>
-              {/* <Button type='secondary' icon={<PlusOutlined />}>Add More Shipment Details</Button> */}
+                          )}
+                        </Form.Item>
+                      </>
+                    )
+                  }}
+                </Form.List>
+              </div>
             </div>
-          </div>
-          <hr />
-          <div className="row">
-            {!editOpen &&
-              <div className="col text-center">
-                <Button htmlType='submit' type='primary'>Submit</Button>
+            <div className="row">
+              <div className="col">
+                <Form.Item>
+                  {!editOpen && (
+                    <Button type="primary" htmlType="submit">
+                      Submit
+                    </Button>
+                  )}
+                  {editOpen && (
+                    <Button type="primary" htmlType="submit">
+                      Update
+                    </Button>
+                  )}
+                </Form.Item>
               </div>
-            }
-            {editOpen &&
-              <div className="col text-center">
-                <Button htmlType='submit' type='primary'>Update Shipment</Button>
-              </div>
-            }
-          </div>
-        </Form>
+            </div>
+          </Form>
+        </div>
       </Drawer>
 
       {/* // create and review sample Report */}
@@ -1323,7 +1381,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                 >
                   {!reviewSampleReport && <DatePicker
                     disabledDate={disabledDate}
-                    showTime
+                    showTime={{
+                      format: 'hh:mm A',
+                      use12Hours: true,
+                    }}
                     onChange={(value, dateString) => {
                       console.log('Selected Time: ', value);
                       console.log('Formatted Selected Time: ', dateString);
@@ -1445,13 +1506,15 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       onRemove={handleInspectionReportRemove}
                       accept=".pdf,.csv"
                     >
-                      <Button loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
+                      {!reviewSampleReport &&
+                        <Button loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
+                      }
                     </Upload>
-                    {viewInspectionReportFile &&
+                    {!reviewSampleReport && viewInspectionReportFile &&
                       <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
                     }
 
-                    {reviewSampleReport && form.getFieldValue('first_sample_inspection_report') &&
+                    {reviewSampleReport &&
                       <Link to={form.getFieldValue('first_sample_inspection_report')} target={'_blank'}>View report file</Link>
                     }
                   </Flex>
@@ -1549,8 +1612,11 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   ]}
                 >
                   {!reviewFinalReportForHirer && <DatePicker
-                    disabledDate={disabledDate}
-                    showTime
+                    // disabledDate={disabledDate}
+                    showTime={{
+                      format: 'hh:mm A',
+                      use12Hours: true,
+                    }}
                     onChange={(value, dateString) => {
                       console.log('Selected Time: ', value);
                       console.log('Formatted Selected Time: ', dateString);
@@ -1597,6 +1663,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                     {
                       required: true,
                       message: 'Please update the order OK quantity!',
+                    },
+                    {
+                      validator: validateOrderQuantity,
                     },
                   ]}
                 >
@@ -1659,7 +1728,9 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                       onRemove={handleProdLotInspectionReportRemove}
                       accept=".pdf,.csv"
                     >
-                      <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
+                      {!reviewFinalReportForHirer &&
+                        <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
+                      }
                     </Upload>
                     {viewProdLotInspectionReportFile &&
                       <Link to={viewProdLotInspectionReportFile} target={'_blank'}>View File</Link>
@@ -1707,7 +1778,10 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
 
                       <DatePicker
                         disabledDate={disabledDate}
-                        showTime
+                        showTime={{
+                          format: 'hh:mm A',
+                          use12Hours: true,
+                        }}
                         onChange={(value, dateString) => {
                           console.log('Selected Time: ', value);
                           console.log('Formatted goods pick Selected Time: ', dateString);

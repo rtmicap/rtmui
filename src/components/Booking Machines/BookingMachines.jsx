@@ -71,7 +71,6 @@ function BookingMachines() {
         console.log('onOk: ', value);
     };
     const onFinish = async (values) => {
-        console.log('onFinish:', values);
         try {
             setLoading(true);
             values.plannedstartdatetime = plannedStartDateTime;
@@ -82,7 +81,7 @@ function BookingMachines() {
             values.orderprogramsheet = viewProgramSheetFile;
             values.orderspec = viewSpecsFile;
             values.otherattachments = viewOthersFile;
-
+            console.log('onFinish:', values);
             const response = await axios.post(QUOTE_SAVE_URL, values);
             // console.log("save quote: ", response);
             message.success(`${response.data.message}`);
@@ -256,7 +255,7 @@ function BookingMachines() {
 
     const disabledDate = (current) => {
         // Can not select days before today and today
-        return current && current < dayjs().endOf('day');
+        return current && current < dayjs().startOf('day');
     };
 
     return (
@@ -291,7 +290,10 @@ function BookingMachines() {
                                     >
                                         <DatePicker
                                             disabledDate={disabledDate}
-                                            showTime
+                                            showTime={{
+                                                format: 'hh:mm A',
+                                                use12Hours: true,
+                                            }}
                                             onChange={(value, dateString) => {
                                                 console.log('Selected Time: ', value);
                                                 console.log('Formatted Selected Time: ', dateString);
@@ -315,7 +317,10 @@ function BookingMachines() {
                                     >
                                         <DatePicker
                                             disabledDate={disabledDate}
-                                            showTime
+                                            showTime={{
+                                                format: 'hh:mm A',
+                                                use12Hours: true,
+                                            }}
                                             onChange={(value, dateString) => {
                                                 console.log('Selected End Time: ', value);
                                                 console.log('Formatted Selected End Time: ', dateString);

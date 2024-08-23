@@ -143,7 +143,7 @@ function Quotes() {
                     <div className="col-md-12">
                         <Table columns={columns} dataSource={data} />
                         {
-                            isModalOpen && <ViewModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} items={passData} />
+                            isModalOpen && <ViewModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} items={passData} refreshData={refreshData} />
                         }
                     </div>
 
@@ -200,6 +200,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             message.success(`${items.quote_id} Quote Accepted!`);
             // setItems(response.data);
             handleOk();
+            refreshData();
             setIsLoading(false);
         } catch (error) {
             console.log("accepted error: ", error);
