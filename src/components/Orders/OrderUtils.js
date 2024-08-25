@@ -14,6 +14,7 @@ export const uomChoices = [
 ];
 
 export const sampleDisposition = [
+    { value: 'pending_approval', label: 'Pending Approval' },
     { value: 'approved', label: 'Approved' },
     { value: 'deviation_request', label: 'Deviation Request' },
     { value: 'rejected', label: 'Rejected' }

@@ -298,7 +298,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       uom: values.UOM,
       first_sample_quantity: values.first_sample_quantity,
       first_sample_inspection_report: values.first_sample_inspection_report,
-      // first_sample_disposition: values.first_sample_disposition,
+      first_sample_disposition: values.first_sample_disposition,
       first_sample_id: values.id
     });
   }
@@ -347,7 +347,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
       uom: values.UOM,
       first_sample_quantity: values.first_sample_quantity,
       first_sample_inspection_report: values.first_sample_inspection_report,
-      first_sample_disposition: values.first_sample_disposition,
+      first_sample_disposition:  values.first_sample_disposition,
       first_sample_id: values.id,
       order_ok_quantity: values.order_ok_quantity ? values.order_ok_quantity : values.final_product_approved_quantity,
       final_product_disposition: values.final_product_disposition,
@@ -842,7 +842,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     values.orderid = items.order_id;
     values.inspection_date_time = inspectionDateTime;
     values.first_sample_inspection_report = viewInspectionReportFile;
-    // values.first_sample_disposition = "pending_approval";
+    values.first_sample_disposition = "pending_approval";
     console.log('onFinishReport:', values);
     const response = await axios.post(CREATE_FIRST_SAMPLE_REPORT_URL, values);
     message.success(`${response.data.message}`);
@@ -907,20 +907,25 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
     //   first_sample_disposition: value,
     //   first_sample_remarks: form.getFieldValue('first_sample_remarks')
     // }
-    try {
-      const data = form.getFieldsValue();
-      data.first_sample_disposition = value;
-      data.orderid = items.order_id;
-      data.first_sample_id = form.getFieldValue("first_sample_id")
-      console.log("datta: ", data);
-      const response = await axios.patch(UPDATE_FIRST_SAMPLE_REPORT_URL, data);
-      console.log("updated: ", response.data);
-      message.success(response.data.message);
-      setOpenSampleReport(false);
-    } catch (error) {
-      console.log("error update: ", error);
-      message.error("There is some error!");
-      setOpenSampleReport(false);
+    if(data.first_sample_disposition == "pending_approval"){
+      try {
+        const data = form.getFieldsValue();
+        console.log("datta sampleReportStatusUpdate: ", value);
+        data.first_sample_disposition = value;
+        data.orderid = items.order_id;
+        data.first_sample_id = form.getFieldValue("first_sample_id")
+        console.log("datta: ", data);
+        const response = await axios.patch(UPDATE_FIRST_SAMPLE_REPORT_URL, data);
+        console.log("updated: ", response.data);
+        message.success(response.data.message);
+        setOpenSampleReport(false);
+      } catch (error) {
+        console.log("error update: ", error);
+        message.error("There is some error!");
+        setOpenSampleReport(false);
+      }
+    }else{
+      message.info("Please update the First sample disposition!")
     }
 
   }
@@ -1336,7 +1341,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   )}
                   {editOpen && (
                     <Button type="primary" htmlType="submit">
-                      Update
+                      Send Goods Receipt Confirmation
                     </Button>
                   )}
                 </Form.Item>
@@ -1751,7 +1756,7 @@ const ViewModal = ({ isModalOpen, setIsModalOpen, handleOk, handleCancel, items 
                   <div className="col">
                     <Form.Item
                       label="Order Completion Remarks (300 words)"
-                      name="order_completion_remarks"
+                      name="final_report_remarks"
                       required
                       rules={[
                         {
