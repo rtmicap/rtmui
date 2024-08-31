@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Descriptions, message, Modal, Space, Table, Tag, Typography } from 'antd';
+import { Button, DatePicker, Descriptions, Form, Input, message, Modal, Space, Table, Tag, Typography } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import axios from "../../api/axios";
 import {
@@ -15,6 +15,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { formattedDateTime } from '../../utils/utils';
 import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
+// import moment from 'moment/moment';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 const dummyData = [
     {
@@ -155,13 +162,16 @@ function Quotes() {
     )
 }
 
-const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
+const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen }) => {
     console.log("items vie", items);
     const navigate = useNavigate();
     const { authUser } = useAuth();
     console.log("items authUser", authUser);
     const [isLoading, setIsLoading] = useState(false);
     // const [items, setItems] = useState(items);
+    const [bookingDateModalOpen, setBookingDateModalOpen] = useState(false);
+    const [bookingLoading, setBookingLoading] = useState(false);
+    const [form] = Form.useForm();
 
     let color;
     let icon;
@@ -210,6 +220,55 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
 
     const bookingPage = () => {
         navigate("/my-bookings");
+    }
+
+    const changeBookingDate = () => {
+        form.setFieldsValue({
+            plannedstartdatetime: dayjs(items.planned_start_date_time).isValid() ? dayjs(items.planned_start_date_time) : null,
+            plannedenddatetime: dayjs(items.planned_end_date_time).isValid() ? dayjs(items.planned_end_date_time) : null,
+            quantity: items.quantity,
+        });
+        setBookingDateModalOpen(true);
+    }
+
+    // Close Booking chaange date the modal
+    const handleBookingDateCancel = () => {
+        setBookingDateModalOpen(false);
+    };
+
+
+    const updateBookingDate = () => {
+        try {
+            setBookingLoading(true);
+            form.validateFields()
+                .then(async values => {
+                    // console.log('Updated Values:', values);
+                    var reqItem = {
+                        quoteid: items.quote_id,
+                        machineid: items.machine_id,
+                        hirerCompanyId: items.hirer_company_id,
+                        plannedstartdatetime: values.plannedstartdatetime ? dayjs(values.plannedstartdatetime).toISOString() : null,
+                        plannedenddatetime: values.plannedenddatetime ? dayjs(values.plannedenddatetime).toISOString() : null,
+                        quotestatus: 'order_date_change_requested',
+                        quantity: values.quantity
+                    }
+                    const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
+                    message.success("Your order change request has been sent to Hirer successfully. You will get their response shortly for their acceptance!");
+                    setBookingLoading(false);
+                    console.log("updateBookingDate: ", response);
+                    setBookingDateModalOpen(false);
+                    setIsModalOpen(false);
+                })
+                .catch(info => {
+                    setBookingLoading(false);
+                    console.log('Validation Failed:', info);
+                    setBookingDateModalOpen(false);
+                });
+        } catch (error) {
+            setBookingLoading(false);
+            message.error("Order Change Request Error! Please try again!");
+            setBookingDateModalOpen(false);
+        }
     }
 
     const quoteItems = [
@@ -291,9 +350,9 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                         <div className="col">
                             <Button type='primary' onClick={() => acceptAndRejectOrder('accepted')}>{isLoading ? 'Accepting your quote...' : 'Accept Order'}</Button>
                         </div>
-                        {/* <div className="col">
-                            <Button type="dashed">Change Booking Dates</Button>
-                        </div> */}
+                        <div className="col">
+                            <Button type="dashed" onClick={changeBookingDate}>Change Booking Dates</Button>
+                        </div>
                         <div className="col">
                             <Button type="primary" danger onClick={() => acceptAndRejectOrder('rejected')}>Reject Order</Button>
                         </div>
@@ -342,6 +401,58 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
                     }}
                     items={quoteItems}
                 />
+            </Modal>
+
+            <Modal
+                title={`Order Date Change Request for Quote ID: ${items.quote_id}`}
+                open={bookingDateModalOpen}
+                onCancel={handleBookingDateCancel}
+                footer={[
+                    <Button key="cancel" onClick={handleBookingDateCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="update" type="primary" onClick={updateBookingDate}>
+                        {bookingLoading ? 'Updating...' : 'Update Date Change'}
+                    </Button>,
+                ]}
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        label="Planned Start Date and Time"
+                        name="plannedstartdatetime"
+                        rules={[{ required: true, message: 'Please select the start date and time!' }]}
+                    >
+                        <DatePicker
+                            showTime={{
+                                format: 'hh:mm A',
+                                use12Hours: true,
+                            }}
+                            format="YYYY-MM-DD hh:mm A"
+                            style={{ width: '100%' }}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Planned End Date and Time"
+                        name="plannedenddatetime"
+                        rules={[{ required: true, message: 'Please select the end date and time!' }]}
+                    >
+                        <DatePicker
+                            showTime={{
+                                format: 'hh:mm A',
+                                use12Hours: true,
+                            }}
+                            format="YYYY-MM-DD hh:mm A"
+                            style={{ width: '100%' }}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Quantity"
+                        name="quantity"
+                        rules={[{ required: true, message: 'Please enter the quantity!' }]}
+                    >
+                        <Input type="number" />
+                    </Form.Item>
+                </Form>
             </Modal>
         </>
     )
