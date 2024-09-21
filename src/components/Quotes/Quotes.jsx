@@ -19,7 +19,6 @@ import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utc from 'dayjs/plugin/utc';
-
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
@@ -191,8 +190,8 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen 
             setIsLoading(true);
             var reqItem = {
                 quoteid: items.quote_id,
-                plannedstartdatetime: items.planned_start_date_time,
-                plannedenddatetime: items.planned_end_date_time,
+                plannedstartdatetime: dayjs(items.planned_start_date_time).utc().format(),
+                plannedenddatetime: dayjs(items.planned_end_date_time).utc().format(),
                 machineid: items.machine_id,
                 orderprocesssheet: items.order_process_sheet,
                 orderspec: items.order_spec,
@@ -247,8 +246,8 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen 
                         quoteid: items.quote_id,
                         machineid: items.machine_id,
                         hirerCompanyId: items.hirer_company_id,
-                        plannedstartdatetime: values.plannedstartdatetime ? dayjs(values.plannedstartdatetime).toISOString() : null,
-                        plannedenddatetime: values.plannedenddatetime ? dayjs(values.plannedenddatetime).toISOString() : null,
+                        plannedstartdatetime: values.plannedstartdatetime ? dayjs(values.plannedstartdatetime).utc().format() : null,
+                        plannedenddatetime: values.plannedenddatetime ? dayjs(values.plannedenddatetime).utc().format() : null,
                         quotestatus: 'order_date_change_requested',
                         quantity: values.quantity
                     }
@@ -380,6 +379,13 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen 
 
     ];
 
+    const validateOrderQuantity = (_, value) => {
+        if (value && items.quantity !== null && value > items.quantity) {
+            return Promise.reject(new Error(`Quantity must not be greater than ${items.quantity}`));
+        }
+        return Promise.resolve();
+    };
+
     return (
         <>
             <Modal open={isModalOpen} width={1300}
@@ -427,7 +433,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen 
                                 format: 'hh:mm A',
                                 use12Hours: true,
                             }}
-                            format="YYYY-MM-DD hh:mm A"
+                            format="DD-MM-YYYY hh:mm A"
                             style={{ width: '100%' }}
                         />
                     </Form.Item>
@@ -441,14 +447,21 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items, setIsModalOpen 
                                 format: 'hh:mm A',
                                 use12Hours: true,
                             }}
-                            format="YYYY-MM-DD hh:mm A"
+                            format="DD-MM-YYYY hh:mm A"
                             style={{ width: '100%' }}
                         />
                     </Form.Item>
                     <Form.Item
                         label="Quantity"
                         name="quantity"
-                        rules={[{ required: true, message: 'Please enter the quantity!' }]}
+                        rules={[
+                            {
+                                required: true, message: 'Please enter the quantity!',
+                            },
+                            {
+                                validator: validateOrderQuantity,
+                            },
+                        ]}
                     >
                         <Input type="number" />
                     </Form.Item>

@@ -7,6 +7,8 @@ import axios from "../../api/axios";
 import HeaderTitle from '../../utils/HeaderTitle';
 import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 function BookingMachines() {
     const location = useLocation();
@@ -295,9 +297,11 @@ function BookingMachines() {
                                                 use12Hours: true,
                                             }}
                                             onChange={(value, dateString) => {
+                                                const utcDate = dayjs(value).utc().format(); // Convert to UTC
+                                                console.log('Selected utcDate: ', utcDate);
                                                 console.log('Selected Time: ', value);
-                                                console.log('Formatted Selected Time: ', dateString);
-                                                setPlannedStartDateTime(dateString);
+                                                console.log('dateString Selected Time: ', dateString);
+                                                setPlannedStartDateTime(utcDate);
                                             }}
                                             onOk={onOk}
                                         />
@@ -322,9 +326,11 @@ function BookingMachines() {
                                                 use12Hours: true,
                                             }}
                                             onChange={(value, dateString) => {
-                                                console.log('Selected End Time: ', value);
-                                                console.log('Formatted Selected End Time: ', dateString);
-                                                setPlannedEndDateTime(dateString);
+                                                const utcEndDate = dayjs(value).utc().format(); // Convert to UTC
+                                                console.log('Selected utcEndDate: ', utcEndDate);
+                                                console.log('Selected Time: ', value);
+                                                console.log('dateString Selected Time: ', dateString);
+                                                setPlannedEndDateTime(utcEndDate);
                                             }}
                                             onOk={onOk}
                                         />
