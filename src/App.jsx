@@ -38,6 +38,7 @@ import BookingMachines from './components/Booking Machines/BookingMachines';
 import MyRegisteredMachines from './components/MyRegisteredMachines/MyRegisteredMachines';
 import ReviewBooking from './components/Review Booking/ReviewBooking';
 import Payment from './components/Payment/Payment';
+import OrderDetailPage from './components/Orders/Order Detail Page/OrderDetailPage';
 
 const App = () => {
   // const {
@@ -77,7 +78,8 @@ const App = () => {
 
             {/* Orders */}
             <Route path='orders' element={<Orders />} />
-
+            <Route path="order-details/:orderId" element={<OrderDetailPage />} />
+            
             {/* My Bookings */}
             <Route path='my-bookings' element={<MyBookings />} />
 

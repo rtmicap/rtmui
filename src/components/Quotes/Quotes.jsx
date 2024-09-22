@@ -21,6 +21,27 @@ function Quotes() {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [form] = Form.useForm();
 
+    const dummyData = [
+        {
+            value: 'jack',
+            label: 'Jack',
+        },
+        {
+            value: 'lucy',
+            label: 'Lucy',
+        },
+        {
+            value: 'Yiminghe',
+            label: 'yiminghe',
+        },
+        // {
+        //     value: 'disabled',
+        //     label: 'Disabled',
+        //     disabled: true,
+        // },
+    ]
+
+
     const showModal = (quote) => {
         setSelectedQuote(quote); // Set the selected quote
         setAttachModal(true); // Show the modal
@@ -198,14 +219,17 @@ function Quotes() {
                     </div>
                 </div>
                 <div className='row'>
-                    <div className='col'>
-                        Category
+                    <div className="col-auto">
+                        <h6 style={{marginTop: '4px'}}>Filter By:</h6>
                     </div>
-                    <div className='col'>
-                        Type
+                    <div className='col-auto'>
+                        <Select placeholder='Select the machine category' options={dummyData} />
                     </div>
-                    <div className='col'>
-                        Button
+                    <div className='col-auto'>
+                        <Select placeholder='Select the machine type' options={dummyData} />
+                    </div>
+                    <div className='col-auto'>
+                        <Button type='primary'>Search</Button>
                     </div>
                 </div>
                 <hr />
