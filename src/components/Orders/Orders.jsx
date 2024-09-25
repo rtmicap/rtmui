@@ -18,7 +18,7 @@ function Orders() {
 
   // console.log("authUser: ", authUser);
 
-  const currentUser = authUser.CompanyId;
+  const currentUserCompanyId = authUser.CompanyId;
 
   const getAllOrders = async () => {
     try {
@@ -42,8 +42,8 @@ function Orders() {
   }, []);
 
   // filtered by current user and company id // please check the db for reference
-  const myOrders = allOrders.filter(order => order.renter_company_id === currentUser);
-  const customerOrders = allOrders.filter(order => order.renter_company_id !== currentUser);
+  const myOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
+  const customerOrders = allOrders.filter(order => order.renter_company_id !== currentUserCompanyId);
 
   const handleView = (record) => {
     navigate(`/order-details/${record.order_id}`,

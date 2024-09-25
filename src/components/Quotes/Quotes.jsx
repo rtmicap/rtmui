@@ -1,17 +1,18 @@
-import { Button, Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Tag } from 'antd'
+import { Button, Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Table, Tabs, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { ReloadOutlined } from "@ant-design/icons";
 import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
-import { formattedDateTime } from '../../utils/utils';
+import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import { Link } from 'react-router-dom';
 import { actionButtons } from './QuotesUtils';
 import dayjs from 'dayjs';
-
+import { useAuth } from '../../contexts/AuthContext';
 const PAGE_SIZE = 10; // Number of items per page
 const { confirm } = Modal;
 
 function Quotes() {
+    const { authUser } = useAuth();
     const [allQuotes, setAllQuotes] = useState([]);
     const [quoteLoading, setQuoteLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,27 +21,13 @@ function Quotes() {
     const [bookingDateModalOpen, setBookingDateModalOpen] = useState(false);
     const [bookingLoading, setBookingLoading] = useState(false);
     const [form] = Form.useForm();
+    // for filtering
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedType, setSelectedType] = useState('');
+    const [filteredQuotes, setFilteredQuotes] = useState([]); // State for storing filtered quotes
 
-    const dummyData = [
-        {
-            value: 'jack',
-            label: 'Jack',
-        },
-        {
-            value: 'lucy',
-            label: 'Lucy',
-        },
-        {
-            value: 'Yiminghe',
-            label: 'yiminghe',
-        },
-        // {
-        //     value: 'disabled',
-        //     label: 'Disabled',
-        //     disabled: true,
-        // },
-    ]
-
+    const currentUserCompanyId = authUser.CompanyId;
+    // console.log("authUser: ", authUser);
 
     const showModal = (quote) => {
         setSelectedQuote(quote); // Set the selected quote
@@ -72,6 +59,29 @@ function Quotes() {
             message.error("Error on loading quotes..");
         }
     };
+
+    // filtered by current user and company id // please check the db for reference
+    const myQuotes = allQuotes.filter(quote => quote.renter_company_id === currentUserCompanyId);
+    const customerQuotes = allQuotes.filter(quote => quote.renter_company_id !== currentUserCompanyId);
+
+    // Extract unique categories and types
+    const uniqueCategories = [...new Set(allQuotes.map(quote => quote.Category))];
+    const uniqueTypes = [...new Set(allQuotes.map(quote => quote.Machine_Type))];
+
+    // Group by category and type
+    const groupedQuotes = (quotes) => {
+        return quotes.reduce((groups, quote) => {
+            const key = `${quote.Category} - ${quote.Machine_Type}`;
+            if (!groups[key]) {
+                groups[key] = [];
+            }
+            groups[key].push(quote);
+            return groups;
+        }, {});
+    };
+
+    const myGroupedQuotes = groupedQuotes(myQuotes);
+    const customerGroupedQuotes = groupedQuotes(customerQuotes);
 
     useEffect(() => {
         getAllQuotes();
@@ -109,26 +119,29 @@ function Quotes() {
 
     const items = currentQuotes.map(quote => ({
         key: quote.quote_id,
-        label: `Category - Machine Type -> Quote ID: ${quote.quote_id}`,
+        label: `${quote.Category} - ${quote.Machine_Type}`,
         children: <>
             <h4>
-                <Tag color={quote.quote_status == 'pending' ? 'processing' : 'error'}>{quote.quote_status.toUpperCase()}</Tag>
+                <Tag color={quote.quote_status == 'pending' ? 'processing' : quote.quote_status == 'accepted' ? 'success' : 'error'}>{quote.quote_status.toUpperCase()}</Tag>
             </h4>
             <table class="table table-bordered table-striped">
                 <tr>
-                    <th>Quote ID</th>
+                    <th>ID</th>
                     <th>Quantity</th>
                     <th>Hirer Company</th>
                     <th>Planned Start Date</th>
                     <th>Planned End Date</th>
-                    <th>Attachments</th>
+                    <th>Files</th>
                     <th>Action</th>
                 </tr>
                 <tr>
                     <td>{quote.quote_id}</td>
                     <td>{quote.quantity}</td>
                     <td>{quote.hirer_company_id}</td>
-                    <td>{formattedDateTime(quote.planned_start_date_time)}</td>
+                    <td>
+
+                        {formattedDateTime(quote.planned_start_date_time)}
+                    </td>
                     <td>{formattedDateTime(quote.planned_end_date_time)}</td>
                     <td>
                         <Button type='link' onClick={() => showModal(quote)}>Click here</Button>
@@ -208,6 +221,82 @@ function Quotes() {
         return Promise.resolve();
     };
 
+    // Define columns for the orders table
+    const columns = [
+        { title: 'ID', dataIndex: 'quote_id', key: 'quote_id' },
+        { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
+        {
+            title: 'Quote Status', key: 'quote_status',
+            render: (_, record) => (
+                <>
+                    {/* <p>{formatUpperCase(record.quote_status)}</p> */}
+                    <Tag color={record.quote_status == 'pending' ? 'processing' : record.quote_status == 'accepted' ? 'success' : 'error'}>{record.quote_status.toUpperCase()}</Tag>
+                </>
+            )
+        },
+        {
+            title: 'Date', key: 'Date',
+            render: (_, record) => (
+                <>
+                    <p><strong>From:</strong> {formattedDateTime(record.planned_start_date_time)}</p>
+                    <p><strong>To:</strong> {formattedDateTime(record.planned_end_date_time)}</p>
+                </>
+            )
+        },
+        {
+            title: 'Files', key: 'files',
+            render: (_, record) => (
+                <>
+                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
+                </>
+            )
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (_, record) => (
+                <>
+                    <Select style={{ width: '100%', height: '100%' }} placeholder="Select the option" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
+                </>
+            ),
+        },
+    ];
+
+    // Pagination config for tables
+    const paginationConfig = {
+        pageSize: 5,
+        showSizeChanger: true,
+        pageSizeOptions: ['5', '10', '20'],
+    };
+
+    const handleSearch = () => {
+        const filtered = allQuotes.filter(quote => {
+            const categoryMatch = selectedCategory ? quote.Category === selectedCategory : true;
+            const typeMatch = selectedType ? quote.Machine_Type === selectedType : true;
+            return categoryMatch && typeMatch;
+        });
+        setFilteredQuotes(filtered);
+    };
+
+    // Group filtered quotes by category and type for display
+    const groupedFilteredQuotes = groupedQuotes(filteredQuotes);
+
+    // Render collapsible panels with tables inside
+    const renderAccordion = (groupedQuotes) => (
+        <Collapse accordion>
+            {Object.keys(groupedQuotes).map((key) => (
+                <Collapse.Panel header={key} key={key}>
+                    <Table
+                        columns={columns}
+                        dataSource={groupedQuotes[key]}
+                        rowKey="quote_id"
+                        pagination={paginationConfig}  // Add pagination here
+                    />
+                </Collapse.Panel>
+            ))}
+        </Collapse>
+    );
+
     return (
         <>
             <div className="container-fluid">
@@ -220,40 +309,82 @@ function Quotes() {
                 </div>
                 <div className='row'>
                     <div className="col-auto">
-                        <h6 style={{marginTop: '4px'}}>Filter By:</h6>
+                        <h6 style={{ marginTop: '4px' }}>Filter By:</h6>
                     </div>
                     <div className='col-auto'>
-                        <Select placeholder='Select the machine category' options={dummyData} />
+                        <Select placeholder='Select the machine category' options={uniqueCategories.map(category => ({ value: category, label: category }))}
+                            onChange={value => setSelectedCategory(value)} />
                     </div>
                     <div className='col-auto'>
-                        <Select placeholder='Select the machine type' options={dummyData} />
+                        <Select placeholder='Select the machine type' options={uniqueTypes.map(type => ({ value: type, label: type }))}
+                            onChange={value => setSelectedType(value)} />
                     </div>
                     <div className='col-auto'>
-                        <Button type='primary'>Search</Button>
+                        <Button type='primary' onClick={handleSearch}>Search</Button>
                     </div>
                 </div>
                 <hr />
                 {quoteLoading ? "Loading your Quotes..." :
                     <>
-                        <Collapse
-                            onChange={onChange}
-                            expandIconPosition='start'
-                            items={items}
-                        />
+
+                        {/* <Collapse>
+                            {Object.keys(groupedQuotes).map((key) => (
+                                <Collapse.Panel header={key} key={key}>
+                                    <Table
+                                        columns={columns}
+                                        dataSource={groupedQuotes[key]}
+                                        rowKey="quote_id"
+                                        pagination={false}
+                                    />
+                                </Collapse.Panel>
+                            ))}
+                        </Collapse>
                         <Pagination
                             current={currentPage}
                             pageSize={PAGE_SIZE}
                             total={allQuotes.length}
                             onChange={onChangePage} // Handle page change
                             style={{ marginTop: '16px', textAlign: 'center' }}
-                        />
+                        /> */}
+
+                        <Tabs defaultActiveKey="1">
+                            {/* My Quotes Tab */}
+                            <Tabs.TabPane tab="My Quotes" key="1">
+                                {Object.keys(myGroupedQuotes).length > 0 ? (
+                                    renderAccordion(myGroupedQuotes)
+                                ) : (
+                                    <p>No quotes available</p>
+                                )}
+                            </Tabs.TabPane>
+
+                            {/* Customer Quotes Tab */}
+                            <Tabs.TabPane tab="Customer Quotes" key="2">
+                                {Object.keys(customerGroupedQuotes).length > 0 ? (
+                                    renderAccordion(customerGroupedQuotes)
+                                ) : (
+                                    <p>No customer quotes available</p>
+                                )}
+                            </Tabs.TabPane>
+
+                            {/* Filtered Quotes Tab */}
+                            {filteredQuotes.length > 0 && (
+                                <Tabs.TabPane tab="Filtered Results" key="3">
+                                    {Object.keys(groupedFilteredQuotes).length > 0 ? (
+                                        renderAccordion(groupedFilteredQuotes)
+                                    ) : (
+                                        <p>No filtered results</p>
+                                    )}
+                                </Tabs.TabPane>
+                            )}
+
+                        </Tabs>
                     </>
                 }
 
                 {/* Attachments File Lists Modal */}
                 {selectedQuote && (
                     <Modal
-                        title="Attachments"
+                        // title="Files"
                         open={attachModal}
                         onOk={handleOk}  // Close modal on "Okay"
                         onCancel={handleCancel}
@@ -263,6 +394,14 @@ function Quotes() {
                             </Button>,
                         ]}
                     >
+                        <h6>Company Details: ID({authUser.CompanyId})</h6>
+                        <ul className="list-group">
+                            <li className="list-group-item">Company Name: <strong>{authUser.companyName}</strong></li>
+                            <li className="list-group-item">Company Ownership: <strong>{authUser.ownership}</strong></li>
+                            <li className="list-group-item">Company Year Established: <strong>{authUser.yearEstablished}</strong></li>
+                        </ul>
+                        <hr />
+                        <h6>Files:</h6>
                         <ul className="list-group">
                             <li className="list-group-item">
                                 View Part Drawing File -&nbsp;<Link to={selectedQuote.order_drawing} target="_blank">View File</Link>
