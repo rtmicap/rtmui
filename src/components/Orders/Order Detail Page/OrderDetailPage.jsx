@@ -1,17 +1,19 @@
-import { Button, Descriptions, Space } from 'antd';
+import { Button, Descriptions, Space, Tag } from 'antd';
 import React from 'react'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
+import { LeftCircleOutlined } from "@ant-design/icons";
 
 function OrderDetailPage() {
     const location = useLocation();
     const { authUser } = useAuth();
     const { order } = location.state || {};
+    const navigate = useNavigate();
 
     if (!order) {
         return <div>No order data found!</div>;
     }
-    // console.log("order: ", order);
+    console.log("order: ", order);
 
     const items = [
         {
@@ -20,65 +22,94 @@ function OrderDetailPage() {
         },
         {
             label: 'Order Status',
-            children: order.order_Status,
+            children: (
+                <>
+                    <Tag color={'teal'}>{order.order_status.toUpperCase()}</Tag>
+                </>
+            )
+
         },
         {
             label: 'Goods Status',
-            children: order.goods_status,
+            children:
+                (
+                    <>
+                        {order.goods_status ?
+                            <Tag color='magenta'>{order.goods_status.toUpperCase()}</Tag>
+                            : '-'
+                        }
+                    </>
+                )
+
         },
         {
-            label: 'Quantity',
+            label: 'Order Quantity',
             children: order.quantity,
         },
         {
             label: 'Planned Hours',
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
             children: order.planned_hours,
+        },
+        {
+            label: 'Actual Hours',
+            children: order.actual_hours,
+        },
+        {
+            label: 'Hirer Company ID',
+            children: (
+                <>
+                    <span>Company Name({order.hirer_company_id})</span>
+                </>
+            ),
+        },
+        {
+            label: 'Renter Company ID',
+            children: (
+                <>
+                    <span>Company Name({order.renter_company_id})</span>
+                </>
+            ),
         },
     ];
 
     return (
         <>
             <div className="container">
-                {/* <table className="table table-bordered table-striped caption-top">
-                    <caption style={{ fontWeight: 'bold', color: '#774AEF' }}>Order Details</caption>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Order Status</th>
-                    </tr>
-                    <tr>
-                        <td>{order.order_id}</td>
-                        <td>{order.order_status}</td>
-                    </tr>
-                </table> */}
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button><hr />
+
                 <Descriptions
                     title="Order Descriptions"
                     bordered
                     column={{
                         xs: 1,
                         sm: 2,
-                        md: 3,
-                        lg: 3,
-                        xl: 4,
-                        xxl: 4,
+                        md: 2,
+                        lg: 2,
+                        xl: 2,
+                        xxl: 2,
                     }}
                     items={items}
                 />
 
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <Space>
-                        {authUser.CompanyId == order.hirer_company_id &&
-                            <Button type="primary">Ship Materials To Renter</Button>
+                        {authUser && authUser.CompanyId == order.hirer_company_id &&
+                            <button type='button' className="btn btn-primary btn-sm">
+                                Ship Materials To Renter
+                            </button>
                         }
 
-                        {authUser.CompanyId == order.renter_company_id &&
-                            <Button type="primary">Review Ship Materials</Button>
+                        {authUser && authUser.CompanyId == order.renter_company_id &&
+                            <button type='button' className="btn btn-primary btn-sm">
+                                Review Ship Materials
+                            </button>
                         }
-                        {/* <Button type="default" onClick={() => handleView(order)}>View</Button>
-                        <Button type="danger" onClick={() => handleDelete(order)}>Delete</Button> */}
+                        <button type='button' className="btn btn-warning btn-sm">
+                            Sample Report
+                        </button>
+                        <button type='button' className="btn btn-dark btn-sm">
+                            Final Report
+                        </button>
                     </Space>
                 </div>
             </div>
