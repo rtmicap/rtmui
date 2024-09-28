@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import { actionButtons } from './QuotesUtils';
 import dayjs from 'dayjs';
 import { useAuth } from '../../contexts/AuthContext';
+import './quote.scss';
+
 const PAGE_SIZE = 10; // Number of items per page
 const { confirm } = Modal;
 
@@ -61,8 +63,8 @@ function Quotes() {
     };
 
     // filtered by current user and company id // please check the db for reference
-    const myQuotes = allQuotes.filter(quote => quote.renter_company_id === currentUserCompanyId);
-    const customerQuotes = allQuotes.filter(quote => quote.renter_company_id !== currentUserCompanyId);
+    const customerQuotes = allQuotes.filter(quote => quote.renter_company_id === currentUserCompanyId);
+    const myQuotes = allQuotes.filter(quote => quote.renter_company_id !== currentUserCompanyId);
 
     // Extract unique categories and types
     const uniqueCategories = [...new Set(allQuotes.map(quote => quote.Category))];
@@ -127,7 +129,7 @@ function Quotes() {
             <table class="table table-bordered table-striped">
                 <tr>
                     <th>ID</th>
-                    <th>Quantity</th>
+                    <th>Qty</th>
                     <th>Hirer Company</th>
                     <th>Planned Start Date</th>
                     <th>Planned End Date</th>
@@ -147,7 +149,7 @@ function Quotes() {
                         <Button type='link' onClick={() => showModal(quote)}>Click here</Button>
                     </td>
                     <td>
-                        <Select style={{ width: '100%', height: '100%' }} placeholder="Select the option" options={actionButtons} onChange={(value) => handleActionChange(value, quote)} />
+                        <Select style={{ width: '100%', height: '100%' }} placeholder="Select" options={actionButtons} onChange={(value) => handleActionChange(value, quote)} />
                     </td>
                 </tr>
             </table>
@@ -226,7 +228,7 @@ function Quotes() {
         { title: 'ID', dataIndex: 'quote_id', key: 'quote_id' },
         { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
         {
-            title: 'Quote Status', key: 'quote_status',
+            title: 'Status', key: 'quote_status',
             render: (_, record) => (
                 <>
                     {/* <p>{formatUpperCase(record.quote_status)}</p> */}
@@ -238,8 +240,8 @@ function Quotes() {
             title: 'Date', key: 'Date',
             render: (_, record) => (
                 <>
-                    <p><strong>From:</strong> {formattedDateTime(record.planned_start_date_time)}</p>
-                    <p><strong>To:</strong> {formattedDateTime(record.planned_end_date_time)}</p>
+                    <div><span class="dateLabel">From: </span><div class="dateValue">{formattedDateTime(record.planned_start_date_time)}</div></div>
+                    <div><span class="dateLabel">To: </span><div class="dateValue">{formattedDateTime(record.planned_end_date_time)}</div></div>
                 </>
             )
         },
@@ -256,7 +258,7 @@ function Quotes() {
             key: 'actions',
             render: (_, record) => (
                 <>
-                    <Select style={{ width: '100%', height: '100%' }} placeholder="Select the option" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
+                    <Select placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
                 </>
             ),
         },
