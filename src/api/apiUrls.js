@@ -37,6 +37,9 @@ export const CREATE_FINAL_REPORT_URL = "/order/createfinalreport";
 export const UPDATE_FINAL_REPORT_URL = "/order/updatefinalreport";
 export const GET_FINAL_SAMPLE_REPORT_ORDERID_URL = "/order/getallfinalreportsbyorderid";
 
+// Company users data
+export const GET_COMPANY_DETAILS_BY_ID = "/user/getcompanydetailsbyid";
+
 // ******************************///*****************///
 //Admin URLS
 

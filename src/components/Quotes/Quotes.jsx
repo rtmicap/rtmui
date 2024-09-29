@@ -4,7 +4,7 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { actionButtons } from './QuotesUtils';
 import dayjs from 'dayjs';
 import { useAuth } from '../../contexts/AuthContext';
@@ -29,6 +29,8 @@ function Quotes() {
     const [filteredQuotes, setFilteredQuotes] = useState([]); // State for storing filtered quotes
 
     const currentUserCompanyId = authUser.CompanyId;
+
+    const navigate = useNavigate();
     // console.log("authUser: ", authUser);
 
     const showModal = (quote) => {
@@ -59,6 +61,19 @@ function Quotes() {
             setAllQuotes([]);
             setQuoteLoading(false);
             message.error("Error on loading quotes..");
+        }
+    };
+
+    const getAllQuotesWithoutLoading = async () => {
+        try {
+            const response = await axios.get(GET_ALL_QUOTES_URL);
+            console.log("getAllQuotesWithoutLoading: ", response.data);
+            setAllQuotes(response.data.result);
+            return response.data.result;
+        } catch (error) {
+            console.log("error getAllQuotesWithoutLoading: ", error);
+            setAllQuotes([]);
+            message.error("Error on loading getAllQuotesWithoutLoading..");
         }
     };
 
@@ -106,7 +121,7 @@ function Quotes() {
     const handleActionChange = (value, quote) => {
         console.log("handleActionChange: ", value);
         if (value === 'accepted' || value === 'rejected') {
-            showConfirm(value); // Show confirmation modal based on the selected value
+            showConfirm(value, quote); // Show confirmation modal based on the selected value
         } else { // change booking date modal
             // set the value to specific fields
             form.setFieldsValue({
@@ -160,13 +175,45 @@ function Quotes() {
         setCurrentPage(page); // Update current page
     };
 
-    const showConfirm = (value) => {
+    const acceptAndRejectQuote = async (value, quote) => {
+        try {
+            // setIsLoading(true);
+            var reqItem = {
+                quoteid: quote.quote_id,
+                plannedstartdatetime: dayjs(quote.planned_start_date_time).utc().format(),
+                plannedenddatetime: dayjs(quote.planned_end_date_time).utc().format(),
+                machineid: quote.machine_id,
+                orderprocesssheet: quote.order_process_sheet,
+                orderspec: quote.order_spec,
+                orderdrawing: quote.order_drawing,
+                orderprogramsheet: quote.order_program_sheet,
+                otherattachments: quote.other_attachments,
+                quotestatus: value,
+                quantity: quote.quantity,
+                hirerCompanyId: quote.hirer_company_id
+            }
+            const response = await axios.patch(UPDATE_QUOTE_URL, (reqItem));
+            console.log("acceptAndRejectQuote: ", reqItem);
+            console.log("accepted: ", response);
+            message.success(`${quote.quote_id} Quote Accepted! Please visit order page for more details.`);
+            // navigate('/orders', { replace: true });
+            // setIsLoading(false);
+        } catch (error) {
+            console.log("accepted error: ", error);
+            message.error("Something error while accepting the quote!");
+            // setIsLoading(false);
+        }
+    }
+
+    const showConfirm = (value, quote) => {
         confirm({
             title: `Are you sure you want to ${value} this quote?`,
             content: `You have selected the option: ${value}. Please confirm your action.`,
             onOk() {
                 // Handle confirmed action here
                 console.log(`${value} confirmed`);
+                acceptAndRejectQuote(value, quote);
+                getAllQuotesWithoutLoading();
             },
             onCancel() {
                 // Handle cancel action here

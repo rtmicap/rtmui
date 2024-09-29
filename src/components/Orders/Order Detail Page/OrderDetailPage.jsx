@@ -1,14 +1,36 @@
-import { Button, Descriptions, Space, Tag } from 'antd';
-import React from 'react'
+import { Button, Descriptions, message, Space, Tag } from 'antd';
+import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { LeftCircleOutlined } from "@ant-design/icons";
+import axios from '../../../api/axios';
+import { GET_COMPANY_DETAILS_BY_ID } from '../../../api/apiUrls';
 
 function OrderDetailPage() {
     const location = useLocation();
     const { authUser } = useAuth();
     const { order } = location.state || {};
     const navigate = useNavigate();
+    const [hirerCompany, setHirerCompany] = useState(null);
+    const [renterCompany, setRenterCompany] = useState(null);
+
+    const getCompanyDetailsById = async (companyId, setter) => {
+        try {
+            const response = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
+                params: { companyId }
+            });
+            console.log("company details: ", response.data.data);
+            setter(response.data.data);
+        } catch (error) {
+            message.error("Error fetching Company Details");
+        }
+    };
+
+    useEffect(() => {
+        getCompanyDetailsById(order.hirer_company_id, setHirerCompany);
+        getCompanyDetailsById(order.renter_company_id, setRenterCompany);
+    }, [])
+
 
     if (!order) {
         return <div>No order data found!</div>;
@@ -58,7 +80,7 @@ function OrderDetailPage() {
             label: 'Hirer Company ID',
             children: (
                 <>
-                    <span>Company Name({order.hirer_company_id})</span>
+                    <span>{hirerCompany ? `${hirerCompany.companyName} (${order.hirer_company_id})` : '-'}</span>
                 </>
             ),
         },
@@ -66,7 +88,9 @@ function OrderDetailPage() {
             label: 'Renter Company ID',
             children: (
                 <>
-                    <span>Company Name({order.renter_company_id})</span>
+                    <>
+                        <span>{renterCompany ? `${renterCompany.companyName} (${order.renter_company_id})` : '-'}</span>
+                    </>
                 </>
             ),
         },
