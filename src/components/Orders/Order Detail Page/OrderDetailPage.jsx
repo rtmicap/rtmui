@@ -29,7 +29,7 @@ function OrderDetailPage() {
     useEffect(() => {
         getCompanyDetailsById(order.hirer_company_id, setHirerCompany);
         getCompanyDetailsById(order.renter_company_id, setRenterCompany);
-    }, [])
+    }, []);
 
 
     if (!order) {

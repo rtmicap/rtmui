@@ -1,4 +1,4 @@
-import { Button, message, Table, Tabs } from 'antd';
+import { Button, Collapse, message, Table, Tabs } from 'antd';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
+import { ReloadOutlined } from "@ant-design/icons";
 
 function Orders() {
 
@@ -40,6 +41,19 @@ function Orders() {
   useEffect(() => {
     getAllOrders();
   }, []);
+
+  // Function to group orders by Category and Machine_Type
+  const groupOrdersByCategoryAndType = (orders) => {
+    const groupedOrders = {};
+    orders.forEach((order) => {
+      const key = `${order.Category}-${order.Machine_Type}`;
+      if (!groupedOrders[key]) {
+        groupedOrders[key] = [];
+      }
+      groupedOrders[key].push(order);
+    });
+    return groupedOrders;
+  };
 
   // filtered by current user and company id // please check the db for reference
   const myOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
@@ -105,14 +119,80 @@ function Orders() {
     },
   ];
 
+  // Pagination config for tables
+  const paginationConfig = {
+    pageSize: 5,
+    showSizeChanger: true,
+    pageSizeOptions: ['5', '10', '20'],
+  };
+
+  const OrdersAccordion = ({ orders }) => {
+    const groupedOrders = groupOrdersByCategoryAndType(orders);
+
+    return (
+      <Collapse accordion>
+        {Object.keys(groupedOrders).map((groupKey) => {
+          const [category, type] = groupKey.split("-");
+          return (
+            <Collapse.Panel header={`${category} - ${type}`} key={groupKey}>
+              <Table
+                dataSource={groupedOrders[groupKey]}
+                // columns={[
+                //   {
+                //     title: 'Machine ID',
+                //     dataIndex: 'machine_id',
+                //     key: 'machine_id',
+                //   },
+                //   {
+                //     title: 'Order Status',
+                //     dataIndex: 'order_status',
+                //     key: 'order_status',
+                //   },
+                //   // Add other columns as needed
+                // ]}
+                columns={columns}
+                rowKey="order_id"
+                pagination={paginationConfig}
+              />
+            </Collapse.Panel>
+          );
+        })}
+      </Collapse>
+    );
+  };
+
+  const MyOrdersTabs = ({ myOrders, customerOrders }) => {
+    return (
+      <Tabs defaultActiveKey="1">
+        <Tabs.TabPane tab="My Orders" key="1">
+          <OrdersAccordion orders={myOrders} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Customer Orders" key="2">
+          <OrdersAccordion orders={customerOrders} />
+        </Tabs.TabPane>
+      </Tabs>
+    );
+  };
+
+  const refreshData = () => {
+    getAllOrders();
+  }
+
+
   return (
     <>
       <div className="container-fluid">
         <h5 class="card-title text-center">My Orders</h5>
-        <Tabs
+        <div className='row'>
+          <div className="col text-end">
+            <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Orders</Button>
+          </div>
+        </div>
+        {/* <Tabs
           defaultActiveKey="1"
           items={items}
-        />
+        /> */}
+        {orderLoading ? <p>Loading your orders</p> : <MyOrdersTabs myOrders={myOrders} customerOrders={customerOrders} />}
       </div>
     </>
   )
