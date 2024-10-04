@@ -39,6 +39,7 @@ import MyRegisteredMachines from './components/MyRegisteredMachines/MyRegistered
 import ReviewBooking from './components/Review Booking/ReviewBooking';
 import Payment from './components/Payment/Payment';
 import OrderDetailPage from './components/Orders/Order Detail Page/OrderDetailPage';
+import Shipment from './components/Shipment/Shipment';
 
 const App = () => {
   // const {
@@ -79,7 +80,7 @@ const App = () => {
             {/* Orders */}
             <Route path='orders' element={<Orders />} />
             <Route path="order-details/:orderId" element={<OrderDetailPage />} />
-            
+            <Route path="order-details/:orderId/shipment-details" element={<Shipment />} />
             {/* My Bookings */}
             <Route path='my-bookings' element={<MyBookings />} />
 
@@ -101,6 +102,9 @@ const App = () => {
             <Route path="view-legal-docs" element={<RentGauges />} />
             <Route path="view-code-conduct" element={<SellGauges />} />
             <Route path="view-company-guidelines" element={<SellGauges />} />
+
+            {/* Shipments Details */}
+            <Route path="shipment-details" element={<Shipment />} />
 
           </Route>
           {/* Admin Routes */}

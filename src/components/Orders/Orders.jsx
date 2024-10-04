@@ -2,7 +2,7 @@ import { Button, Collapse, message, Table, Tabs } from 'antd';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
@@ -59,16 +59,24 @@ function Orders() {
   const myOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
   const customerOrders = allOrders.filter(order => order.renter_company_id !== currentUserCompanyId);
 
+  // const handleView = (record) => {
+  //   navigate(`/order-details/${record.order_id}`,
+  //     {
+  //       state:
+  //       {
+  //         order: record
+  //       }
+  //     }
+  //   );
+  // }
+
   const handleView = (record) => {
-    navigate(`/order-details/${record.order_id}`,
-      {
-        state:
-        {
-          order: record
-        }
-      }
-    );
-  }
+    navigate(`/order-details/${record.order_id}`, {
+      state: {
+        order: record,
+      },
+    });
+  };
 
   // Define columns for the orders table
   const columns = [
@@ -131,10 +139,10 @@ function Orders() {
 
     return (
       <Collapse accordion>
-        {Object.keys(groupedOrders).map((groupKey) => {
+        {Object.keys(groupedOrders).map((groupKey, index) => {
           const [category, type] = groupKey.split("-");
           return (
-            <Collapse.Panel header={`${category} - ${type}`} key={groupKey}>
+            <Collapse.Panel header={`${category} - ${type}`} key={`${groupKey}-${index}`}>
               <Table
                 dataSource={groupedOrders[groupKey]}
                 // columns={[
@@ -151,7 +159,7 @@ function Orders() {
                 //   // Add other columns as needed
                 // ]}
                 columns={columns}
-                rowKey="order_id"
+                rowKey={(record) => `${record.order_id}-${groupKey}`}
                 pagination={paginationConfig}
               />
             </Collapse.Panel>
@@ -193,6 +201,8 @@ function Orders() {
           items={items}
         /> */}
         {orderLoading ? <p>Loading your orders</p> : <MyOrdersTabs myOrders={myOrders} customerOrders={customerOrders} />}
+        {/* This Outlet will render the nested routes */}
+        {/* <Outlet /> */}
       </div>
     </>
   )

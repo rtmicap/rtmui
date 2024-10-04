@@ -96,6 +96,19 @@ function OrderDetailPage() {
         },
     ];
 
+    // const handleShipmentRedirect = () => {
+    //     navigate("order-details/:orderId/shipment-details")
+    // }
+
+    const handleShipmentRedirect = (record, value) => {
+        navigate(`/order-details/${record.order_id}/shipment-details`, {
+            state: {
+                order: record,
+                reviewShipment: value == "reviewMaterials" ? true : false
+            },
+        });
+    };
+
     return (
         <>
             <div className="container">
@@ -118,13 +131,13 @@ function OrderDetailPage() {
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <Space>
                         {authUser && authUser.CompanyId == order.hirer_company_id &&
-                            <button type='button' className="btn btn-primary btn-sm">
+                            <button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'shipMaterials')}>
                                 Ship Materials To Renter
                             </button>
                         }
 
                         {authUser && authUser.CompanyId == order.renter_company_id &&
-                            <button type='button' className="btn btn-primary btn-sm">
+                            <button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'reviewMaterials')}>
                                 Review Ship Materials
                             </button>
                         }
