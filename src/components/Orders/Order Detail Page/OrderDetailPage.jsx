@@ -109,6 +109,25 @@ function OrderDetailPage() {
         });
     };
 
+    const handleSampleReportRedirect = (record, value) => {
+        navigate(`/order-details/${record.order_id}/sample-report`, {
+            state: {
+                order: record,
+                reviewShipment: value == "reviewSampleReports" ? true : false
+            },
+        });
+    };
+
+    const handleFinalReportRedirect = (record, value) => {
+        navigate(`/order-details/${record.order_id}/final-report`, {
+            state: {
+                order: record,
+                reviewShipment: value == "reviewFinalReports" ? true : false
+            },
+        });
+    };
+
+
     return (
         <>
             <div className="container">
@@ -141,12 +160,33 @@ function OrderDetailPage() {
                                 Review Ship Materials
                             </button>
                         }
-                        <button type='button' className="btn btn-warning btn-sm">
-                            Sample Report
-                        </button>
-                        <button type='button' className="btn btn-dark btn-sm">
-                            Final Report
-                        </button>
+                        {/* Sample Reports */}
+
+                        {authUser && authUser.CompanyId == order.hirer_company_id &&
+                            <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'reviewSampleReports')}>
+                                Review Sample Report
+                            </button>
+                        }
+
+                        {authUser && authUser.CompanyId == order.renter_company_id &&
+                            <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}>
+                                Sample Report
+                            </button>
+                        }
+
+                        {/* Final Reports */}
+                        {authUser && authUser.CompanyId == order.hirer_company_id &&
+                            <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'reviewFinalReports')}>
+                                Review Final Report
+                            </button>
+                        }
+
+                        {authUser && authUser.CompanyId == order.renter_company_id &&
+                            <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'finalReports')}>
+                                Final Report
+                            </button>
+                        }
+
                     </Space>
                 </div>
             </div>

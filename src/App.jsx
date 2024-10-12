@@ -40,6 +40,8 @@ import ReviewBooking from './components/Review Booking/ReviewBooking';
 import Payment from './components/Payment/Payment';
 import OrderDetailPage from './components/Orders/Order Detail Page/OrderDetailPage';
 import Shipment from './components/Shipment/Shipment';
+import SampleReports from './components/Sample Reports/SampleReports';
+import FinalReports from './components/Final Reports/FinalReports';
 
 const App = () => {
   // const {
@@ -81,6 +83,8 @@ const App = () => {
             <Route path='orders' element={<Orders />} />
             <Route path="order-details/:orderId" element={<OrderDetailPage />} />
             <Route path="order-details/:orderId/shipment-details" element={<Shipment />} />
+            <Route path="order-details/:orderId/sample-report" element={<SampleReports />} />
+            <Route path="order-details/:orderId/final-report" element={<FinalReports />} />
             {/* My Bookings */}
             <Route path='my-bookings' element={<MyBookings />} />
 

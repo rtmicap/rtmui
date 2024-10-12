@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip } from 'antd';
+import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex } from 'antd';
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -17,7 +17,7 @@ import {
 const { TextArea } = Input;
 import React, { useEffect, useState } from 'react';
 import { LeftCircleOutlined } from "@ant-design/icons";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import HeaderTitle from '../../utils/HeaderTitle';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
@@ -40,6 +40,9 @@ function Shipment() {
     const [selectedItems, setSelectedItems] = useState([]);
     // Note: fileUrls will be [url1, url2 ....]
     const [fileUrls, setFileUrls] = useState({});
+    const [invoiceFile, setInvoiceFile] = useState('');
+    const [invoiceFileLoading, setInvoiceFileLoading] = useState(false);
+    const [invoiceFileList, setInvoiceFileList] = useState([]);
     // shipment data
     const [shipmentData, setShipmentData] = useState({});
 
@@ -62,32 +65,81 @@ function Shipment() {
         }
     }
 
+    // const fetchShipmentDetails = async (orderId) => {
+    //     const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
+    //     console.log("fetchShipmentDetails: ", response.data);
+    //     if (response.data.message === "Successfully fetched shipment details for order id provided") {
+    //         const formattedDetails = response.data.result.map((detail, index) => {
+    //             // Populate fileUrls with image and invoice URLs based on the current index
+    //             const newFileUrls = { ...fileUrls };
+    //             if (detail.image) {
+    //                 newFileUrls[index] = detail.image;
+    //             }
+    //             // if (detail.invoice) {
+    //             //     newFileUrls[index] = detail.invoice;
+    //             // }
+    //             setFileUrls(newFileUrls);
+    //             console.log("newFileUrls: ", newFileUrls);
+    //             // Return the formatted detail
+    //             return {
+    //                 ...detail,
+    //                 typeofgoods: detail.type_of_goods,
+    //             };
+    //         });
+    //         form.setFieldsValue({ shipment_details: formattedDetails });
+    //         form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) });
+    //         console.log("formattedDetails: ", formattedDetails);
+    //     }
+    // };
+
     const fetchShipmentDetails = async (orderId) => {
-        const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
-        console.log("fetchShipmentDetails: ", response);
-        if (response.data.message === "Successfully fetched shipment details for order id provided") {
-            const formattedDetails = response.data.result.map((detail, index) => {
-                // Populate fileUrls with image and invoice URLs based on the current index
-                const newFileUrls = { ...fileUrls };
-                if (detail.image) {
-                    newFileUrls[index] = detail.image;
-                }
-                if (detail.invoice) {
-                    newFileUrls[index] = detail.invoice;
-                }
+        try {
+            const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${orderId}`);
+            console.log("fetchShipmentDetails: ", response.data);
+            if (response && response.data && response.data.result.length > 0) {
+                // Initialize an empty object to store the file URLs
+                let newFileUrls = {};
+                // Format the shipment details and populate fileUrls
+                const formattedDetails = response.data.result.map((detail, index) => {
+                    // Check if an image is available and set it in fileUrls
+                    if (detail.image) {
+                        newFileUrls[index] = detail.image;
+                    }
+    
+                    // Optional: If you want to store invoices in a separate index or field, uncomment this
+                    // if (detail.invoice) {
+                    //     newFileUrls[`invoice_${index}`] = detail.invoice;
+                    // }
+    
+                    // Return the formatted shipment detail
+                    return {
+                        typeofgoods: detail.type_of_goods, // Remap the field for form compatibility
+                        quantity: detail.quantity,
+                        description: detail.description,
+                        uom: detail.uom,
+                        image: detail.image,  // Ensure the form field has the image URL
+                        invoice: detail.invoice, // Add invoice URL to the form if needed
+                    };
+                });
+    
+                // Set the file URLs for the images
                 setFileUrls(newFileUrls);
                 console.log("newFileUrls: ", newFileUrls);
-                // Return the formatted detail
-                return {
-                    ...detail,
-                    typeofgoods: detail.type_of_goods,
-                };
-            });
-            form.setFieldsValue({ shipment_details: formattedDetails });
-            form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) });
-            console.log("formattedDetails: ", formattedDetails);
+    
+                // Set the formatted shipment details and datetime in the form
+                form.setFieldsValue({
+                    shipment_details: formattedDetails,
+                    shipment_datetime: moment(response.data.result[0].shipment_date), // Assuming shipment_date exists
+                    invoice: response.data.result[0].invoice// Assuming shipment_date exists
+                });
+    
+                console.log("formattedDetails: ", formattedDetails);
+            }
+        } catch (error) {
+            console.error("Error fetching shipment details:", error);
         }
     };
+    
 
     // Set review mode and trigger shipment fetching when reviewShipment is true
     useEffect(() => {
@@ -144,7 +196,7 @@ function Shipment() {
     const handleInvoiceChange = async (info, name) => {
         console.log("handleInvoiceChange: ", info);
         try {
-            setFileIsLoading(true);
+            setInvoiceFileLoading(true);
             const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj);
             const isPdf = info.fileList[0].type === 'application/pdf';
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
@@ -153,25 +205,23 @@ function Shipment() {
                 // Show error message for non-PDF files
                 message.warning('You can only upload PDF file!');
                 console.warn('You can only upload PDF file!');
-                setFileIsLoading(false);
+                setInvoiceFileLoading(false);
             } else if (!isLt2M) {
                 // Show error message for files larger than 2MB
                 message.warning('File must be smaller than 2MB!');
                 console.warn('File must be smaller than 2MB!');
-                setFileIsLoading(false);
+                setInvoiceFileLoading(false);
             } else {
-                setFileUrls((prev) => ({
-                    ...prev,
-                    [name]: fileUrl,
-                }));
-                setFileIsLoading(false);
+                setInvoiceFileList(info.fileList);
+                setInvoiceFile(fileUrl);
+                setInvoiceFileLoading(false);
                 message.success("Invoice File Uploaded!");
             }
 
         } catch (error) {
             console.error('File upload error:', error);
             message.error('File upload failed. Please try again.');
-            setFileIsLoading(false);
+            setInvoiceFileLoading(false);
         }
     };
 
@@ -179,14 +229,14 @@ function Shipment() {
         console.log("handleInvoiceChange: ", info);
         try {
             setImageFileIsLoading(true);
-            const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj);
-            const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
+            // const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
+            const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png'].includes(info.fileList[0].type);
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
 
             if (!isImageFormat) {
                 // Show error message for non-PDF files
-                message.warning('You can only upload PDF file!');
-                console.warn('You can only upload PDF file!');
+                message.warning('You can only upload JPEG, JPG, PNG files!');
+                console.warn('You can only upload JPEG, JPG, PNG files!');
                 setImageFileIsLoading(false);
             } else if (!isLt2M) {
                 // Show error message for files larger than 2MB
@@ -194,6 +244,7 @@ function Shipment() {
                 console.warn('File must be smaller than 2MB!');
                 setImageFileIsLoading(false);
             } else {
+                const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj, name);
                 setFileUrls((prev) => ({
                     ...prev,
                     [name]: fileUrl,
@@ -201,7 +252,6 @@ function Shipment() {
                 setImageFileIsLoading(false);
                 message.success(`Image File Uploaded!`);
             }
-
         } catch (error) {
             console.error('File upload error:', error);
             message.error('File upload failed. Please try again.');
@@ -253,37 +303,25 @@ function Shipment() {
         values.orderid = order.order_id;
         values.shipment_datetime = shipmentDateTime;
         values.goods_status = "goods_in_transit";
+        values.invoice = invoiceFile;
         try {
-            console.log('before Success:', values);
-            const checkInvoice = values.shipment_details.find((data) => data.typeofgoods === 'invoice');
-
-            if (!checkInvoice) {
-                notifyMissingInvoice();
-            } else {
-                // Proceed with form submission
-                // console.log('Form values:', values);
-                console.log('Success:', values);
-                // ... handle form submission
-                const updatedShipmentDetails = await Promise.all(
-                    values.shipment_details.map(async (detail, index) => {
-                        let updatedDetail = { ...detail };
-                        if (fileUrls[index]) {
-                            updatedDetail.image = fileUrls[index];
-                        }
-                        if (updatedDetail.typeofgoods === 'invoice') {
-                            updatedDetail = { typeofgoods: 'invoice', invoice: updatedDetail.image };
-                        }
-                        return updatedDetail;
-                    })
-                );
-                const finalValues = { ...values, shipment_details: updatedShipmentDetails };
-                console.log('Success22:', finalValues);
-                const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
-                console.log("shipmentRes: ", shipmentRes);
-                message.success(shipmentRes.data.message);
-                // resetForm(); // clear the form data
-                navigate(-1); // redirect to previous page
-            }
+            console.log('Success:', values);
+            // ... handle form submission
+            const updatedShipmentDetails = await Promise.all(
+                values.shipment_details.map(async (detail, index) => {
+                    let updatedDetail = { ...detail };
+                    if (fileUrls[index]) {
+                        updatedDetail.image = fileUrls[index];
+                    }
+                    return updatedDetail;
+                })
+            );
+            const finalValues = { ...values, shipment_details: updatedShipmentDetails };
+            const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
+            console.log("shipmentRes: ", shipmentRes);
+            message.success(shipmentRes.data.message);
+            // resetForm(); // clear the form data
+            navigate(-1); // redirect to previous page
 
         } catch (error) {
             console.error('Shipment error:', error);
@@ -301,6 +339,11 @@ function Shipment() {
     const disabledDate = (current) => {
         // Can not select days before today and today
         return current && current < dayjs().startOf('day');
+    };
+
+    const handleInvoiceRemove = () => {
+        setInvoiceFileList([]);
+        setInvoiceFile('');
     };
 
     return (
@@ -361,6 +404,48 @@ function Shipment() {
                                 )}
                             </Form.Item>
                         </div>
+
+                        <div className="col">
+                            <Form.Item
+                                label="Attach Invoice File"
+                                name={'invoice'}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Invoice file is required!',
+                                    },
+                                ]}
+                            >
+                                <Flex gap="small" wrap>
+                                    {!invoiceFile && !isReview && (
+                                        <Upload
+                                            fileList={invoiceFileList}
+                                            onChange={(info) => handleInvoiceChange(info, 'invoice')}
+                                            beforeUpload={() => false}
+                                            accept=".pdf"
+                                            maxCount={1}
+                                        >
+                                            <Button loading={invoiceFileLoading} type={'primary'} icon={<PlusCircleOutlined />}>{invoiceFileLoading ? 'Uploading...' : 'Attach invoice'} </Button>
+                                            <p>Max: 2 MB (Only PDF Format)</p>
+                                        </Upload>
+                                    )}
+
+                                    {invoiceFile && !isReview && (
+                                        <div className='col-auto'>
+                                            <div>
+                                                <Link to={invoiceFile} target={'_blank'}>View Invoice File</Link>
+                                                <Button type="link" onClick={handleInvoiceRemove}>Remove</Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {isReview && (
+                                        <Link to={form.getFieldValue('invoice')} target={'_blank'}>View Invoice File</Link>
+                                    )}
+                                </Flex>
+                            </Form.Item>
+
+                        </div>
                     </div>
 
                     {/* Other Data to update */}
@@ -412,158 +497,115 @@ function Shipment() {
                                                             </Form.Item>
                                                         </div>
 
-                                                        {form.getFieldValue(['shipment_details', name, 'typeofgoods']) !== 'invoice' && (
-                                                            <>
-                                                                <div className="col">
-                                                                    <Form.Item
-                                                                        label="Description"
-                                                                        {...restField}
-                                                                        name={[name, 'description']}
-                                                                        rules={[
-                                                                            {
-                                                                                required: true,
-                                                                                message: 'Please input your description!',
-                                                                            },
-                                                                        ]}
-                                                                        required
-                                                                    >
-                                                                        <TextArea rows={3} readOnly={isReview} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount />
-                                                                    </Form.Item>
-                                                                </div>
-
-                                                                <div className="col">
-                                                                    <Form.Item
-                                                                        label="Shipment Qty"
-                                                                        {...restField}
-                                                                        name={[name, 'quantity']}
-                                                                        rules={[
-                                                                            {
-                                                                                required: true,
-                                                                                message: 'Please input your shipment quantity!',
-                                                                            },
-                                                                            {
-                                                                                pattern: /^\d{1,5}$/, // Regex pattern to match 10 digits
-                                                                                message: 'Please enter a valid number! (upto 5 digits)',
-                                                                            },
-                                                                        ]}
-                                                                        required
-                                                                    >
-                                                                        <Input placeholder='Enter shipment quantity' readOnly={isReview} />
-                                                                    </Form.Item>
-                                                                </div>
-
-                                                                <div className="col">
-                                                                    <Form.Item
-                                                                        label={"UOM"}
-                                                                        {...restField}
-                                                                        name={[name, 'UOM']}
-                                                                        rules={[
-                                                                            {
-                                                                                required: true,
-                                                                                message: 'Please input your UOM!',
-                                                                            },
-                                                                        ]}
-                                                                    >
-                                                                        <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                                                                    </Form.Item>
-                                                                </div>
-
-                                                                {isReview &&
-                                                                    <div className="col">
-                                                                        <Form.Item
-                                                                            label="Receipt Confirmation"
-                                                                            {...restField}
-                                                                            name={[name, 'received_status']}
-                                                                            rules={[
-                                                                                {
-                                                                                    required: true,
-                                                                                    message: 'Please input receipt confirmation!',
-                                                                                },
-                                                                            ]}
-                                                                        >
-                                                                            <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
-                                                                        </Form.Item>
-                                                                    </div>
-                                                                }
-
-                                                                {!fileUrls[name] && <div className="col-auto mt-4">
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'image']}
-                                                                    >
-                                                                        <Upload
-                                                                            valuePropName="file"
-                                                                            getValueFromEvent={(e) => {
-                                                                                if (Array.isArray(e)) {
-                                                                                    return e;
-                                                                                }
-                                                                                return e && e.file;
-                                                                            }}
-                                                                            onChange={(info) => handleImageChange(info, name)}
-                                                                            beforeUpload={() => false}
-                                                                            accept=".jpg,.jpeg,.png"
-                                                                            maxCount={1}
-                                                                            showUploadList={false}
-                                                                        >
-                                                                            {imageFileIsLoading ? <>
-                                                                                <Spin indicator={<LoadingOutlined spin />} />
-                                                                            </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>}
-                                                                            <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
-                                                                        </Upload>
-                                                                    </Form.Item>
-
-                                                                </div>
-                                                                }
-                                                            </>
-                                                        )}
-
-                                                        {form.getFieldValue(['shipment_details', name, 'typeofgoods']) === 'invoice' && (
-                                                            <>
-                                                                {!fileUrls[name] && <div className="col-auto mt-4">
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'invoice']}
-                                                                        rules={[
-                                                                            {
-                                                                                required: true,
-                                                                                message: 'Invoice file is required!',
-                                                                            },
-                                                                        ]}
-                                                                    >
-                                                                        <Upload
-                                                                            valuePropName="file"
-                                                                            getValueFromEvent={(e) => {
-                                                                                if (Array.isArray(e)) {
-                                                                                    return e;
-                                                                                }
-                                                                                return e && e.file;
-                                                                            }}
-                                                                            onChange={(info) => handleInvoiceChange(info, name)}
-                                                                            beforeUpload={() => false}
-                                                                            accept=".pdf"
-                                                                            maxCount={1}
-                                                                            showUploadList={false}
-                                                                        >
-                                                                            {fileIsLoading ? <>
-                                                                                <Spin indicator={<LoadingOutlined spin />} />
-                                                                            </> : <Button type={'primary'} icon={<PlusCircleOutlined />}>{fileIsLoading ? 'Uploading...' : 'Attach invoice'} </Button>}
-                                                                            <p>Max: 2 MB (Only PDF Format)</p>
-                                                                        </Upload>
-                                                                    </Form.Item>
-
-                                                                </div>
-                                                                }
-                                                            </>
-                                                        )}
-
-                                                        {fileUrls[name] && (
-                                                            <div className='col-auto mt-4'>
-                                                                <div>
-                                                                    <a href={fileUrls[name]} target="_blank" rel="noopener noreferrer">View File</a>
-                                                                    <Button type="link" onClick={() => handleFileRemove(name)}>Remove</Button>
-                                                                </div>
+                                                        <>
+                                                            <div className="col">
+                                                                <Form.Item
+                                                                    label="Description"
+                                                                    {...restField}
+                                                                    name={[name, 'description']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Please input your description!',
+                                                                        },
+                                                                    ]}
+                                                                    required
+                                                                >
+                                                                    <TextArea rows={3} readOnly={isReview} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount />
+                                                                </Form.Item>
                                                             </div>
-                                                        )}
+
+                                                            <div className="col">
+                                                                <Form.Item
+                                                                    label="Shipment Qty"
+                                                                    {...restField}
+                                                                    name={[name, 'quantity']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Please input your shipment quantity!',
+                                                                        },
+                                                                        {
+                                                                            pattern: /^\d{1,5}$/, // Regex pattern to match 10 digits
+                                                                            message: 'Please enter a valid number! (upto 5 digits)',
+                                                                        },
+                                                                    ]}
+                                                                    required
+                                                                >
+                                                                    <Input placeholder='Enter shipment quantity' readOnly={isReview} />
+                                                                </Form.Item>
+                                                            </div>
+
+                                                            <div className="col">
+                                                                <Form.Item
+                                                                    label={"UOM"}
+                                                                    {...restField}
+                                                                    name={[name, 'UOM']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Please input your UOM!',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
+                                                                </Form.Item>
+                                                            </div>
+
+                                                            {isReview &&
+                                                                <div className="col">
+                                                                    <Form.Item
+                                                                        label="Receipt Confirmation"
+                                                                        {...restField}
+                                                                        name={[name, 'received_status']}
+                                                                        rules={[
+                                                                            {
+                                                                                required: true,
+                                                                                message: 'Please input receipt confirmation!',
+                                                                            },
+                                                                        ]}
+                                                                    >
+                                                                        <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
+                                                                    </Form.Item>
+                                                                </div>
+                                                            }
+
+                                                            {!fileUrls[name] && <div className="col-auto mt-4">
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'image']}
+                                                                >
+                                                                    <Upload
+                                                                        valuePropName="file"
+                                                                        getValueFromEvent={(e) => {
+                                                                            if (Array.isArray(e)) {
+                                                                                return e;
+                                                                            }
+                                                                            return e && e.file;
+                                                                        }}
+                                                                        onChange={(info) => handleImageChange(info, name)}
+                                                                        beforeUpload={() => false}
+                                                                        accept=".jpg,.jpeg,.png"
+                                                                        maxCount={1}
+                                                                        showUploadList={false}
+                                                                    >
+                                                                        <Button loading={imageFileIsLoading} type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>
+                                                                        <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
+                                                                    </Upload>
+                                                                </Form.Item>
+
+                                                            </div>
+                                                            }
+
+                                                            {fileUrls[name] && (
+                                                                <div className='col-auto mt-4'>
+                                                                    <div>
+                                                                        <Link to={fileUrls[name]} target={'_blank'}>View File</Link>
+                                                                        <Button type="link" onClick={() => handleFileRemove(name)}>Remove</Button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </>
 
                                                         <div className="col-auto mt-4">
                                                             {!isReview && fields.length > 1 ? (

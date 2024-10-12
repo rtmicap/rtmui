@@ -3,7 +3,7 @@ export const typesOfGoods = [
     { value: 'fixtures', label: 'Fixtures' },
     { value: 'tools', label: 'Tools' },
     { value: 'gauges', label: 'Gauges' },
-    { value: 'invoice', label: 'Invoice' }
+    // { value: 'invoice', label: 'Invoice' }
 ];
 
 export const uomChoices = [
