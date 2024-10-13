@@ -65,33 +65,6 @@ function Shipment() {
         }
     }
 
-    // const fetchShipmentDetails = async (orderId) => {
-    //     const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
-    //     console.log("fetchShipmentDetails: ", response.data);
-    //     if (response.data.message === "Successfully fetched shipment details for order id provided") {
-    //         const formattedDetails = response.data.result.map((detail, index) => {
-    //             // Populate fileUrls with image and invoice URLs based on the current index
-    //             const newFileUrls = { ...fileUrls };
-    //             if (detail.image) {
-    //                 newFileUrls[index] = detail.image;
-    //             }
-    //             // if (detail.invoice) {
-    //             //     newFileUrls[index] = detail.invoice;
-    //             // }
-    //             setFileUrls(newFileUrls);
-    //             console.log("newFileUrls: ", newFileUrls);
-    //             // Return the formatted detail
-    //             return {
-    //                 ...detail,
-    //                 typeofgoods: detail.type_of_goods,
-    //             };
-    //         });
-    //         form.setFieldsValue({ shipment_details: formattedDetails });
-    //         form.setFieldsValue({ shipment_datetime: moment(formattedDetails[0].shipment_date) });
-    //         console.log("formattedDetails: ", formattedDetails);
-    //     }
-    // };
-
     const fetchShipmentDetails = async (orderId) => {
         try {
             const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${orderId}`);
@@ -105,41 +78,41 @@ function Shipment() {
                     if (detail.image) {
                         newFileUrls[index] = detail.image;
                     }
-    
+
                     // Optional: If you want to store invoices in a separate index or field, uncomment this
                     // if (detail.invoice) {
                     //     newFileUrls[`invoice_${index}`] = detail.invoice;
                     // }
-    
+
                     // Return the formatted shipment detail
                     return {
                         typeofgoods: detail.type_of_goods, // Remap the field for form compatibility
                         quantity: detail.quantity,
                         description: detail.description,
-                        uom: detail.uom,
+                        UOM: detail.UOM,
                         image: detail.image,  // Ensure the form field has the image URL
                         invoice: detail.invoice, // Add invoice URL to the form if needed
                     };
                 });
-    
+
                 // Set the file URLs for the images
                 setFileUrls(newFileUrls);
                 console.log("newFileUrls: ", newFileUrls);
-    
+
                 // Set the formatted shipment details and datetime in the form
                 form.setFieldsValue({
                     shipment_details: formattedDetails,
                     shipment_datetime: moment(response.data.result[0].shipment_date), // Assuming shipment_date exists
                     invoice: response.data.result[0].invoice// Assuming shipment_date exists
                 });
-    
+
                 console.log("formattedDetails: ", formattedDetails);
             }
         } catch (error) {
             console.error("Error fetching shipment details:", error);
         }
     };
-    
+
 
     // Set review mode and trigger shipment fetching when reviewShipment is true
     useEffect(() => {
@@ -292,6 +265,7 @@ function Shipment() {
             console.log("response update ship: ", response);
             message.success(response.data.message);
             setIsReview(false);
+            navigate(-1); // redirect to previous page
         } catch (error) {
             message.error("There is some error while updating the shipment!");
             console.log("shipment update err: ", error);
@@ -320,7 +294,6 @@ function Shipment() {
             const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
             console.log("shipmentRes: ", shipmentRes);
             message.success(shipmentRes.data.message);
-            // resetForm(); // clear the form data
             navigate(-1); // redirect to previous page
 
         } catch (error) {

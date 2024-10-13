@@ -113,7 +113,7 @@ function OrderDetailPage() {
         navigate(`/order-details/${record.order_id}/sample-report`, {
             state: {
                 order: record,
-                reviewShipment: value == "reviewSampleReports" ? true : false
+                reviewSampleReports: value == "reviewSampleReports" ? true : false
             },
         });
     };
@@ -122,7 +122,7 @@ function OrderDetailPage() {
         navigate(`/order-details/${record.order_id}/final-report`, {
             state: {
                 order: record,
-                reviewShipment: value == "reviewFinalReports" ? true : false
+                reviewFinalReports: value == "reviewFinalReports" ? true : false
             },
         });
     };
