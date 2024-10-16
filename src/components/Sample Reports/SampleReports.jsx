@@ -212,18 +212,19 @@ function SampleReports() {
                             </div>
 
                             <div className="col">
-                                {!reviewSampleReports &&
-                                    <Form.Item label="Inspection Date/Time" name={'inspection_date_time'} tooltip={{
-                                        title: 'This is a required field',
-                                        // icon: <InfoCircleOutlined />,
-                                    }}
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: 'Please choose inspection start date/time',
-                                            },
-                                        ]}
-                                    >
+
+                                <Form.Item label="Inspection Date/Time" name={'inspection_date_time'} tooltip={{
+                                    title: 'This is a required field',
+                                    // icon: <InfoCircleOutlined />,
+                                }}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Please choose inspection start date/time',
+                                        },
+                                    ]}
+                                >
+                                    {!reviewSampleReports &&
                                         <DatePicker
                                             disabledDate={disabledDate}
                                             showTime={{
@@ -237,10 +238,9 @@ function SampleReports() {
                                             }}
                                             onOk={onOk}
                                         />
+                                    }
 
-                                    </Form.Item>
-                                }
-
+                                </Form.Item>
                                 {reviewSampleReports && (
                                     <>{form.getFieldValue('inspection_date_time') ? formattedDateTime(form.getFieldValue('inspection_date_time')) : 'Not updated by renter'}</>
                                 )}

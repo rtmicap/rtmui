@@ -278,6 +278,7 @@ function Shipment() {
         values.shipment_datetime = shipmentDateTime;
         values.goods_status = "goods_in_transit";
         values.invoice = invoiceFile;
+        values.received_quantity = values.quantity
         try {
             console.log('Success:', values);
             // ... handle form submission

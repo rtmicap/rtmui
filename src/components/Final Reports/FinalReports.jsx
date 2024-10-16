@@ -81,7 +81,7 @@ function FinalReports() {
         values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
         values.completion_date_time = orderCompletionDateTime;
         values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
-        values.final_product_disposition = "approved";
+        values.final_product_disposition = "pending_approval";
         values.first_sample_id = form.getFieldValue("first_sample_id");
         console.log('onFinishFinalReport:', values);
         const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
