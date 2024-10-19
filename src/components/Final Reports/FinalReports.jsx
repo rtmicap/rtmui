@@ -27,6 +27,8 @@ function FinalReports() {
     const [fileFinalReportLoading, setFileFinalReportLoading] = useState(false);
     const [orderCompletionDateTime, setOrderCompletionDateTime] = useState('');
 
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
     const getFinalReportsByOrderId = async () => {
         try {
             const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order.order_id}`)
@@ -63,8 +65,18 @@ function FinalReports() {
 
     useEffect(() => {
         getFinalReportsByOrderId();
-    }, [])
+    }, []);
 
+    // Enable or disable the submit button based on form validation
+    useEffect(() => {
+        const checkFormValidity = () => {
+            const fieldsError = form.getFieldsError();
+            const hasErrors = fieldsError.some(({ errors }) => errors.length > 0);
+            const isTouched = form.isFieldsTouched(true);
+            setIsSubmitDisabled(hasErrors || !isTouched);
+        };
+        form.onFieldsChange(() => checkFormValidity());
+    }, [form]);
 
     const handleFinalReportSubmit = async (values) => {
         if (reviewFinalReports && finalReportDispositionStatus) {

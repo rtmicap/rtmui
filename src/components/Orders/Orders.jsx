@@ -56,8 +56,8 @@ function Orders() {
   };
 
   // filtered by current user and company id // please check the db for reference
-  const myOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
-  const customerOrders = allOrders.filter(order => order.renter_company_id !== currentUserCompanyId);
+  const myOrders = allOrders.filter(order => order.renter_company_id !== currentUserCompanyId);
+  const customerOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
 
   // const handleView = (record) => {
   //   navigate(`/order-details/${record.order_id}`,
@@ -80,7 +80,7 @@ function Orders() {
 
   // Define columns for the orders table
   const columns = [
-    { title: 'Order ID', dataIndex: 'order_id', key: 'order_id' },
+    { title: 'ID', dataIndex: 'order_id', key: 'order_id' },
     { title: 'Status', dataIndex: 'order_status', key: 'order_status' },
     { title: 'Goods Status', dataIndex: 'goods_status', key: 'goods_status' },
     { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
@@ -129,8 +129,8 @@ function Orders() {
 
   // Pagination config for tables
   const paginationConfig = {
-    pageSize: 5,
-    showSizeChanger: true,
+    pageSize: 10,
+    showSizeChanger: false,
     pageSizeOptions: ['5', '10', '20'],
   };
 

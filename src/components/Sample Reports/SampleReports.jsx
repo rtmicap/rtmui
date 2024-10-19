@@ -24,8 +24,8 @@ function SampleReports() {
     const [inspectionReportFileList, setInspectionReportFileList] = useState([]);
     const [fileReportLoading, setFileReportLoading] = useState(false);
     const [viewInspectionReportFile, setViewInspectionReportFile] = useState('');
-
     const [sampleReportData, setSampleReportData] = useState([]);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
 
     const getSampleReportsByOrderId = async () => {
@@ -65,6 +65,17 @@ function SampleReports() {
     useEffect(() => {
         getSampleReportsByOrderId();
     }, []);
+
+    // Enable or disable the submit button based on form validation
+    useEffect(() => {
+        const checkFormValidity = () => {
+            const fieldsError = form.getFieldsError();
+            const hasErrors = fieldsError.some(({ errors }) => errors.length > 0);
+            const isTouched = form.isFieldsTouched(true);
+            setIsSubmitDisabled(hasErrors || !isTouched);
+        };
+        form.onFieldsChange(() => checkFormValidity());
+    }, [form]);
 
     const sampleReportStatusUpdate = async (value) => {
         const data = form.getFieldsValue();
@@ -396,7 +407,7 @@ function SampleReports() {
                         {authUser.CompanyId == order.renter_company_id &&
                             <div className="row">
                                 <div className="col">
-                                    <Button type='primary' htmlType="submit">Share FSIR to {reviewSampleReports ? 'Renter' : 'Hirer'}</Button>
+                                    <Button type='primary' htmlType="submit" disabled={isSubmitDisabled}>Share FSIR to {reviewSampleReports ? 'Renter' : 'Hirer'}</Button>
                                 </div>
                             </div>
                         }

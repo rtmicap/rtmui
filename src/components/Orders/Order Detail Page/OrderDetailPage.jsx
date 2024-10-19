@@ -1,4 +1,4 @@
-import { Button, Descriptions, message, Space, Tag } from 'antd';
+import { Button, Descriptions, message, Space, Tag, Timeline } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -131,10 +131,11 @@ function OrderDetailPage() {
     return (
         <>
             <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button><hr />
-
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <h6 className='text-center'>Order Details</h6>
+                <hr />
                 <Descriptions
-                    title="Order Descriptions"
+                    // title="Order Descriptions"
                     bordered
                     column={{
                         xs: 1,
@@ -188,6 +189,26 @@ function OrderDetailPage() {
                         }
 
                     </Space>
+                </div>
+                <hr />
+                <div>
+                    <h5>Steps to follow before completing the order:</h5><br />
+                    <Timeline
+                        items={[
+                            {
+                                children: 'As a Hirer please ship materials to Renter ',
+                            },
+                            {
+                                children: 'Renter will review the materials and update the status accordingly',
+                            },
+                            {
+                                children: 'Once the shipment process is completed then update the sample report to Hirer',
+                            },
+                            {
+                                children: 'Once the sample report process is completed then update the final report to Hirer',
+                            },
+                        ]}
+                    />
                 </div>
             </div>
         </>
