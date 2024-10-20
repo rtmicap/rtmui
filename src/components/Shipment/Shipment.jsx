@@ -260,6 +260,7 @@ function Shipment() {
         try {
             const data = form.getFieldsValue();
             data.orderid = order.order_id;
+            data.shipmentid = form.getFieldValue('shipment_id');
             console.log("updateShipmentFn: ", data);
             const response = await axios.patch(UPDATE_SHIPMENT_URL, data);
             console.log("response update ship: ", response);
