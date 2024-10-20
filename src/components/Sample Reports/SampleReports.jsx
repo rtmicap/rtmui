@@ -398,7 +398,7 @@ function SampleReports() {
                         {authUser.CompanyId == order.renter_company_id &&
                             <div className="row">
                                 <div className="col">
-                                    <Button type='primary' htmlType="submit" disabled={isSubmitDisabled}>Share FSIR to {reviewSampleReports ? 'Renter' : 'Hirer'}</Button>
+                                    <Button type='primary' htmlType="submit">Share FSIR to {reviewSampleReports ? 'Renter' : 'Hirer'}</Button>
                                 </div>
                             </div>
                         }
