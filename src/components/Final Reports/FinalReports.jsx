@@ -37,24 +37,26 @@ function FinalReports() {
                 setFinalReportData(response.data.results);
                 // Sort the results array by inspection_date_time in descending order to get the latest record
                 const sortedDetails = response.data.results.sort(
-                    (a, b) => new Date(b.final_completion_date_time) - new Date(a.final_completion_date_time)
+                    (a, b) => new Date(a.final_completion_date_time) - new Date(b.final_completion_date_time)
                 );
                 // console.log("sortedDetails: ", sortedDetails);
                 const latestDetail = sortedDetails[0];
                 console.log("latestDetail: ", latestDetail);
                 if (latestDetail) {
                     // Set form fields based on the latest record data
-                    form.setFieldsValue({
-                        part_number: latestDetail.part_number,
-                        part_name: latestDetail.part_name,
-                        uom: latestDetail.UOM,
-                        order_ok_quantity: latestDetail.final_product_approved_quantity,
-                        completion_date_time: moment(latestDetail.final_completion_date_time),
-                        final_product_disposition: latestDetail.final_product_disposition,
-                        final_completion_remarks: latestDetail.final_completion_remarks,
-                        prod_lot_inspection_report: latestDetail.final_inspection_report,
-                        final_report_id: latestDetail.id
-                    });
+                    if (authUser.CompanyId == order.hirer_company_id) {
+                        form.setFieldsValue({
+                            part_number: latestDetail.part_number,
+                            part_name: latestDetail.part_name,
+                            uom: latestDetail.UOM,
+                            order_ok_quantity: latestDetail.final_product_approved_quantity,
+                            completion_date_time: moment(latestDetail.final_completion_date_time),
+                            final_product_disposition: latestDetail.final_product_disposition,
+                            final_completion_remarks: latestDetail.final_completion_remarks,
+                            prod_lot_inspection_report: latestDetail.final_inspection_report,
+                            final_report_id: latestDetail.id
+                        });
+                    }
                 }
             }
         } catch (error) {
@@ -66,17 +68,6 @@ function FinalReports() {
     useEffect(() => {
         getFinalReportsByOrderId();
     }, []);
-
-    // Enable or disable the submit button based on form validation
-    useEffect(() => {
-        const checkFormValidity = () => {
-            const fieldsError = form.getFieldsError();
-            const hasErrors = fieldsError.some(({ errors }) => errors.length > 0);
-            const isTouched = form.isFieldsTouched(true);
-            setIsSubmitDisabled(hasErrors || !isTouched);
-        };
-        form.onFieldsChange(() => checkFormValidity());
-    }, [form]);
 
     const handleFinalReportSubmit = async (values) => {
         if (reviewFinalReports && finalReportDispositionStatus) {

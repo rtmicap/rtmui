@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex } from 'antd';
+import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex, Collapse } from 'antd';
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -44,7 +44,7 @@ function Shipment() {
     const [invoiceFileLoading, setInvoiceFileLoading] = useState(false);
     const [invoiceFileList, setInvoiceFileList] = useState([]);
     // shipment data
-    const [shipmentData, setShipmentData] = useState({});
+    const [shipmentData, setShipmentData] = useState([]);
 
     const [imageFileIsLoading, setImageFileIsLoading] = useState(false);
     const [fileIsLoading, setFileIsLoading] = useState(false);
@@ -61,7 +61,7 @@ function Shipment() {
         } catch (error) {
             message.error("Something error while fetching shipment data!");
             console.log("shipment data err: ", error);
-            setShipmentData({});
+            setShipmentData([]);
         }
     }
 
@@ -319,6 +319,27 @@ function Shipment() {
         setInvoiceFileList([]);
         setInvoiceFile('');
     };
+
+    const collapseItems = shipmentData.map((item, index) => ({
+        key: item.id,
+        label: `Shipment ID: ${item.shipment_id}`,
+        children: (
+            <div className='row'>
+                <div className="col">
+                    <p><strong>Types of Goods:</strong> {item.type_of_goods}</p>
+                    <p><strong>Quantity:</strong> {item.quantity}</p>
+                    <p><strong>UOM:</strong> {item.UOM}</p>
+                    <p><strong>Shipment Date:</strong> {formattedDateTime(item.shipment_date)}</p>
+                    {item.image && (
+                        <p><strong>Invoice Report:</strong> <Link to={item.invoice} target={'_blank'}>View Invoice</Link></p>
+                    )}
+                    {item.image && (
+                        <p><strong>Image:</strong> <Link to={item.image} target={'_blank'}>View Image</Link></p>
+                    )}
+                </div>
+            </div>
+        ),
+    }));
 
     return (
         <>
@@ -623,6 +644,14 @@ function Shipment() {
                         </div>
                     </div>
                 </Form>
+                <hr />
+                {/* Lists of shipment details */}
+                {shipmentData && shipmentData.length > 0 &&
+                    <>
+                        <h6>Lists of shipment details:</h6>
+                        <Collapse items={collapseItems} />
+                    </>
+                }
             </div>
         </>
     )

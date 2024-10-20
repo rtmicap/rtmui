@@ -36,24 +36,26 @@ function SampleReports() {
                 setSampleReportData(response.data.results);
                 // Sort the results array by inspection_date_time in descending order to get the latest record
                 const sortedDetails = response.data.results.sort(
-                    (a, b) => new Date(b.inspection_date_time) - new Date(a.inspection_date_time)
+                    (a, b) => new Date(a.inspection_date_time) - new Date(b.inspection_date_time)
                 );
-                // console.log("sortedDetails: ", sortedDetails);
+                console.log("sortedDetails: ", sortedDetails);
                 const latestDetail = sortedDetails[0];
                 console.log("latestDetail: ", latestDetail);
                 if (latestDetail) {
                     // Set form fields based on the latest record data
-                    form.setFieldsValue({
-                        part_number: latestDetail.part_number,
-                        part_name: latestDetail.part_name,
-                        uom: latestDetail.UOM,
-                        first_sample_quantity: latestDetail.first_sample_quantity,
-                        inspection_date_time: moment(latestDetail.inspection_date_time),
-                        first_sample_disposition: latestDetail.first_sample_disposition,
-                        first_sample_remarks: latestDetail.first_sample_remarks,
-                        first_sample_inspection_report: latestDetail.first_sample_inspection_report,
-                        first_sample_id: latestDetail.id
-                    });
+                    if (authUser.CompanyId == order.hirer_company_id) {
+                        form.setFieldsValue({
+                            part_number: latestDetail.part_number,
+                            part_name: latestDetail.part_name,
+                            uom: latestDetail.UOM,
+                            first_sample_quantity: latestDetail.first_sample_quantity,
+                            inspection_date_time: moment(latestDetail.inspection_date_time),
+                            first_sample_disposition: latestDetail.first_sample_disposition,
+                            first_sample_remarks: latestDetail.first_sample_remarks,
+                            first_sample_inspection_report: latestDetail.first_sample_inspection_report,
+                            first_sample_id: latestDetail.id
+                        });
+                    }
                 }
             }
         } catch (error) {
@@ -65,17 +67,6 @@ function SampleReports() {
     useEffect(() => {
         getSampleReportsByOrderId();
     }, []);
-
-    // Enable or disable the submit button based on form validation
-    useEffect(() => {
-        const checkFormValidity = () => {
-            const fieldsError = form.getFieldsError();
-            const hasErrors = fieldsError.some(({ errors }) => errors.length > 0);
-            const isTouched = form.isFieldsTouched(true);
-            setIsSubmitDisabled(hasErrors || !isTouched);
-        };
-        form.onFieldsChange(() => checkFormValidity());
-    }, [form]);
 
     const sampleReportStatusUpdate = async (value) => {
         const data = form.getFieldsValue();
@@ -427,7 +418,6 @@ function SampleReports() {
                                 </div>
                                 <hr />
                             </>
-
                         }
 
                     </div>
