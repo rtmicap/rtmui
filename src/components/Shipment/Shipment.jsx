@@ -86,6 +86,7 @@ function Shipment() {
 
                     // Return the formatted shipment detail
                     return {
+                        shipment_id: detail.shipment_id, // Remap the field for form compatibility
                         typeofgoods: detail.type_of_goods, // Remap the field for form compatibility
                         quantity: detail.quantity,
                         description: detail.description,
@@ -260,7 +261,7 @@ function Shipment() {
         try {
             const data = form.getFieldsValue();
             data.orderid = order.order_id;
-            data.shipmentid = form.getFieldValue('shipment_id');
+            data.shipment_details = form.getFieldValue(['shipment_details'])
             console.log("updateShipmentFn: ", data);
             const response = await axios.patch(UPDATE_SHIPMENT_URL, data);
             console.log("response update ship: ", response);
