@@ -142,43 +142,6 @@ function Quotes() {
         }
     }
 
-   /*  const items = currentQuotes.map(quote => ({
-        key: quote.quote_id,
-        label: `${quote.Category} - ${quote.Machine_Type}`,
-        children: <>
-            <h4>
-                <Tag color={quote.quote_status == 'pending' ? 'processing' : quote.quote_status == 'accepted' ? 'success' : 'error'}>{quote.quote_status.toUpperCase()}</Tag>
-            </h4>
-            <table className="table table-bordered table-striped">
-                <tr>
-                    <th>ID</th>
-                    <th>Qty</th>
-                    <th>Hirer Company</th>
-                    <th>Planned Start Date</th>
-                    <th>Planned End Date</th>
-                    <th>Files</th>
-                    <th>Action</th>
-                </tr>
-                <tr>
-                    <td>{quote.quote_id}</td>
-                    <td>{quote.quantity}</td>
-                    <td>{quote.hirer_company_id}</td>
-                    <td>
-
-                        {formattedDateTime(quote.planned_start_date_time)}
-                    </td>
-                    <td>{formattedDateTime(quote.planned_end_date_time)}</td>
-                    <td>
-                        <Button type='link' onClick={() => showModal(quote)}>Click here one</Button>
-                    </td>
-                    <td>
-                        <Select style={{ width: '100%', height: '100%' }} placeholder="Select" options={actionButtons} onChange={(value) => handleActionChange(value, quote)} />
-                    </td>
-                </tr>
-            </table>
-        </>,
-    })); */
-
     const onChangePage = (page) => {
         setCurrentPage(page); // Update current page
     };

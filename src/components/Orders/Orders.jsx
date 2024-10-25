@@ -1,4 +1,4 @@
-import { Button, Collapse, message, Table, Tabs } from 'antd';status
+import { Button, Collapse, message, Table, Tabs } from 'antd';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
