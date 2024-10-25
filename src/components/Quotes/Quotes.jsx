@@ -267,7 +267,7 @@ function Quotes() {
             title: 'Files', key: 'files',
             render: (_, record) => (
                 <>
-                    <Button type='link' onClick={() => showModal(record)}>Click here two</Button>
+                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
                 </>
             )
         },
@@ -416,8 +416,8 @@ function Quotes() {
                     >
                         <h6>Company Details: ID({selectedQuote.hirer_company_id})</h6>
                         <ul className="list-group">
-                            <li className="list-group-item">Company Name: <strong>{hirerCompany.companyName}</strong></li>
-                            <li className="list-group-item">Company Office Email: <strong>{hirerCompany.offEmail}</strong></li>
+                            <li className="list-group-item">Company Name: <strong>{hirerCompany?hirerCompany.companyName:"Not Available"}</strong></li>
+                            <li className="list-group-item">Company Office Email: <strong>{hirerCompany?hirerCompany.offEmail:"Not Available"}</strong></li>
                         </ul>
                         <hr />
                         <h6>Files:</h6>
