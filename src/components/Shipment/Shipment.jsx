@@ -347,7 +347,7 @@ function Shipment() {
         <>
             <div className="container">
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h5 className='text-center'>Shipment for (Order ID: {order.order_id})</h5>
+                <h5 className='text-center'>Shipment for (ID: {order.quote_id})</h5>
                 <hr />
                 <Form
                     name="basic"
