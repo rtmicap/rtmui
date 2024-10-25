@@ -39,8 +39,8 @@ function OrderDetailPage() {
 
     const items = [
         {
-            label: 'Order ID',
-            children: order.order_id,
+            label: 'ID',
+            children: order.quote_id,
         },
         {
             label: 'Order Status',
@@ -171,7 +171,7 @@ function OrderDetailPage() {
 
                         {authUser && authUser.CompanyId == order.renter_company_id &&
                             <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}>
-                                Sample Report
+                                Create Sample Report
                             </button>
                         }
 
@@ -184,7 +184,7 @@ function OrderDetailPage() {
 
                         {authUser && authUser.CompanyId == order.renter_company_id &&
                             <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'finalReports')}>
-                                Final Report
+                                Create Final Report
                             </button>
                         }
 

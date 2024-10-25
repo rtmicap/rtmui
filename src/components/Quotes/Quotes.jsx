@@ -8,6 +8,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { actionButtons } from './QuotesUtils';
 import dayjs from 'dayjs';
 import { useAuth } from '../../contexts/AuthContext';
+import { GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls';
 import './quote.scss';
 
 const PAGE_SIZE = 10; // Number of items per page
@@ -27,6 +28,7 @@ function Quotes() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedType, setSelectedType] = useState('');
     const [filteredQuotes, setFilteredQuotes] = useState([]); // State for storing filtered quotes
+    const [hirerCompany, setHirerCompany] = useState(null);
 
     const currentUserCompanyId = authUser.CompanyId;
 
@@ -34,6 +36,7 @@ function Quotes() {
     // console.log("authUser: ", authUser);
 
     const showModal = (quote) => {
+        getCompanyDetailsById(quote.hirer_company_id, setHirerCompany);
         setSelectedQuote(quote); // Set the selected quote
         setAttachModal(true); // Show the modal
     };
@@ -47,17 +50,24 @@ function Quotes() {
     };
 
     const startIndex = (currentPage - 1) * PAGE_SIZE;
-
+    const getCompanyDetailsById = async (companyId, setter) => {
+        try {
+            const response = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
+                params: { companyId }
+            });
+            setter(response.data.data);
+        } catch (error) {
+            message.error("Error fetching Company Details");
+        }
+    };
     const getAllQuotes = async () => {
         try {
             setQuoteLoading(true);
             const response = await axios.get(GET_ALL_QUOTES_URL);
-            console.log("quotes: ", response.data);
             setAllQuotes(response.data.result);
             setQuoteLoading(false);
             return response.data.result;
         } catch (error) {
-            console.log("error quotes: ", error);
             setAllQuotes([]);
             setQuoteLoading(false);
             message.error("Error on loading quotes..");
@@ -67,11 +77,9 @@ function Quotes() {
     const getAllQuotesWithoutLoading = async () => {
         try {
             const response = await axios.get(GET_ALL_QUOTES_URL);
-            console.log("getAllQuotesWithoutLoading: ", response.data);
             setAllQuotes(response.data.result);
             return response.data.result;
         } catch (error) {
-            console.log("error getAllQuotesWithoutLoading: ", error);
             setAllQuotes([]);
             message.error("Error on loading getAllQuotesWithoutLoading..");
         }
@@ -133,43 +141,6 @@ function Quotes() {
             setSelectedQuote(quote);
         }
     }
-
-    const items = currentQuotes.map(quote => ({
-        key: quote.quote_id,
-        label: `${quote.Category} - ${quote.Machine_Type}`,
-        children: <>
-            <h4>
-                <Tag color={quote.quote_status == 'pending' ? 'processing' : quote.quote_status == 'accepted' ? 'success' : 'error'}>{quote.quote_status.toUpperCase()}</Tag>
-            </h4>
-            <table class="table table-bordered table-striped">
-                <tr>
-                    <th>ID</th>
-                    <th>Qty</th>
-                    <th>Hirer Company</th>
-                    <th>Planned Start Date</th>
-                    <th>Planned End Date</th>
-                    <th>Files</th>
-                    <th>Action</th>
-                </tr>
-                <tr>
-                    <td>{quote.quote_id}</td>
-                    <td>{quote.quantity}</td>
-                    <td>{quote.hirer_company_id}</td>
-                    <td>
-
-                        {formattedDateTime(quote.planned_start_date_time)}
-                    </td>
-                    <td>{formattedDateTime(quote.planned_end_date_time)}</td>
-                    <td>
-                        <Button type='link' onClick={() => showModal(quote)}>Click here</Button>
-                    </td>
-                    <td>
-                        <Select style={{ width: '100%', height: '100%' }} placeholder="Select" options={actionButtons} onChange={(value) => handleActionChange(value, quote)} />
-                    </td>
-                </tr>
-            </table>
-        </>,
-    }));
 
     const onChangePage = (page) => {
         setCurrentPage(page); // Update current page
@@ -287,8 +258,8 @@ function Quotes() {
             title: 'Date', key: 'Date',
             render: (_, record) => (
                 <>
-                    <div><span class="dateLabel">From: </span><div class="dateValue">{formattedDateTime(record.planned_start_date_time)}</div></div>
-                    <div><span class="dateLabel">To: </span><div class="dateValue">{formattedDateTime(record.planned_end_date_time)}</div></div>
+                    <div><span className="dateLabel">From: </span><div className="dateValue">{formattedDateTime(record.planned_start_date_time)}</div></div>
+                    <div><span className="dateLabel">To: </span><div className="dateValue">{formattedDateTime(record.planned_end_date_time)}</div></div>
                 </>
             )
         },
@@ -296,7 +267,7 @@ function Quotes() {
             title: 'Files', key: 'files',
             render: (_, record) => (
                 <>
-                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
+                    <Button type='link' onClick={() => showModal(record)}>Click here two</Button>
                 </>
             )
         },
@@ -349,7 +320,7 @@ function Quotes() {
     return (
         <>
             <div className="container-fluid">
-                <h5 class="card-title text-center">Quotes</h5>
+                <h5 className="card-title text-center">Quotes</h5>
                 <br />
                 <div className='row'>
                     <div className="col text-end">
@@ -443,11 +414,10 @@ function Quotes() {
                             </Button>,
                         ]}
                     >
-                        <h6>Company Details: ID({authUser.CompanyId})</h6>
+                        <h6>Company Details: ID({selectedQuote.hirer_company_id})</h6>
                         <ul className="list-group">
-                            <li className="list-group-item">Company Name: <strong>{authUser.companyName}</strong></li>
-                            <li className="list-group-item">Company Ownership: <strong>{authUser.ownership}</strong></li>
-                            <li className="list-group-item">Company Year Established: <strong>{authUser.yearEstablished}</strong></li>
+                            <li className="list-group-item">Company Name: <strong>{hirerCompany.companyName}</strong></li>
+                            <li className="list-group-item">Company Office Email: <strong>{hirerCompany.offEmail}</strong></li>
                         </ul>
                         <hr />
                         <h6>Files:</h6>

@@ -26,12 +26,10 @@ function Orders() {
       setOrderLoading(true);
       const response = await axios.get(GET_ALL_ORDERS_URL);
       // const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
-      console.log("all orders: ", response.data);
       setAllOrders(response.data.results);
       setOrderLoading(false);
       return response.data.results;
     } catch (error) {
-      console.log("error orders: ", error);
       setAllOrders([]);
       setOrderLoading(false);
       message.error("Error on loading orders..");
@@ -80,7 +78,7 @@ function Orders() {
 
   // Define columns for the orders table
   const columns = [
-    { title: 'ID', dataIndex: 'order_id', key: 'order_id' },
+    { title: 'ID', dataIndex: 'quote_id', key: 'quote_id' },
     { title: 'Status', dataIndex: 'order_status', key: 'order_status' },
     { title: 'Goods Status', dataIndex: 'goods_status', key: 'goods_status' },
     { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
