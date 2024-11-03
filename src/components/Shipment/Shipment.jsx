@@ -18,7 +18,6 @@ const { TextArea } = Input;
 import React, { useEffect, useState } from 'react';
 import { LeftCircleOutlined } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import HeaderTitle from '../../utils/HeaderTitle';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../api/apiUrls';
@@ -26,12 +25,16 @@ import dayjs from 'dayjs';
 import { receiptConfirmation, typesOfGoods, uomChoices } from '../Orders/OrderUtils';
 import { formattedDateTime } from '../../utils/utils';
 import moment from 'moment/moment';
+import HirerShipmentPage from './Details Page/HirerShipmentPage';
+import RenterShipmentPage from './Details Page/RenterShipmentPage';
 
 function Shipment() {
     const location = useLocation();
     const { authUser } = useAuth();
     const { order, reviewShipment } = location.state || {};
     const navigate = useNavigate();
+
+    const currentUserCompanyId = authUser.CompanyId;
 
     const [form] = Form.useForm();
     const [shipmentDateTime, setShipmentDateTime] = useState('');
@@ -345,316 +348,14 @@ function Shipment() {
 
     return (
         <>
-            <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h5 className='text-center'>Shipment for (ID: {order.quote_id})</h5>
-                <hr />
-                <Form
-                    name="basic"
-                    onFinish={isReview ? updateShipmentFn : onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                    layout='vertical'
-                    form={form}
-                    initialValues={{
-                        shipment_details: [
-                            {
-                                typeofgoods: 'raw_material', // Default type of goods
-                            },
-                        ],
-                    }}
-                >
-                    {/* Shipment Date Time */}
-                    <div className='row'>
-                        <div className="col">
-                            <Form.Item
-                                label="Shipment Date Time"
-                                name="shipment_datetime"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your shipment date & time!',
-                                    },
-                                ]}
-                                required
-                            >
-                                {!isReview &&
-                                    <DatePicker
-                                        disabledDate={disabledDate}
-                                        showTime={{
-                                            format: 'hh:mm A',
-                                            use12Hours: true,
-                                        }}
-                                        name='shipment_date'
-                                        onChange={(value, dateString) => {
-                                            console.log('Selected Time: ', value);
-                                            console.log('Formatted Selected Time: ', dateString);
-                                            setShipmentDateTime(dateString);
-                                        }}
-                                        onOk={onOk}
-                                        placeholder="Select shipment date"
-                                    />
-                                }
+          
 
-                                {isReview && (
-                                    <>{formattedDateTime(form.getFieldValue('shipment_date'))}</>
-                                )}
-                            </Form.Item>
-                        </div>
-
-                        <div className="col">
-                            <Form.Item
-                                label="Attach Invoice File"
-                                name={'invoice'}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Invoice file is required!',
-                                    },
-                                ]}
-                            >
-                                <Flex gap="small" wrap>
-                                    {!invoiceFile && !isReview && (
-                                        <Upload
-                                            fileList={invoiceFileList}
-                                            onChange={(info) => handleInvoiceChange(info, 'invoice')}
-                                            beforeUpload={() => false}
-                                            accept=".pdf"
-                                            maxCount={1}
-                                        >
-                                            <Button loading={invoiceFileLoading} type={'primary'} icon={<PlusCircleOutlined />}>{invoiceFileLoading ? 'Uploading...' : 'Attach invoice'} </Button>
-                                            <p>Max: 2 MB (Only PDF Format)</p>
-                                        </Upload>
-                                    )}
-
-                                    {invoiceFile && !isReview && (
-                                        <div className='col-auto'>
-                                            <div>
-                                                <Link to={invoiceFile} target={'_blank'}>View Invoice File</Link>
-                                                <Button type="link" onClick={handleInvoiceRemove}>Remove</Button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {isReview && (
-                                        <Link to={form.getFieldValue('invoice')} target={'_blank'}>View Invoice File</Link>
-                                    )}
-                                </Flex>
-                            </Form.Item>
-
-                        </div>
-                    </div>
-
-                    {/* Other Data to update */}
-                    <div className="row">
-                        <div className="col">
-                            <Form.List name="shipment_details">
-                                {(fields, { add, remove }) => {
-                                    // const typeOfGoods = form.getFieldValue(['shipment_details', name, 'typeofgoods']);
-                                    // const isInvoice = typeOfGoods === 'invoice';
-                                    return (
-                                        <>
-                                            <div className="row">
-                                                <div className="col">
-                                                    {isReview &&
-                                                        <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
-                                                    }
-                                                </div>
-                                            </div>
-                                            {fields.map(({ key, name, ...restField }) => {
-                                                return (
-                                                    <div className='row' key={key}>
-                                                        <h6>Shipment Details - {name + 1}</h6>
-                                                        <div className="col">
-                                                            <Form.Item
-                                                                label="Type of Goods"
-                                                                {...restField}
-                                                                name={[name, 'typeofgoods']}
-                                                                value={selectedItems}
-                                                                onChange={setSelectedItems}
-                                                                rules={[
-                                                                    {
-                                                                        required: true,
-                                                                        message: 'Please input your type of goods!',
-                                                                    },
-                                                                ]}
-                                                            >
-
-                                                                {isReview ? form.getFieldValue(['shipment_details', name, 'typeofgoods']) : <>
-                                                                    <Select
-                                                                        readOnly={isReview}
-                                                                        placeholder='Choose type of goods'
-                                                                        style={{
-                                                                            width: 'auto'
-                                                                        }}
-                                                                        onChange={handleSelectChange}
-                                                                        options={typesOfGoods}
-                                                                    />
-                                                                </>}
-                                                            </Form.Item>
-                                                        </div>
-
-                                                        <>
-                                                            <div className="col">
-                                                                <Form.Item
-                                                                    label="Description"
-                                                                    {...restField}
-                                                                    name={[name, 'description']}
-                                                                    rules={[
-                                                                        {
-                                                                            required: true,
-                                                                            message: 'Please input your description!',
-                                                                        },
-                                                                    ]}
-                                                                    required
-                                                                >
-                                                                    <TextArea rows={3} readOnly={isReview} placeholder="Enter your description (max: 200 words)" maxLength={200} showCount />
-                                                                </Form.Item>
-                                                            </div>
-
-                                                            <div className="col">
-                                                                <Form.Item
-                                                                    label="Shipment Qty"
-                                                                    {...restField}
-                                                                    name={[name, 'quantity']}
-                                                                    rules={[
-                                                                        {
-                                                                            required: true,
-                                                                            message: 'Please input your shipment quantity!',
-                                                                        },
-                                                                        {
-                                                                            pattern: /^\d{1,5}$/, // Regex pattern to match 10 digits
-                                                                            message: 'Please enter a valid number! (upto 5 digits)',
-                                                                        },
-                                                                    ]}
-                                                                    required
-                                                                >
-                                                                    <Input placeholder='Enter shipment quantity' readOnly={isReview} />
-                                                                </Form.Item>
-                                                            </div>
-
-                                                            <div className="col">
-                                                                <Form.Item
-                                                                    label={"UOM"}
-                                                                    {...restField}
-                                                                    name={[name, 'UOM']}
-                                                                    rules={[
-                                                                        {
-                                                                            required: true,
-                                                                            message: 'Please input your UOM!',
-                                                                        },
-                                                                    ]}
-                                                                >
-                                                                    <Select placeholder='Choose UOM' style={{ width: '100%' }} options={uomChoices} />
-                                                                </Form.Item>
-                                                            </div>
-
-                                                            {isReview &&
-                                                                <div className="col">
-                                                                    <Form.Item
-                                                                        label="Receipt Confirmation"
-                                                                        {...restField}
-                                                                        name={[name, 'received_status']}
-                                                                        rules={[
-                                                                            {
-                                                                                required: true,
-                                                                                message: 'Please input receipt confirmation!',
-                                                                            },
-                                                                        ]}
-                                                                    >
-                                                                        <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
-                                                                    </Form.Item>
-                                                                </div>
-                                                            }
-
-                                                            {!fileUrls[name] && <div className="col-auto mt-4">
-                                                                <Form.Item
-                                                                    {...restField}
-                                                                    name={[name, 'image']}
-                                                                >
-                                                                    <Upload
-                                                                        valuePropName="file"
-                                                                        getValueFromEvent={(e) => {
-                                                                            if (Array.isArray(e)) {
-                                                                                return e;
-                                                                            }
-                                                                            return e && e.file;
-                                                                        }}
-                                                                        onChange={(info) => handleImageChange(info, name)}
-                                                                        beforeUpload={() => false}
-                                                                        accept=".jpg,.jpeg,.png"
-                                                                        maxCount={1}
-                                                                        showUploadList={false}
-                                                                    >
-                                                                        <Button loading={imageFileIsLoading} type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>
-                                                                        <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
-                                                                    </Upload>
-                                                                </Form.Item>
-
-                                                            </div>
-                                                            }
-
-                                                            {fileUrls[name] && (
-                                                                <div className='col-auto mt-4'>
-                                                                    <div>
-                                                                        <Link to={fileUrls[name]} target={'_blank'}>View File</Link>
-                                                                        <Button type="link" onClick={() => handleFileRemove(name)}>Remove</Button>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </>
-
-                                                        <div className="col-auto mt-4">
-                                                            {!isReview && fields.length > 1 ? (
-                                                                <Tooltip title="Remove this shipment detail">
-                                                                    <Button type="primary" danger icon={<CloseOutlined />} onClick={() => remove(name)} />
-                                                                </Tooltip>
-                                                            ) : null}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            <Form.Item>
-                                                {fields.length < 4 && !isReview && (
-                                                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                                        Add more shipment details (Upto 4)
-                                                    </Button>
-                                                )}
-                                            </Form.Item>
-                                        </>
-                                    )
-                                }}
-                            </Form.List>
-                        </div>
-                    </div>
-
-                    {/* Submit Buttons */}
-                    <div className="row">
-                        <div className="col">
-                            <Form.Item>
-                                {!isReview && (
-                                    <Button type="primary" htmlType="submit">
-                                        Submit
-                                    </Button>
-                                )}
-                                {isReview && (
-                                    <Button type="primary" htmlType="submit">
-                                        Send Goods Receipt Confirmation
-                                    </Button>
-                                )}
-                            </Form.Item>
-                        </div>
-                    </div>
-                </Form>
-                <hr />
-                {/* Lists of shipment details */}
-                {shipmentData && shipmentData.length > 0 &&
-                    <>
-                        <h6>Lists of shipment details:</h6>
-                        <Collapse items={collapseItems} />
-                    </>
-                }
-            </div>
+            {authUser && currentUserCompanyId == order.hirer_company_id ?
+                <HirerShipmentPage />
+                : authUser && currentUserCompanyId == order.renter_company_id ?
+                    <RenterShipmentPage />
+                    : <h4 className='text-center'>Something went wrong</h4>
+            }
         </>
     )
 }

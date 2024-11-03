@@ -57,16 +57,6 @@ function Orders() {
   const myOrders = allOrders.filter(order => order.renter_company_id !== currentUserCompanyId);
   const customerOrders = allOrders.filter(order => order.renter_company_id === currentUserCompanyId);
 
-  // const handleView = (record) => {
-  //   navigate(`/order-details/${record.order_id}`,
-  //     {
-  //       state:
-  //       {
-  //         order: record
-  //       }
-  //     }
-  //   );
-  // }
 
   const handleView = (record) => {
     navigate(`/order-details/${record.order_id}`, {
@@ -143,19 +133,6 @@ function Orders() {
             <Collapse.Panel header={`${category} - ${type}`} key={`${groupKey}-${index}`}>
               <Table
                 dataSource={groupedOrders[groupKey]}
-                // columns={[
-                //   {
-                //     title: 'Machine ID',
-                //     dataIndex: 'machine_id',
-                //     key: 'machine_id',
-                //   },
-                //   {
-                //     title: 'Order Status',
-                //     dataIndex: 'order_status',
-                //     key: 'order_status',
-                //   },
-                //   // Add other columns as needed
-                // ]}
                 columns={columns}
                 rowKey={(record) => `${record.order_id}-${groupKey}`}
                 pagination={paginationConfig}
@@ -188,7 +165,7 @@ function Orders() {
   return (
     <>
       <div className="container-fluid">
-        <h5 class="card-title text-center">My Orders</h5>
+        <h5 class="card-title text-center">Orders</h5>
         <div className='row'>
           <div className="col text-end">
             <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Orders</Button>
