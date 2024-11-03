@@ -170,6 +170,8 @@ function RenterShipmentPage() {
             <h4 className='text-center'>Renter shipment page</h4>
             <hr />
             <div className="container">
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <br />
                 <div className="row">
                     <div className="col">
                         <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
