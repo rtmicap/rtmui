@@ -24,5 +24,5 @@ export const receiptConfirmation = [
     { value: 'received_in_full', label: 'Received in Full' },
     { value: 'received_short', label: 'Received Short' },
     { value: 'reject_goods_quality_issue', label: 'Rejected' },
-    { value: 'return_goods_wrong_parts', label: 'Return Goods Wrong Parts' }
+    { value: 'return_goods_wrong_parts', label: 'Wrong Parts' }
 ];

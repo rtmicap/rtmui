@@ -32,7 +32,7 @@ function HirerShipmentPage() {
     const { order, reviewShipment } = location.state || {};
     const navigate = useNavigate();
 
-    const currentUserCompanyId = authUser.CompanyId;
+    const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const [form] = Form.useForm();
     const [shipmentDateTime, setShipmentDateTime] = useState('');
@@ -321,6 +321,9 @@ function HirerShipmentPage() {
     const handleInvoiceRemove = () => {
         setInvoiceFileList([]);
         setInvoiceFile('');
+        form.setFieldsValue({
+            invoice: '',  // Reset the specific field by setting it to an empty string
+        });
     };
 
     const collapseItems = shipmentData.map((item, index) => ({

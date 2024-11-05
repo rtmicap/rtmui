@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex, Collapse, Table, Space } from 'antd';
+import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex, Collapse, Table, Space, Modal } from 'antd';
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -35,26 +35,51 @@ function RenterShipmentPage() {
     const [shipmentData, setShipmentData] = useState([]);
     const [form] = Form.useForm();
     const [shipments, setShipments] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const getShipmentByOrderId = async () => {
         try {
+            setLoading(true);
             const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
             console.log("Renter getShipmentByOrderId: ", response.data);
             setShipmentData(response.data.result);
+            setLoading(false);
         } catch (error) {
             message.error("Something error while fetching shipment data!");
             console.log("shipment data err: ", error);
             setShipmentData([]);
+            setLoading(false);
         }
     }
 
     const handleStatusChange = (value, shipmentId) => {
-        const updatedShipments = shipmentData.map((shipment) =>
-            shipment.shipment_id === shipmentId
-                ? { ...shipment, received_status: value }
-                : shipment
-        );
-        setShipments(updatedShipments);
+        const selectedOption = receiptConfirmation.find(option => option.value === value);
+        const selectedLabel = selectedOption ? selectedOption.label : '';
+        let content;
+        if (value == "reject_goods_quality_issue" || value == "return_goods_wrong_parts") {
+            content = "This action will cancel the order and cannot be reverted";
+        } else {
+            content = `Are you sure you want to update the ${selectedLabel} status?`;
+        }
+        Modal.confirm({
+            title: 'Confirm Status Change',
+            content: content,
+            okText: 'Yes',
+            cancelText: 'No',
+            cancelButtonProps: { danger: true },
+            onOk: () => {
+                // Update shipment data only if user confirms
+                const updatedShipments = shipmentData.map((shipment) =>
+                    shipment.shipment_id === shipmentId
+                        ? { ...shipment, received_status: value }
+                        : shipment
+                );
+                setShipments(updatedShipments);
+            },
+            onCancel: () => {
+                console.log('Status change canceled');
+            },
+        });
     };
 
     const columns = [
@@ -111,38 +136,13 @@ function RenterShipmentPage() {
                     name={'received_status'}
                     // value={received_status}
                     onChange={(value) => handleStatusChange(value, record.shipment_id)}
-                    options={[
-                        { value: 'received_in_full', label: 'Received in Full' },
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'partial', label: 'Partial' },
-                        { value: 'other_status', label: 'Other Status' },
-                    ]}
+                    options={receiptConfirmation}
                     placeholder={'Select status'}
                     style={{ width: 150 }}
                 />
             ),
         },
     ];
-
-
-
-    const updateShipmentFn = async (data) => {
-        try {
-            const data = form.getFieldsValue();
-            data.orderid = order.order_id;
-            data.shipment_details = form.getFieldValue(['shipment_details'])
-            console.log("updateShipmentFn: ", data);
-            const response = await axios.patch(UPDATE_SHIPMENT_URL, data);
-            console.log("response update ship: ", response);
-            message.success(response.data.message);
-            setIsReview(false);
-            navigate(-1); // redirect to previous page
-        } catch (error) {
-            message.error("There is some error while updating the shipment!");
-            console.log("shipment update err: ", error);
-        }
-
-    }
 
     useEffect(() => {
         getShipmentByOrderId();
@@ -156,12 +156,20 @@ function RenterShipmentPage() {
     };
 
     const handleSave = async () => {
-        const updatedShipments = shipments.filter(shipment => shipment.received_status);
+        // console.error('shipments:', shipments);
+        // const hasEmptyStatus = shipments.some((shipment) => shipment.received_status == "");
+        // console.error('hasEmptyStatus:', hasEmptyStatus);
+        // if (hasEmptyStatus) {
+        //     message.info("Please update the Received Status!");
+        // } else {
+        // }
         try {
-            await axios.put(UPDATE_SHIPMENT_URL, { shipment_details: updatedShipments, orderid: order.order_id });
-            console.log('Shipments updated successfully', updatedShipments);
+            const resp = await axios.patch(UPDATE_SHIPMENT_URL, { shipment_details: shipments, orderid: order.order_id });
+            message.success(resp.data.message);
+            navigate(-1); // redirect to previous page
         } catch (error) {
             console.error('Failed to update shipments:', error);
+            message.error("There is some error while updating the shipment!");
         }
     };
 
@@ -177,28 +185,9 @@ function RenterShipmentPage() {
                         <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
                     </div>
                 </div>
-                <Table columns={columns} dataSource={shipmentData} pagination={false} />
-                {/* <Form
-                    name="basic"
-                    // onFinish={isReview ? updateShipmentFn : onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                    layout='vertical'
-                    form={form}
-                >
-                    <Form.Item
-                        label="Receipt Confirmation"
-                        name={'received_status'}
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Please input receipt confirmation!',
-                            },
-                        ]}
-                    >
-                        <Select placeholder='Choose Receipt Confirmation' style={{ width: '100%' }} options={receiptConfirmation} />
-                    </Form.Item>
-                </Form> */}
+
+                <Table columns={columns} dataSource={shipmentData} pagination={false} loading={loading} />
+
                 <Space style={{ marginTop: 16 }}>
                     <Button type="primary" onClick={handleSave}>
                         Save Changes

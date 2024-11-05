@@ -30,7 +30,7 @@ function Quotes() {
     const [filteredQuotes, setFilteredQuotes] = useState([]); // State for storing filtered quotes
     const [hirerCompany, setHirerCompany] = useState(null);
 
-    const currentUserCompanyId = authUser.CompanyId;
+    const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const navigate = useNavigate();
     // console.log("authUser: ", authUser);

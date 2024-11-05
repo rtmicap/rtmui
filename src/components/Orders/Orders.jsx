@@ -19,7 +19,7 @@ function Orders() {
 
   // console.log("authUser: ", authUser);
 
-  const currentUserCompanyId = authUser.CompanyId;
+  const currentUserCompanyId = authUser && authUser.CompanyId;
 
   const getAllOrders = async () => {
     try {
