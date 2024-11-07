@@ -15,7 +15,6 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { typesOfGoods, uomChoices } from '../Orders/OrderUtils';
 import { formattedDateTime } from '../../utils/utils';
 const { TextArea } = Input;
 

@@ -1,49 +1,80 @@
 import { Button, Collapse, DatePicker, Flex, Form, Input, message, Select, Tooltip, Upload } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CREATE_FIRST_SAMPLE_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
-import { useAuth } from '../../contexts/AuthContext';
-import dayjs from 'dayjs';
-import axios from '../../api/axios';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import dayjs from 'dayjs';
+import moment from 'moment/moment';
+import { CREATE_FINAL_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
+import { useAuth } from '../../contexts/AuthContext';
+import axios from '../../api/axios';
 import { uomChoices } from '../../utils/selectOptionUtils';
+const { TextArea } = Input;
 
-function RenterSampleReports() {
+function RenterFinalReports() {
     const location = useLocation();
-    const [form] = Form.useForm();
     const { authUser } = useAuth();
-    const { order, reviewSampleReports } = location.state || {};
-    const navigate = useNavigate();
+    const { order, reviewFinalReports } = location.state || {};
+    const [form] = Form.useForm();
 
-    const [inspectionDateTime, setInspectionDateTime] = useState('');
-    const [inspectionReportFileList, setInspectionReportFileList] = useState([]);
-    const [fileReportLoading, setFileReportLoading] = useState(false);
-    const [viewInspectionReportFile, setViewInspectionReportFile] = useState('');
+    const [finalReportDispositionStatus, setFinalReportDispositionStatus] = useState(null);
+    const [sampleReportData, setFinalReportData] = useState([]);
+    const [goodsPickUpDateTime, setGoodsPickUpDateTime] = useState('');
+    const [prodInspectionReportFileList, setProdInspectionReportFileList] = useState([]);
+    const [viewProdLotInspectionReportFile, setViewProdLotInspectionReportFile] = useState('');
+    const [fileFinalReportLoading, setFileFinalReportLoading] = useState(false);
+    const [orderCompletionDateTime, setOrderCompletionDateTime] = useState('');
 
     const currentUserCompanyId = authUser && authUser.CompanyId;
+    const navigate = useNavigate();
 
-    const onFinishReport = async (values) => {
+    const getFinalReportsByOrderId = async () => {
         try {
-            values.orderid = order.order_id;
-            values.inspection_date_time = inspectionDateTime;
-            values.first_sample_inspection_report = viewInspectionReportFile;
-            values.first_sample_disposition = "pending_approval";
-            console.log('onFinishReport:', values);
-            const response = await axios.post(CREATE_FIRST_SAMPLE_REPORT_URL, values);
-            message.success(`${response.data.message}`);
-            navigate(-1);
+            const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order.order_id}`)
+            console.log("getFinalReportsByOrderId: ", response.data);
+            if (response && response.data && response.data.results.length > 0) {
+                setFinalReportData(response.data.results);
+            }
         } catch (error) {
-            console.log('onFinishReport err:', error);
-            message.error(`${error && error.response.data ? error.response.data.error : 'Something went wrong while creating the sample report!'}`);
+            console.log("getFinalReportsByOrderId err: ", error);
+            message.error("Error while fetching final report!");
         }
-
     }
 
-    const onFinishFailedSampleReport = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+    useEffect(() => {
+        getFinalReportsByOrderId();
+    }, []);
+
+    const onFinishFinalReport = async (values) => {
+        const data = form.getFieldsValue();
+        console.log("get Data: ", data);
+        values.orderid = order.order_id;
+        values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
+        values.completion_date_time = orderCompletionDateTime;
+        values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
+        values.final_product_disposition = "pending_approval";
+        values.first_sample_id = form.getFieldValue("first_sample_id");
+        console.log('onFinishFinalReport:', values);
+        const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
+        message.success(`${response.data.message}`);
+        navigate(-1);
+    }
+
+    const onFinishFailedFinalReport = (errorInfo) => {
+        console.log('onFinishFailedFinalReport Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });
+    };
+
+    const validateOrderQuantity = (_, value) => {
+        if (value && order.quantity !== null && value > order.quantity) {
+            return Promise.reject(new Error(`Quantity must not be greater than ${order.quantity}`));
+        }
+        return Promise.resolve();
+    };
+
+    const onOk = (value) => {
+        console.log('onOk: ', value);
     };
 
     const fileUpload = async (file) => {
@@ -60,35 +91,39 @@ function RenterSampleReports() {
         }
     }
 
-    const handleInspectionReportFileChange = async (info) => {
-        let fileList = [...info.fileList];
-        // Limit to only one file
-        fileList = fileList.slice(-1);
-        // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
-        // Display an error message if more than one file is uploaded
-        if (fileList.length > 1) {
-            message.error('You can only upload one file');
-        } else {
-            setInspectionReportFileList(fileList);
-            if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
-                setFileReportLoading(true);
-                // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
-                // console.log("fileRes: ", fileRes);
-                message.success("Inspection Report File Uploaded!")
-                setViewInspectionReportFile(fileRes.fileUrl);
-                setFileReportLoading(false);
+    const handleProdLotInspectionReportFileChange = async (info) => {
+        try {
+            let fileList = [...info.fileList];
+            // Limit to only one file
+            fileList = fileList.slice(-1);
+            // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+            // Display an error message if more than one file is uploaded
+            if (fileList.length > 1) {
+                message.error('You can only upload one file');
             } else {
-                message.error('File size must less than 3 MB');
+                setProdInspectionReportFileList(fileList);
+                if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
+                    setFileFinalReportLoading(true);
+                    // update file upload api
+                    const fileRes = await fileUpload(fileList[0]);
+                    // console.log("fileRes: ", fileRes);
+                    message.success("Final Inspection Report File Uploaded!")
+                    setViewProdLotInspectionReportFile(fileRes.fileUrl);
+                    setFileFinalReportLoading(false);
+                } else {
+                    message.error('File size must less than 3 MB');
+                }
             }
+        } catch (error) {
+            message.error('Error while uploading the file!');
         }
     }
 
-    const handleInspectionReportRemove = () => {
-        setInspectionReportFileList([]);
-        setViewInspectionReportFile('');
-        form.setFieldsValue({
-            first_sample_inspection_report: '',  // Reset the specific field by setting it to an empty string
+    const handleProdLotInspectionReportRemove = () => {
+        setProdInspectionReportFileList([]);
+        setViewProdLotInspectionReportFile('');
+        form.setFieldValue({
+            prod_lot_inspection_report: '' // empty the file list
         });
     };
 
@@ -97,18 +132,17 @@ function RenterSampleReports() {
         return current && current < dayjs().startOf('day');
     };
 
-    const onOk = (value) => {
-        console.log('onOk: ', value);
-    };
-
     return (
         <>
-            <div className="container">
+            <div>
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <h5 className='text-center'>Final Report for Order ID: {order.order_id}</h5>
+                <hr />
                 <Form
                     form={form}
                     layout="vertical"
-                    onFinish={onFinishReport}
-                    onFinishFailed={onFinishFailedSampleReport}
+                    onFinish={onFinishFinalReport}
+                    onFinishFailed={onFinishFailedFinalReport}
                 >
                     <div className="container-fluid">
                         <div className="row">
@@ -118,26 +152,26 @@ function RenterSampleReports() {
                                     name={'orderid'}
                                 >
                                     <Tooltip title={`Order ID is ${order.order_id}. You can't modify.`}>
-                                        <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly />
+                                        {order.order_id}
+                                        {/* <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly /> */}
                                     </Tooltip>
                                 </Form.Item>
                             </div>
 
                             <div className="col">
-
-                                <Form.Item label="Inspection Date/Time" name={'inspection_date_time'} tooltip={{
+                                <Form.Item label="Completion Date/Time" name={'completion_date_time'} required tooltip={{
                                     title: 'This is a required field',
                                     // icon: <InfoCircleOutlined />,
                                 }}
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Please choose inspection start date/time',
+                                            message: 'Please choose completion date/time',
                                         },
                                     ]}
                                 >
                                     <DatePicker
-                                        disabledDate={disabledDate}
+                                        // disabledDate={disabledDate}
                                         showTime={{
                                             format: 'hh:mm A',
                                             use12Hours: true,
@@ -145,7 +179,7 @@ function RenterSampleReports() {
                                         onChange={(value, dateString) => {
                                             console.log('Selected Time: ', value);
                                             console.log('Formatted Selected Time: ', dateString);
-                                            setInspectionDateTime(dateString);
+                                            setOrderCompletionDateTime(dateString);
                                         }}
                                         onOk={onOk}
                                     />
@@ -169,16 +203,7 @@ function RenterSampleReports() {
                                 </Form.Item>
                             </div>
                             <div className="col">
-                                <Form.Item label="Part Number" required name={'part_number'} tooltip={{
-                                    title: 'This is a required field'
-                                }}
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Please update the part number!',
-                                        },
-                                    ]}
-                                >
+                                <Form.Item label="Part Number" name={'part_number'}>
                                     <Input placeholder="input placeholder" style={{ width: '100%' }} />
                                 </Form.Item>
                             </div>
@@ -186,17 +211,16 @@ function RenterSampleReports() {
 
                         <div className="row">
                             <div className="col">
-                                <Form.Item label="Sample Quantity" required name={'first_sample_quantity'} tooltip={{
+                                <Form.Item label="Order OK Quantity" required name={'order_ok_quantity'} tooltip={{
                                     title: 'This is a required field'
                                 }}
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Please update the sample quantity!',
+                                            message: 'Please update the order OK quantity!',
                                         },
                                         {
-                                            pattern: /^[1-9]$/,
-                                            message: 'Sample quantity must be between 1 and 9!',
+                                            validator: validateOrderQuantity,
                                         },
                                     ]}
                                 >
@@ -222,40 +246,41 @@ function RenterSampleReports() {
 
                         <div className="row">
                             <div className="col">
-                                <Form.Item label="Attach Inspection Report (Max: 3 MB Size)" required name={'first_sample_inspection_report'} tooltip={{
+                                <Form.Item label="Prod Lot Inspection Report (Max: 3 MB Size)" required name={'prod_lot_inspection_report'} tooltip={{
                                     title: 'This is a required field'
                                 }}
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Please attach the inspection report!',
+                                            message: 'Please attach the prod lot inspection report!',
                                         },
                                     ]}
                                 >
                                     <Flex gap="small" wrap>
                                         <Upload
-                                            fileList={inspectionReportFileList}
-                                            onChange={handleInspectionReportFileChange}
+                                            fileList={prodInspectionReportFileList}
+                                            onChange={handleProdLotInspectionReportFileChange}
                                             maxCount={1}
                                             beforeUpload={() => false}
-                                            onRemove={handleInspectionReportRemove}
+                                            onRemove={handleProdLotInspectionReportRemove}
                                             accept=".pdf,.csv"
                                         >
-                                            <Button type='link' loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
+                                            <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
                                         </Upload>
-                                        {viewInspectionReportFile &&
-                                            <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
+                                        {viewProdLotInspectionReportFile &&
+                                            <Link to={viewProdLotInspectionReportFile} target={'_blank'}>View File</Link>
                                         }
                                     </Flex>
                                 </Form.Item>
                             </div>
-
                         </div>
+
                         <div className="row">
-                            <div className="col">
-                                <Button type='primary' htmlType="submit">Share FSIR to Hirer</Button>
+                            <div className="col text-center">
+                                <Button type='primary' htmlType="submit">Send Order Completion Report</Button>
                             </div>
                         </div>
+
                     </div>
                 </Form>
             </div>
@@ -263,4 +288,4 @@ function RenterSampleReports() {
     )
 }
 
-export default RenterSampleReports
+export default RenterFinalReports

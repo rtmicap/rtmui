@@ -1,14 +1,14 @@
-import { Button, Collapse, DatePicker, Flex, Form, Input, message, Select, Tooltip, Upload } from 'antd';
+import { Button, Collapse, DatePicker, Flex, Form, Input, message, Modal, Select, Tooltip, Upload } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GET_FIRST_SAMPLE_REPORT_ORDERID_URL, UPDATE_FIRST_SAMPLE_REPORT_URL } from '../../api/apiUrls';
 import { useAuth } from '../../contexts/AuthContext';
-import { sampleDisposition, uomChoices } from '../Orders/OrderUtils';
 import dayjs from 'dayjs';
 import axios from '../../api/axios';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from 'moment/moment';
 import { formattedDateTime } from '../../utils/utils';
+import { firstSampleProductStatus, uomChoices } from '../../utils/selectOptionUtils';
 const { TextArea } = Input;
 
 function HirerSampleReports() {
@@ -61,8 +61,8 @@ function HirerSampleReports() {
 
     const sampleReportStatusUpdate = async () => {
         const data = form.getFieldsValue();
-        if (data.first_sample_disposition == "pending_approval") {
-            message.info("Please update the First sample disposition!")
+        if (data.first_sample_disposition == "pending_approval" || data.first_sample_disposition == "") {
+            message.info("Please update the First sample disposition status!")
         } else {
             try {
                 data.first_sample_disposition = sampleReportStatus;
@@ -76,7 +76,7 @@ function HirerSampleReports() {
                 navigate(-1);
             } catch (error) {
                 console.log("error update: ", error);
-                message.error("There is some error!");
+                message.error("There is something error updating the sample report!");
             }
         }
     }
@@ -85,6 +85,30 @@ function HirerSampleReports() {
         console.log('Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
+        });
+    };
+
+    const handleStatusChange = (value) => {
+        const selectedOption = firstSampleProductStatus.find(option => option.value === value);
+        const selectedLabel = selectedOption ? selectedOption.label : '';
+        let content;
+        if (value == "rejected") {
+            content = "This action will cancel the order and cannot be reverted";
+        } else {
+            content = `Are you sure you want to update the ${selectedLabel} status?`;
+        }
+        Modal.confirm({
+            title: 'Confirm Status Change',
+            content: content,
+            okText: 'Yes',
+            cancelText: 'No',
+            cancelButtonProps: { danger: true },
+            onOk: () => {
+                setSampleReportStatus(value);
+            },
+            onCancel: () => {
+                console.log('Status change canceled');
+            },
         });
     };
 
@@ -202,7 +226,7 @@ function HirerSampleReports() {
                                         },
                                     ]}
                                 >
-                                    <Select placeholder='Choose sample disposition' style={{ width: '100%' }} options={sampleDisposition} />
+                                    <Select placeholder='Choose sample disposition' onChange={(value) => handleStatusChange(value)} style={{ width: '100%' }} options={firstSampleProductStatus} />
                                 </Form.Item>
                             </div>
 
@@ -239,13 +263,7 @@ function HirerSampleReports() {
 
                         <div className="row">
                             <div className="col">
-                                <Button type='primary' htmlType="submit" onClick={() => setSampleReportStatus("approved")}>Approved & Proceed for Production</Button>
-                            </div>
-                            <div className="col">
-                                <Button htmlType="submit" onClick={() => setSampleReportStatus("repeat_sample")}>Do Resample</Button>
-                            </div>
-                            <div className="col">
-                                <Button type='primary' htmlType="submit" danger onClick={() => setSampleReportStatus("rejected")}>Reject & Cancel Order</Button>
+                                <Button type='primary' htmlType="submit">Update</Button>
                             </div>
                         </div>
                         <hr />

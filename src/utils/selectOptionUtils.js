@@ -26,3 +26,18 @@ export const receiptConfirmation = [
     { value: 'reject_goods_quality_issue', label: 'Rejected' },
     { value: 'return_goods_wrong_parts', label: 'Wrong Parts' }
 ];
+
+
+export const finalProductStatus = [
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rework', label: 'Reword' },
+    { value: 'rejected', label: 'Rejected' }
+];
+
+export const firstSampleProductStatus = [
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'repeat_sample', label: 'Repeat Sample' },
+    { value: 'rejected', label: 'Rejected' }
+];

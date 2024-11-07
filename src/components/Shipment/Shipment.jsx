@@ -22,7 +22,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
-import { receiptConfirmation, typesOfGoods, uomChoices } from '../Orders/OrderUtils';
 import { formattedDateTime } from '../../utils/utils';
 import moment from 'moment/moment';
 import HirerShipmentPage from './Details Page/HirerShipmentPage';

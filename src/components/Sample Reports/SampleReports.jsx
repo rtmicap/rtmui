@@ -69,10 +69,10 @@ function SampleReports() {
                         <RenterSampleReports />
                         : <h4 className='text-center'>Something went wrong</h4>
                 }
-                <hr />
                 {/* Lists of sample Reports */}
                 {sampleReportData && sampleReportData.length > 0 && (authUser && authUser.CompanyId == order.renter_company_id) &&
                     <>
+                        <hr />
                         <h6>Lists of updated sample reports:</h6>
                         <Collapse items={collapseItems} />
                     </>
