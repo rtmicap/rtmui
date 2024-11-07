@@ -9,8 +9,6 @@ const { Content } = Layout;
 function Login() {
     const navigate = useNavigate();
     const { isLoading, error, userLogin } = useAuth();
-    // const [loading, setLoading] = useState(false);
-
 
     const onFinish = async (values) => {
         console.log('Success:', values);
@@ -20,8 +18,10 @@ function Login() {
                 navigate('/');
             } else if (res && res.status && res.admin) {
                 navigate('/admin/dashboard');
+            } if (res && !res.status && !res.admin) {
+                message.error(res.response.message ? res.response.message : "Unable to login! Please contact support");
             } else {
-                message.error(res.response.message)
+                message.error(res.response.message ? res.response.message : "Unable to login! Please contact support");
             }
         });
     };

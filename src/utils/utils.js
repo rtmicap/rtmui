@@ -5,5 +5,5 @@ export const formatUpperCase = (text) => {
 }
 
 export const formattedDateTime = (data) => {
-    return moment(data).format('MMMM Do YYYY, h:mm a');
+    return moment(data).format('MMM Do YYYY, h:mm a');
 }

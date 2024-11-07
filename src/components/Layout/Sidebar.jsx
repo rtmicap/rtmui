@@ -110,7 +110,7 @@ function Sidebar() {
                                 minHeight: 360,
                                 background: colorBgContainer,
                                 borderRadius: borderRadiusLG,
-                                textAlign: 'center',
+                                // textAlign: 'center',
                             }}
                         >
                             <Outlet />
