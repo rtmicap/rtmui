@@ -36,6 +36,7 @@ function RenterShipmentPage() {
     const [form] = Form.useForm();
     const [shipments, setShipments] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [receivedQuantity, setReceivedQuantity] = useState(null);
 
     const getShipmentByOrderId = async () => {
         try {
@@ -71,9 +72,17 @@ function RenterShipmentPage() {
                 // Update shipment data only if user confirms
                 const updatedShipments = shipmentData.map((shipment) =>
                     shipment.shipment_id === shipmentId
-                        ? { ...shipment, received_status: value }
+                        ? {
+                            ...shipment,
+                            received_status: value,
+                            received_quantity: receivedQuantity,
+                            typeofgoods: shipment.type_of_goods, 
+                        }
                         : shipment
-                );
+                ).map((shipment) => {
+                    const { type_of_goods, ...rest } = shipment;  
+                    return rest;
+                });
                 setShipments(updatedShipments);
             },
             onCancel: () => {
