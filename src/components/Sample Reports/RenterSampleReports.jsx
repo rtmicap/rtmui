@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import axios from '../../api/axios';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { uomChoices } from '../../utils/selectOptionUtils';
+import SampleReportsDetails from '../Detail Pages/SampleReportsDetails';
 
 function RenterSampleReports() {
     const location = useLocation();
@@ -258,6 +259,9 @@ function RenterSampleReports() {
                         </div>
                     </div>
                 </Form>
+                <hr />
+                {/* Lists of Sample Reports details */}
+                <SampleReportsDetails order_id={order.order_id} />
             </div>
         </>
     )

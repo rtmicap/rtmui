@@ -9,6 +9,7 @@ import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from 'moment/moment';
 import { formattedDateTime } from '../../utils/utils';
 import { firstSampleProductStatus, uomChoices } from '../../utils/selectOptionUtils';
+import SampleReportsDetails from '../Detail Pages/SampleReportsDetails';
 const { TextArea } = Input;
 
 function HirerSampleReports() {
@@ -267,6 +268,8 @@ function HirerSampleReports() {
                             </div>
                         </div>
                         <hr />
+                        {/* Lists of Sample Reports details */}
+                        <SampleReportsDetails order_id={order.order_id} />
                     </div>
                 </Form>
             </div>

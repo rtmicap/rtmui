@@ -8,6 +8,7 @@ import { CREATE_FINAL_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { uomChoices } from '../../utils/selectOptionUtils';
+import FinalReportsDetails from '../Detail Pages/FinalReportsDetails';
 const { TextArea } = Input;
 
 function RenterFinalReports() {
@@ -17,7 +18,7 @@ function RenterFinalReports() {
     const [form] = Form.useForm();
 
     const [finalReportDispositionStatus, setFinalReportDispositionStatus] = useState(null);
-    const [sampleReportData, setFinalReportData] = useState([]);
+    const [finalReportData, setFinalReportData] = useState([]);
     const [goodsPickUpDateTime, setGoodsPickUpDateTime] = useState('');
     const [prodInspectionReportFileList, setProdInspectionReportFileList] = useState([]);
     const [viewProdLotInspectionReportFile, setViewProdLotInspectionReportFile] = useState('');
@@ -281,8 +282,11 @@ function RenterFinalReports() {
                             </div>
                         </div>
 
+                        {/* Lists of Final Reports details */}
+                        <FinalReportsDetails order_id={order.order_id} />
                     </div>
                 </Form>
+
             </div>
         </>
     )

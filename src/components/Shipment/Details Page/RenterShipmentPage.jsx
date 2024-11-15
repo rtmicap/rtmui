@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex, Collapse, Table, Space, Modal } from 'antd';
+import { Button, DatePicker, Form, message, Select, Spin, Upload, Input, notification, Tooltip, Flex, Collapse, Table, Space, Modal, InputNumber } from 'antd';
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -36,14 +36,24 @@ function RenterShipmentPage() {
     const [form] = Form.useForm();
     const [shipments, setShipments] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [receivedQuantity, setReceivedQuantity] = useState(null);
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState(false);
 
     const getShipmentByOrderId = async () => {
         try {
             setLoading(true);
             const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
             console.log("Renter getShipmentByOrderId: ", response.data);
-            setShipmentData(response.data.result);
-            setLoading(false);
+            if (response && response.data.result.length > 0) {
+                // display only those updated the status 
+                const filteredDataByStatus = response.data.result.filter((data) => !data.received_status);
+                setShipmentData(response.data.result);
+                setLoading(false);
+            } else {
+                setShipmentData([]);
+                setLoading(false);
+            }
         } catch (error) {
             message.error("Something error while fetching shipment data!");
             console.log("shipment data err: ", error);
@@ -52,43 +62,102 @@ function RenterShipmentPage() {
         }
     }
 
-    const handleStatusChange = (value, shipmentId) => {
-        const selectedOption = receiptConfirmation.find(option => option.value === value);
+
+    const handleSaveChanges = (record, newStatus) => {
+        const selectedOption = receiptConfirmation.find(option => option.value === newStatus);
         const selectedLabel = selectedOption ? selectedOption.label : '';
         let content;
-        if (value == "reject_goods_quality_issue" || value == "return_goods_wrong_parts") {
-            content = "This action will cancel the order and cannot be reverted";
+        if (record.type_of_goods === 'raw_material') {
+            if (newStatus === 'reject_goods_quality_issue' || newStatus === 'return_goods_wrong_parts') {
+                content = "This action will cancel the order and cannot be reverted";
+            } else {
+                content = `You are changing the received status as ${selectedLabel}. Please confirm`;
+            }
         } else {
-            content = `Are you sure you want to update the ${selectedLabel} status?`;
+            content = `You are changing the received status as ${selectedLabel}. Please confirm`;
         }
-        Modal.confirm({
-            title: 'Confirm Status Change',
-            content: content,
-            okText: 'Yes',
-            cancelText: 'No',
-            cancelButtonProps: { danger: true },
-            onOk: () => {
-                // Update shipment data only if user confirms
-                const updatedShipments = shipmentData.map((shipment) =>
-                    shipment.shipment_id === shipmentId
-                        ? { ...shipment, received_status: value }
-                        : shipment
-                );
-                setShipments(updatedShipments);
-            },
-            onCancel: () => {
-                console.log('Status change canceled');
-            },
-        });
+
+        if (record.type_of_goods === "raw_material" && newStatus === "received_short") {
+            // Show modal to input new order quantity
+            Modal.confirm({
+                title: "Enter New Order Quantity",
+                content: (
+                    <>
+                        <div className='row'>
+                            <div className="col">
+                                <b> UOM:</b>  {record.UOM}
+                            </div>
+                            <div className="col">
+                                <b>Order Quantity:</b>  {order.quantity}
+                            </div>
+                        </div><br />
+                        <div className="row">
+                            <div className="col">
+                                <b>Shipment Quantity:</b> {record.quantity}
+                            </div>
+                            <div className="col">
+                                <label htmlFor="">Enter new order quantity</label>
+                                <InputNumber
+                                    placeholder="Enter New Order Quantity"
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    required
+                                    name={'new_order_quantity'}
+                                    // prefix="Enter New Order Quantity"
+                                    onChange={(value) => {
+                                        record.new_order_quantity = value;
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                    </>
+                ),
+                okText: "Save",
+                width: "60%", // Adjust width to 60% of the viewport
+                centered: true, // Center modal horizontally
+                onOk: () => {
+                    if (record.new_order_quantity) {
+                        updateShipment(record, newStatus);
+                    } else {
+                        message.error("Please enter a valid quantity.");
+                    }
+                },
+            });
+        } else {
+            // Show confirmation modal for other statuses/types
+            Modal.confirm({
+                title: "Confirm Status Change",
+                // content: `Are you sure you want to change the status to "${selectedLabel}"?`,
+                content: content,
+                okText: "Yes",
+                cancelText: "No",
+                onOk: () => updateShipment(record, newStatus),
+            });
+        }
+    };
+
+    const updateShipment = (record, newStatus) => {
+        // console.log("updatedShipments: ", shipmentData)
+        const updatedShipments = shipmentData.map((shipment) =>
+            shipment.shipment_id === record.shipment_id
+                ? { ...shipment, received_quantity: record.quantity, received_status: newStatus, typeofgoods: shipment.type_of_goods }
+                : shipment
+        );
+
+        console.log("updatedShipments2: ", updatedShipments);
+        setShipmentData(updatedShipments);
+        // message.success("Shipment updated successfully!");
     };
 
     const columns = [
-        {
-            title: 'Shipment ID',
-            dataIndex: 'shipment_id',
-            key: 'shipment_id',
-            //   render: (text) => <a>{text}</a>,
-        },
+        // {
+        //     title: 'Shipment ID',
+        //     dataIndex: 'shipment_id',
+        //     key: 'shipment_id',
+        //     //   render: (text) => <a>{text}</a>,
+        // },
         {
             title: 'Type of Goods',
             dataIndex: 'type_of_goods',
@@ -134,8 +203,8 @@ function RenterShipmentPage() {
             render: (received_status, record) => (
                 <Select
                     name={'received_status'}
-                    // value={received_status}
-                    onChange={(value) => handleStatusChange(value, record.shipment_id)}
+                    // value={received_status || null}  // Set current value for controlled component
+                    onChange={(value) => handleSaveChanges(record, value)}
                     options={receiptConfirmation}
                     placeholder={'Select status'}
                     style={{ width: 150 }}
@@ -156,22 +225,23 @@ function RenterShipmentPage() {
     };
 
     const handleSave = async () => {
-        // console.error('shipments:', shipments);
-        // const hasEmptyStatus = shipments.some((shipment) => shipment.received_status == "");
-        // console.error('hasEmptyStatus:', hasEmptyStatus);
-        // if (hasEmptyStatus) {
-        //     message.info("Please update the Received Status!");
-        // } else {
-        // }
         try {
-            const resp = await axios.patch(UPDATE_SHIPMENT_URL, { shipment_details: shipments, orderid: order.order_id });
-            message.success(resp.data.message);
+            // console.log('shipmentData:', shipmentData);
+            const hasEmptyStatus = shipmentData.filter((shipment) => shipment && !shipment.received_status);
+            console.log('hasEmptyStatus:', hasEmptyStatus);
+            if (hasEmptyStatus && hasEmptyStatus.length > 0) {
+                message.info("Please update the Received Status!");
+            }
+            console.log('shipments2:', shipmentData);
+            const resp = await axios.patch(UPDATE_SHIPMENT_URL, { shipment_details: shipmentData, orderid: order.order_id });
+            message.success(resp.data.message ? resp.data.message : 'Shipment Updated!');
             navigate(-1); // redirect to previous page
         } catch (error) {
             console.error('Failed to update shipments:', error);
             message.error("There is some error while updating the shipment!");
         }
     };
+
 
     return (
         <>
@@ -193,6 +263,41 @@ function RenterShipmentPage() {
                         Save Changes
                     </Button>
                 </Space>
+
+                {/* Change Quantity for received shorts */}
+                {/* {selectedRecord && (
+                    <Modal
+                        title={`Received Short Status Update`}
+                        open={openModal}
+                        onCancel={handleQuantityCancel}
+                        footer={[
+                            <Button key="cancel" onClick={handleQuantityCancel}>
+                                Cancel
+                            </Button>,
+                            <Button key="update" type="primary" onClick={() => handleQuantityChange(selectedRecord)}>
+                                Update
+                            </Button>,
+                        ]}
+                    >
+                        <Form form={form} layout="vertical">
+                            <Form.Item
+                                label="UOM"
+                                name="UOM"
+                            >
+                                {selectedRecord.UOM}
+                            </Form.Item>
+                            <Form.Item
+                                label="Enter new order quantity"
+                                name="new_order_quantity"
+                                rules={[{ required: true, message: 'Please enter new order quantity!' }]}
+                            >
+                                <Input
+                                    placeholder="Enter new order quantity"
+                                    onChange={(e) => setReceivedQuantity(e.target.value)}
+                                />
+                            </Form.Item>
+                        </Form>
+                    </Modal>)} */}
             </div>
         </>
     )
