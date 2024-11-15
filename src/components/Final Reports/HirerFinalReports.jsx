@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { formattedDateTime } from '../../utils/utils';
 import { finalProductStatus, uomChoices } from '../../utils/selectOptionUtils';
+import FinalReportsDetails from '../Detail Pages/FinalReportsDetails';
 const { TextArea } = Input;
 
 function HirerFinalReports() {
@@ -315,6 +316,8 @@ function HirerFinalReports() {
                             </div>
                         </div>
                         <hr />
+                        {/* Lists of Final Reports details */}
+                        <FinalReportsDetails order_id={order.order_id} />
                     </div>
                 </Form>
             </div>

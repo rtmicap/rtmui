@@ -166,7 +166,7 @@ function RenterOrdersDetailPage() {
                     </Space>
                 </div>
                 {/* Lists of shipment details */}
-                <ShipmentDetails order_id={order.order_id} />
+                {/* <ShipmentDetails order_id={order.order_id} /> */}
             </div>
         </>
     )

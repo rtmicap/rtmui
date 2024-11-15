@@ -25,6 +25,7 @@ import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
 import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
 import { typesOfGoods, uomChoices } from '../../../utils/selectOptionUtils';
+import ShipmentDetails from '../ShipmentDetails/ShipmentDetails';
 
 function HirerShipmentPage() {
     const location = useLocation();
@@ -607,14 +608,10 @@ function HirerShipmentPage() {
                         </div>
                     </div>
                 </Form>
-                <hr />
                 {/* Lists of shipment details */}
-                {shipmentData && shipmentData.length > 0 &&
-                    <>
-                        <h6>Lists of shipment details:</h6>
-                        <Collapse items={collapseItems} />
-                    </>
-                }
+                <>
+                    <ShipmentDetails order_id={order.orderId} />
+                </>
             </div>
         </>
     )
