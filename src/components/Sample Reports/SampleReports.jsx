@@ -61,7 +61,7 @@ function SampleReports() {
         <>
             <div className="container">
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h5 className='text-center'>Sample Report for Order ID: {order.order_id}</h5>
+                <h3 className='text-center'>Sample Report for Order</h3>
                 <hr />
                 {authUser && currentUserCompanyId == order.hirer_company_id ?
                     <HirerSampleReports />

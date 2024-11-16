@@ -119,7 +119,7 @@ function RenterSampleReports() {
                                     name={'orderid'}
                                 >
                                     <Tooltip title={`Order ID is ${order.order_id}. You can't modify.`}>
-                                        <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly />
+                                    <div>{order.quote_id} </div>
                                     </Tooltip>
                                 </Form.Item>
                             </div>

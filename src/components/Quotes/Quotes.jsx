@@ -276,7 +276,11 @@ function Quotes() {
             key: 'actions',
             render: (_, record) => (
                 <>
-                    <Select placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
+                    {(record.hirer_company_id == authUser.CompanyId && record.quote_status=="pending")?
+                    <div>Under Review</div>
+                    :
+                    <Select className="quoteAction" placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
+                    }
                 </>
             ),
         },
@@ -303,10 +307,10 @@ function Quotes() {
 
     // Render collapsible panels with tables inside
     const renderAccordion = (groupedQuotes) => (
-        <Collapse accordion>
+        <Collapse accordion className="accordianSection">
             {Object.keys(groupedQuotes).map((key) => (
                 <Collapse.Panel header={key} key={key}>
-                    <Table
+                    <Table className="tableSection"
                         columns={columns}
                         dataSource={groupedQuotes[key]}
                         rowKey="quote_id"
@@ -320,16 +324,16 @@ function Quotes() {
     return (
         <>
             <div className="container-fluid">
-                <h5 className="card-title text-center">Quotes</h5>
-                <br />
+                <h3 className="card-title text-center">Quotes</h3>
                 <div className='row'>
                     <div className="col text-end">
                         <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Quotes</Button>
                     </div>
                 </div>
-                <div className='row'>
+                
+{/*                 <div className='row'>
                     <div className="col-auto">
-                        <h6 style={{ marginTop: '4px' }}>Filter By:</h6>
+                        <h6>Filter By:</h6>
                     </div>
                     <div className='col-auto'>
                         <Select placeholder='Select the machine category' options={uniqueCategories.map(category => ({ value: category, label: category }))}
@@ -342,8 +346,7 @@ function Quotes() {
                     <div className='col-auto'>
                         <Button type='primary' onClick={handleSearch}>Search</Button>
                     </div>
-                </div>
-                <hr />
+                </div> */}
                 {quoteLoading ? "Loading your Quotes..." :
                     <>
 

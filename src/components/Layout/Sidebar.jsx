@@ -30,7 +30,7 @@ const items = [
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('My Quotes', 'quotes', <ContactsOutlined />),
     getItem('My Orders', 'orders', <UnorderedListOutlined />),
-    getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
+    /* getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
     getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
@@ -49,7 +49,7 @@ const items = [
         getItem('View Code of Conduct', 'view-code-conduct'),
         getItem('View Company Guidelines', 'view-company-guidelines', null),
     ]),
-    getItem('Settings', 'settings', <SettingOutlined />),
+    getItem('Settings', 'settings', <SettingOutlined />), */
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
