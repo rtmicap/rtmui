@@ -82,7 +82,7 @@ function ShipmentDetails({ order_id }) {
             title: 'New Order Quantity',
             key: 'new_order_quantity',
             // dataIndex: 'new_order_quantity',
-            render: (_, value) => <>{value.received_status == "received_short" ? order.new_order_quantity : '-'}</>,
+            render: (_, value) => <>{value.received_status == "received_short" ? order.new_order_quantity : '-'}</>
         },
     ];
 
