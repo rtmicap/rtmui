@@ -96,7 +96,7 @@ function RenterShipmentPage() {
                                 <b>Shipment Quantity:</b> {record.quantity}
                             </div>
                             <div className="col">
-                                <label htmlFor="">Enter new order quantity</label>
+                                <label htmlFor=""><b>Enter new order quantity</b></label>
                                 <InputNumber
                                     placeholder="Enter New Order Quantity"
                                     style={{
@@ -119,7 +119,11 @@ function RenterShipmentPage() {
                 centered: true, // Center modal horizontally
                 onOk: () => {
                     if (record.new_order_quantity) {
-                        updateShipment(record, newStatus);
+                        if (record.new_order_quantity > order.quantity) {
+                            message.error(`New order quantity should not more than ${order.quantity}.`);
+                        } else {
+                            updateShipment(record, newStatus);
+                        }
                     } else {
                         message.error("Please enter a valid quantity.");
                     }
