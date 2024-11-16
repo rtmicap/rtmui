@@ -23,8 +23,9 @@ import moment from 'moment/moment';
 import { useAuth } from '../../../contexts/AuthContext';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
-import { typesOfGoods, uomChoices } from '../../Orders/OrderUtils';
 import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
+import { typesOfGoods, uomChoices } from '../../../utils/selectOptionUtils';
+import ShipmentDetails from '../ShipmentDetails/ShipmentDetails';
 
 function HirerShipmentPage() {
     const location = useLocation();
@@ -32,7 +33,7 @@ function HirerShipmentPage() {
     const { order, reviewShipment } = location.state || {};
     const navigate = useNavigate();
 
-    const currentUserCompanyId = authUser.CompanyId;
+    const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const [form] = Form.useForm();
     const [shipmentDateTime, setShipmentDateTime] = useState('');
@@ -321,6 +322,9 @@ function HirerShipmentPage() {
     const handleInvoiceRemove = () => {
         setInvoiceFileList([]);
         setInvoiceFile('');
+        form.setFieldsValue({
+            invoice: '',  // Reset the specific field by setting it to an empty string
+        });
     };
 
     const collapseItems = shipmentData.map((item, index) => ({
@@ -604,14 +608,10 @@ function HirerShipmentPage() {
                         </div>
                     </div>
                 </Form>
-                <hr />
                 {/* Lists of shipment details */}
-                {shipmentData && shipmentData.length > 0 &&
-                    <>
-                        <h6>Lists of shipment details:</h6>
-                        <Collapse items={collapseItems} />
-                    </>
-                }
+                <>
+                    <ShipmentDetails order_id={order.orderId} />
+                </>
             </div>
         </>
     )

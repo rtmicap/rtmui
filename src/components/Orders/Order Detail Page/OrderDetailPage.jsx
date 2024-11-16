@@ -13,7 +13,7 @@ function OrderDetailPage() {
     const { authUser } = useAuth();
     const { order } = location.state || {};
 
-    const currentUserCompanyId = authUser.CompanyId;
+    const currentUserCompanyId = authUser && authUser.CompanyId;
 
     if (!order) {
         return <div>No order data found!</div>;

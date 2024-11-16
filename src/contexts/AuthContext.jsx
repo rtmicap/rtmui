@@ -62,6 +62,7 @@ export const AuthContextProvider = ({ children }) => {
             console.log("loginResponse data: ", data);
         }).catch((error) => {
             console.log("loginResponse error: ", error);
+            callbackFun({ status: 0, response: error.response.data })
             fetchError(error.message);
         });
     };

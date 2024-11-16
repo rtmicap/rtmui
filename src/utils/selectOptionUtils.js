@@ -24,5 +24,20 @@ export const receiptConfirmation = [
     { value: 'received_in_full', label: 'Received in Full' },
     { value: 'received_short', label: 'Received Short' },
     { value: 'reject_goods_quality_issue', label: 'Rejected' },
-    { value: 'return_goods_wrong_parts', label: 'Return Goods Wrong Parts' }
+    { value: 'return_goods_wrong_parts', label: 'Wrong Parts' }
+];
+
+
+export const finalProductStatus = [
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rework', label: 'Reword' },
+    { value: 'rejected', label: 'Rejected' }
+];
+
+export const firstSampleProductStatus = [
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'repeat_sample', label: 'Repeat Sample' },
+    { value: 'rejected', label: 'Rejected' }
 ];

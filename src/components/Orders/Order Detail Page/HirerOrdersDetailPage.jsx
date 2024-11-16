@@ -5,6 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { LeftCircleOutlined } from "@ant-design/icons";
 import axios from '../../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID } from '../../../api/apiUrls';
+import ShipmentDetails from '../../Shipment/ShipmentDetails/ShipmentDetails';
 
 function HirerOrdersDetailPage() {
     const location = useLocation();
@@ -14,7 +15,7 @@ function HirerOrdersDetailPage() {
     const [hirerCompany, setHirerCompany] = useState(null);
     const [renterCompany, setRenterCompany] = useState(null);
 
-    const currentUserCompanyId = authUser.CompanyId;
+    const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const getCompanyDetailsById = async (companyId, setter) => {
         try {
@@ -166,28 +167,8 @@ function HirerOrdersDetailPage() {
                         </button>
                     </Space>
                 </div>
-
-                <hr />
-                <div>
-                    <h5>Steps to follow before completing the order:</h5><br />
-                    {/* <Timeline
-                        items={[
-                            {
-                                children: 'As a Hirer please ship materials to Renter ',
-                            },
-                            {
-                                children: 'Renter will review the materials and update the status accordingly',
-                            },
-                            {
-                                children: 'Once the shipment process is completed then update the sample report to Hirer',
-                            },
-                            {
-                                children: 'Once the sample report process is completed then update the final report to Hirer',
-                            },
-                        ]}
-                    /> */}
-                    <p>Hirer's Instructions</p>
-                </div>
+                {/* Lists of shipment details */}
+                {/* <ShipmentDetails order_id={order.order_id} /> */}
             </div>
         </>
     )
