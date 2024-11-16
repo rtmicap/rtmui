@@ -106,7 +106,7 @@ function FinalReportsDetails({ order_id }) {
     return (
         <>
             <>
-                <h6>Lists of Final Report details:</h6>
+                <h3>Lists of Final Report details:</h3>
                 {finalReportData && finalReportData.length > 0
                     ? <Collapse items={collapseItems} />
                     : <h5 className='text-center'>Final report not generated</h5>

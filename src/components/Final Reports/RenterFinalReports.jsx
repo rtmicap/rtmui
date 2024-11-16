@@ -137,7 +137,7 @@ function RenterFinalReports() {
         <>
             <div>
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h5 className='text-center'>Final Report for Order ID: {order.order_id}</h5>
+                <h5 className='text-center'>Final Report</h5>
                 <hr />
                 <Form
                     form={form}
@@ -152,8 +152,8 @@ function RenterFinalReports() {
                                     label="Order ID"
                                     name={'orderid'}
                                 >
-                                    <Tooltip title={`Order ID is ${order.order_id}. You can't modify.`}>
-                                        {order.order_id}
+                                    <Tooltip title={`Cannot change Order ID.`}>
+                                    <div>{order.quote_id} </div>
                                         {/* <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly /> */}
                                     </Tooltip>
                                 </Form.Item>

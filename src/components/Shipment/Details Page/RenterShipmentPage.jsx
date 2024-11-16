@@ -47,8 +47,8 @@ function RenterShipmentPage() {
             console.log("Renter getShipmentByOrderId: ", response.data);
             if (response && response.data.result.length > 0) {
                 // display only those updated the status 
-                const filteredDataByStatus = response.data.result.filter((data) => !data.received_status);
-                setShipmentData(response.data.result);
+                const filteredDataByStatus = response.data.result;//.filter((data) => !data.received_status);                
+                setShipmentData(filteredDataByStatus);
                 setLoading(false);
             } else {
                 setShipmentData([]);
@@ -205,6 +205,8 @@ function RenterShipmentPage() {
             dataIndex: 'received_status',
             key: 'received_status',
             render: (received_status, record) => (
+                !received_status?
+                <div>
                 <Select
                     name={'received_status'}
                     // value={received_status || null}  // Set current value for controlled component
@@ -213,7 +215,10 @@ function RenterShipmentPage() {
                     placeholder={'Select status'}
                     style={{ width: 150 }}
                 />
+                </div>:
+                <div>{received_status.toUpperCase()}</div>
             ),
+            
         },
     ];
 
@@ -249,18 +254,20 @@ function RenterShipmentPage() {
 
     return (
         <>
-            <h4 className='text-center'>Renter shipment page</h4>
+            <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+            <h3 className='text-center'>Shipment Review</h3>
+            <p className='text-center'>(Order Id: {order.quote_id})</p>
             <hr />
             <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <br />
                 <div className="row">
                     <div className="col">
                         <p><span style={{ fontWeight: 'bold' }}>Note:</span>&nbsp;<span style={{ color: "red" }}>You can't modify any of the below fields except receipt confirmation</span></p>
                     </div>
                 </div>
 
-                <Table columns={columns} dataSource={shipmentData} pagination={false} loading={loading} />
+                <Table columns={columns} dataSource={shipmentData} pagination={false} loading={loading} locale={{
+                    emptyText: loading ? "Loading data..." : "No shipment records available or status have been updated already",
+                }} />
 
                 <Space style={{ marginTop: 16 }}>
                     <Button type="primary" onClick={handleSave}>

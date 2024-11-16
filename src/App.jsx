@@ -59,7 +59,7 @@ const App = () => {
         {/* With Auth */}
         <Route element={<PrivateRoutes />}>
           <Route path="/*" element={<Layout />}>
-            <Route index element={<Dashboard />} />
+          <Route index element={<Dashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
             <Route path="register-machine" element={<RegistrationMachines />} />
             <Route path="my-registered-machines" element={<MyRegisteredMachines />} />
