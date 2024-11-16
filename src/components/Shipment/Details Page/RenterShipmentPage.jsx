@@ -47,8 +47,8 @@ function RenterShipmentPage() {
             console.log("Renter getShipmentByOrderId: ", response.data);
             if (response && response.data.result.length > 0) {
                 // display only those updated the status 
-                const filteredDataByStatus = response.data;//.result.filter((data) => !data.received_status);
-                setShipmentData(response.data.result);
+                const filteredDataByStatus = response.data;//.result.filter((data) => !data.received_status);                
+                setShipmentData(filteredDataByStatus);
                 setLoading(false);
             } else {
                 setShipmentData([]);
@@ -265,7 +265,9 @@ function RenterShipmentPage() {
                     </div>
                 </div>
 
-                <Table columns={columns} dataSource={shipmentData} pagination={false} loading={loading} />
+                <Table columns={columns} dataSource={shipmentData} pagination={false} loading={loading} locale={{
+                    emptyText: loading ? "Loading data..." : "No shipment records available or status have been updated already",
+                }} />
 
                 <Space style={{ marginTop: 16 }}>
                     <Button type="primary" onClick={handleSave}>
