@@ -610,7 +610,7 @@ function HirerShipmentPage() {
                 </Form>
                 {/* Lists of shipment details */}
                 <>
-                    <ShipmentDetails order_id={order.orderId} />
+                    <ShipmentDetails order_id={order.order_id} />
                 </>
             </div>
         </>
