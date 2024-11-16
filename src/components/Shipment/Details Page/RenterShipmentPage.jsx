@@ -47,7 +47,7 @@ function RenterShipmentPage() {
             console.log("Renter getShipmentByOrderId: ", response.data);
             if (response && response.data.result.length > 0) {
                 // display only those updated the status 
-                const filteredDataByStatus = response.data;//.result.filter((data) => !data.received_status);                
+                const filteredDataByStatus = response.data.result;//.filter((data) => !data.received_status);                
                 setShipmentData(filteredDataByStatus);
                 setLoading(false);
             } else {
