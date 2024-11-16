@@ -112,7 +112,7 @@ function ShipmentDetails({ order_id }) {
     return (
         <>
             <hr />
-            <h6>Lists of shipment details:</h6>
+            <h3>Lists of shipment details:</h3>
             {shipmentData && shipmentData.length > 0 ?
                 <>
                     <Collapse items={collapseItems} />

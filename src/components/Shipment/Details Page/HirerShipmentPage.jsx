@@ -350,11 +350,12 @@ function HirerShipmentPage() {
 
     return (
         <>
-            <h3 className='text-center'>Hirer shipment page</h3>
-            <hr />
+{/*             <h3 className='text-center'>Hirer shipment page</h3>
+            <hr /> */}
             <div className="container">
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h5 className='text-center'>Shipment for (ID: {order.quote_id})</h5>
+                <h3 className='text-center'>Shipment To Renter </h3>
+                <p className='text-center'>(Order Id: {order.quote_id})</p>
                 <hr />
                 <Form
                     name="basic"
@@ -455,7 +456,7 @@ function HirerShipmentPage() {
                                             {fields.map(({ key, name, ...restField }) => {
                                                 return (
                                                     <div className='row' key={key}>
-                                                        <h6>Shipment Details - {name + 1}</h6>
+                                                        <h3>Shipment Details - {name + 1}</h3>
                                                         <div className="col">
                                                             <Form.Item
                                                                 label="Type of Goods"

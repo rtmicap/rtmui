@@ -5,7 +5,7 @@ function Dashboard() {
     return (
         <>
             <div className="container-fluid">
-                <div className="row">
+                <div>
                     <HeaderTitle title={'Dashboard'} />
                 </div>
 

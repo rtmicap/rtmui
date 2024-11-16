@@ -132,7 +132,7 @@ function RenterOrdersDetailPage() {
         <>
             <div className="container">
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                <h6 className='text-center'>Order Details</h6>
+                <h3 className='text-center'>Order Details</h3>
                 <hr />
                 <Descriptions
                     // title="Order Descriptions"

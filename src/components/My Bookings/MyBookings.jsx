@@ -125,7 +125,7 @@ function MyBookings() {
         <>
             <div className="container-fluid">
                 <div className='row'>
-                    <h5 class="card-title">My Bookings</h5>
+                    <h3 class="card-title">My Bookings</h3>
                     <div className="col text-end">
                         <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Bookings</Button>
                     </div>
