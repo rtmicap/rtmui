@@ -1,6 +1,6 @@
 import { Collapse, Table } from 'antd';
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { GET_SHIPMENT_BY_ORDERID_URL } from '../../../api/apiUrls';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
@@ -8,6 +8,9 @@ import { formattedDateTime } from '../../../utils/utils';
 function ShipmentDetails({ order_id }) {
     // shipment data
     const [shipmentData, setShipmentData] = useState([]);
+    const location = useLocation();
+    const { order } = location.state || {};
+    console.log("order: ", order);
 
     const getShipmentByOrderId = async () => {
         try {
@@ -78,8 +81,8 @@ function ShipmentDetails({ order_id }) {
         {
             title: 'New Order Quantity',
             key: 'new_order_quantity',
-            dataIndex: 'new_order_quantity',
-            render: (text) => <>{text ? text : '-'}</>,
+            // dataIndex: 'new_order_quantity',
+            render: (_, value) => <>{value.received_status == "received_short" ? order.new_order_quantity : '-'}</>,
         },
     ];
 
