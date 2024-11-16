@@ -47,7 +47,7 @@ function RenterShipmentPage() {
             console.log("Renter getShipmentByOrderId: ", response.data);
             if (response && response.data.result.length > 0) {
                 // display only those updated the status 
-                const filteredDataByStatus = response.data.result.filter((data) => !data.received_status);
+                const filteredDataByStatus = response.data;//.result.filter((data) => !data.received_status);
                 setShipmentData(response.data.result);
                 setLoading(false);
             } else {
@@ -205,6 +205,8 @@ function RenterShipmentPage() {
             dataIndex: 'received_status',
             key: 'received_status',
             render: (received_status, record) => (
+                !received_status?
+                <div>
                 <Select
                     name={'received_status'}
                     // value={received_status || null}  // Set current value for controlled component
@@ -213,7 +215,10 @@ function RenterShipmentPage() {
                     placeholder={'Select status'}
                     style={{ width: 150 }}
                 />
+                </div>:
+                <div>{received_status.toUpperCase()}</div>
             ),
+            
         },
     ];
 
