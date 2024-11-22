@@ -90,11 +90,29 @@ function RenterShipmentPage() {
                             <div className="col">
                                 <b>Order Quantity:</b>  {order.quantity}
                             </div>
-                        </div><br />
-                        <div className="row">
                             <div className="col">
                                 <b>Shipment Quantity:</b> {record.quantity}
                             </div>
+                        </div><br />
+
+                        <div className="row">
+                            <div className="col">
+                                <label htmlFor=""><b>Enter Received quantity</b></label>
+                                <InputNumber
+                                    placeholder="Enter Received Quantity"
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    required
+                                    name={'received_quantity'}
+                                    onChange={(value) => {
+                                        record.received_quantity = value;
+                                    }}
+                                />
+                            </div>
+                        </div><br />
+
+                        <div className="row">
                             <div className="col">
                                 <label htmlFor=""><b>Enter new order quantity</b></label>
                                 <InputNumber
@@ -104,7 +122,6 @@ function RenterShipmentPage() {
                                     }}
                                     required
                                     name={'new_order_quantity'}
-                                    // prefix="Enter New Order Quantity"
                                     onChange={(value) => {
                                         record.new_order_quantity = value;
                                     }}
@@ -118,14 +135,18 @@ function RenterShipmentPage() {
                 width: "60%", // Adjust width to 60% of the viewport
                 centered: true, // Center modal horizontally
                 onOk: () => {
-                    if (record.new_order_quantity) {
-                        if (record.new_order_quantity > order.quantity) {
-                            message.error(`New order quantity should not more than ${order.quantity}.`);
+                    if (record.received_quantity) {
+                        if (record.new_order_quantity) {
+                            if (record.new_order_quantity > order.quantity) {
+                                message.error(`New order quantity should not more than ${order.quantity}.`);
+                            } else {
+                                updateShipment(record, newStatus);
+                            }
                         } else {
-                            updateShipment(record, newStatus);
+                            message.error("Please enter a valid quantity.");
                         }
                     } else {
-                        message.error("Please enter a valid quantity.");
+                        message.error(`Update Received quantity!`);
                     }
                 },
             });
@@ -146,7 +167,7 @@ function RenterShipmentPage() {
         // console.log("updatedShipments: ", shipmentData)
         const updatedShipments = shipmentData.map((shipment) =>
             shipment.shipment_id === record.shipment_id
-                ? { ...shipment, received_quantity: record.quantity, received_status: newStatus, typeofgoods: shipment.type_of_goods }
+                ? { ...shipment, received_status: newStatus, typeofgoods: shipment.type_of_goods }
                 : shipment
         );
 
@@ -205,20 +226,20 @@ function RenterShipmentPage() {
             dataIndex: 'received_status',
             key: 'received_status',
             render: (received_status, record) => (
-                !received_status?
-                <div>
-                <Select
-                    name={'received_status'}
-                    // value={received_status || null}  // Set current value for controlled component
-                    onChange={(value) => handleSaveChanges(record, value)}
-                    options={receiptConfirmation}
-                    placeholder={'Select status'}
-                    style={{ width: 150 }}
-                />
-                </div>:
-                <div>{received_status.toUpperCase()}</div>
+                !received_status ?
+                    <div>
+                        <Select
+                            name={'received_status'}
+                            // value={received_status || null}  // Set current value for controlled component
+                            onChange={(value) => handleSaveChanges(record, value)}
+                            options={receiptConfirmation}
+                            placeholder={'Select status'}
+                            style={{ width: 150 }}
+                        />
+                    </div> :
+                    <div>{received_status.toUpperCase()}</div>
             ),
-            
+
         },
     ];
 
