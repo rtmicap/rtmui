@@ -24,10 +24,7 @@ function FinalReportsDetails({ order_id }) {
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
-           if (response.data.results.length==0){
-                
-            }
-            else{
+           if (response.data.results.length!=0){
               message.error("Error while fetching final report!");
             }
         }
