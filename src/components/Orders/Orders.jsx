@@ -7,7 +7,7 @@ import { GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReloadOutlined } from "@ant-design/icons";
-import "./orders.scss";
+
 
 function Orders() {
 
