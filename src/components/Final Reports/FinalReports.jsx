@@ -11,7 +11,7 @@ import moment from 'moment/moment';
 import { formattedDateTime } from '../../utils/utils';
 import HirerFinalReports from './HirerFinalReports';
 import RenterFinalReports from './RenterFinalReports';
-import './finalReport.scss'
+
 const { TextArea } = Input;
 
 function FinalReports() {

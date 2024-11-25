@@ -10,7 +10,7 @@ import { formattedDateTime,firstChrUpperCase } from '../../utils/utils';
 import moment from 'moment/moment';
 import HirerSampleReports from './HirerSampleReports';
 import RenterSampleReports from './RenterSampleReports';
-import "./sampleReports.scss"
+
 
 function SampleReports() {
     const location = useLocation();

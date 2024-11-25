@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { GET_SHIPMENT_BY_ORDERID_URL } from '../../../api/apiUrls';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
-import './shipmentDetails.scss';
+
 
 function ShipmentDetails({ order_id }) {
     // shipment data
