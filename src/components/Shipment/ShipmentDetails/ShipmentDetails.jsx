@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { GET_SHIPMENT_BY_ORDERID_URL } from '../../../api/apiUrls';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
+import './shipmentDetails.scss';
 
 function ShipmentDetails({ order_id }) {
     // shipment data
@@ -46,20 +47,20 @@ function ShipmentDetails({ order_id }) {
             key: 'type_of_goods',
         },
         {
+            title: 'Qty',
+            key: 'quantity',
+            dataIndex: 'quantity',
+        },
+        {
             title: 'UOM',
             key: 'UOM',
             dataIndex: 'UOM',
         },
         {
-            title: 'Quantity',
-            key: 'quantity',
-            dataIndex: 'quantity',
-        },
-        {
             title: 'Invoice Report',
             key: 'invoice',
             dataIndex: 'invoice',
-            render: (inv) => <><Link target={'_blank'} to={inv}>View Invoice Report</Link></>,
+            render: (inv) => <><Link target={'_blank'} to={inv}>View</Link></>,
         },
         {
             title: 'Shipment Date/Time',
@@ -71,15 +72,16 @@ function ShipmentDetails({ order_id }) {
             title: 'Received Status',
             dataIndex: 'received_status',
             key: 'received_status',
+            render: (text) => <>{text ? text : '-'}</>,
         },
         {
-            title: 'Received Quantity',
+            title: 'Received Qty',
             key: 'received_quantity',
             dataIndex: 'received_quantity',
             render: (text) => <>{text ? text : '-'}</>,
         },
         {
-            title: 'New Order Quantity',
+            title: 'New Order Qty',
             key: 'new_order_quantity',
             // dataIndex: 'new_order_quantity',
             render: (_, value) => <>{value.received_status == "received_short" ? order.new_order_quantity : '-'}</>
@@ -107,7 +109,7 @@ function ShipmentDetails({ order_id }) {
             //     </div>
             // </div>
             <>
-                <Table columns={columns} dataSource={shipmentData} pagination={false} />
+                <Table className="tableSectionScroll" columns={columns} dataSource={shipmentData} pagination={false} />
             </>
         ),
     }];

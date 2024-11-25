@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { GET_FIRST_SAMPLE_REPORT_ORDERID_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
-import { formattedDateTime } from '../../utils/utils';
+import { firstChrUpperCase, formattedDateTime } from '../../utils/utils';
 
 function SampleReportsDetails({ order_id }) {
     const [sampleReportData, setSampleReportData] = useState([]);
@@ -31,14 +31,14 @@ function SampleReportsDetails({ order_id }) {
     useEffect(() => {
         getSampleReportsByOrderId();
     }, []);
-
+    var qty ='first_sample_quantity' + 'UOM';
     const columns = [
-        {
-            title: 'Sample Report ID',
+       /*  {
+            title: 'ID',
             dataIndex: 'id',
             key: 'id',
             //   render: (text) => <a>{text}</a>,
-        },
+        }, */
         {
             title: 'Part Number',
             dataIndex: 'part_number',
@@ -50,35 +50,36 @@ function SampleReportsDetails({ order_id }) {
             key: 'part_name',
         },
         {
-            title: 'UOM',
-            key: 'UOM',
-            dataIndex: 'UOM',
-        },
-        {
-            title: 'First Sample Quantity',
+            title: 'Sample Qty',
             key: 'first_sample_quantity',
             dataIndex: 'first_sample_quantity',
         },
         {
-            title: 'First Sample Inspection Report',
-            key: 'first_sample_inspection_report',
-            dataIndex: 'first_sample_inspection_report',
-            render: (inv) => <><Link target={'_blank'} to={inv}>View Sample Inspection Report</Link></>,
+            title: 'UOM',
+            key: 'UOM',
+            dataIndex: 'UOM',
+            render: (uom) => <>{firstChrUpperCase(uom)}</>,
         },
         {
-            title: 'Inspection Date/Time',
+            title: 'Inspection Report',
+            key: 'first_sample_inspection_report',
+            dataIndex: 'first_sample_inspection_report',
+            render: (inv) => <><Link target={'_blank'} to={inv}>View</Link></>,
+        },
+        {
+            title: 'Date/Time',
             key: 'inspection_date_time',
             dataIndex: 'inspection_date_time',
             render: (date) => <>{formattedDateTime(date)}</>,
         },
         {
-            title: 'First Sample Disposition',
+            title: 'Disposition',
             key: 'first_sample_disposition',
             dataIndex: 'first_sample_disposition',
             render: (text) => <>{text ? text.toUpperCase() : '-'}</>,
         },
         {
-            title: 'First Sample Remarks',
+            title: 'Remarks',
             key: 'first_sample_remarks',
             dataIndex: 'first_sample_remarks',
             render: (text) => <>{text ? text : '-'}</>,
@@ -88,7 +89,7 @@ function SampleReportsDetails({ order_id }) {
     const collapseItems = [
         {
             key: '1',
-            label: `Sample Reports`,
+            label: `First Sample Reports`,
             children: (
                 <>
                     <Table columns={columns} dataSource={sampleReportData} pagination={false} loading={loading} />

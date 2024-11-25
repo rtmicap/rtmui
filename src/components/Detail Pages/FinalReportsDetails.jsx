@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { GET_FINAL_SAMPLE_REPORT_ORDERID_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
-import { formattedDateTime } from '../../utils/utils';
+import { firstChrUpperCase,formattedDateTime } from '../../utils/utils';
 
 function FinalReportsDetails({ order_id }) {
     const [finalReportData, setFinalReportData] = useState([]);
@@ -24,21 +24,26 @@ function FinalReportsDetails({ order_id }) {
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
-            message.error("Error while fetching final report!");
+           if (response.data.results.length==0){
+                
+            }
+            else{
+              message.error("Error while fetching final report!");
+            }
         }
     }
 
     useEffect(() => {
         getFinalReportsByOrderId();
     }, []);
-
+    let qtyUom="";
     const columns = [
-        {
+        /* {
             title: 'Sample Report ID',
             dataIndex: 'id',
             key: 'id',
             //   render: (text) => <a>{text}</a>,
-        },
+        }, */
         {
             title: 'Part Number',
             dataIndex: 'part_number',
@@ -50,44 +55,44 @@ function FinalReportsDetails({ order_id }) {
             key: 'part_name',
         },
         {
+            title: 'Approved Qty',
+            key: 'final_product_approved_quantity',
+            dataIndex: 'final_product_approved_quantity',
+        },
+        {
             title: 'UOM',
             key: 'UOM',
             dataIndex: 'UOM',
         },
         {
-            title: 'Final Product Approved Quantity',
-            key: 'final_product_approved_quantity',
-            dataIndex: 'final_product_approved_quantity',
-        },
-        {
-            title: 'Final Inspection Report',
+            title: 'Inspection Report',
             key: 'final_inspection_report',
             dataIndex: 'final_inspection_report',
-            render: (inv) => <><Link target={'_blank'} to={inv}>View Final Inspection Report</Link></>,
+            render: (inv) => <><Link target={'_blank'} to={inv}>View</Link></>,
         },
         {
-            title: 'Final Completion Date/Time',
+            title: 'Completion Date/Time',
             key: 'final_completion_date_time',
             dataIndex: 'final_completion_date_time',
             render: (date) => <>{formattedDateTime(date)}</>,
         },
         {
-            title: 'Final Product Disposition',
+            title: 'Product Disposition',
             key: 'final_product_disposition',
             dataIndex: 'final_product_disposition',
             render: (text) => <>{text ? text.toUpperCase() : '-'}</>,
         },
         {
-            title: 'Final Completion Remarks',
+            title: 'Remarks',
             key: 'final_completion_remarks',
             dataIndex: 'final_completion_remarks',
             render: (text) => <>{text ? text : '-'}</>,
         },
         {
-            title: 'Final Goods Planned Pickup Date/Time',
+            title: 'Goods Pickup Date/Time',
             key: 'final_goods_planned_pickup_date_time',
             dataIndex: 'final_goods_planned_pickup_date_time',
-            render: (date) => <>{formattedDateTime(date)}</>,
+            render: (date) => <>{formattedDateTime(date)=="Invalid date"?"Not Available":formattedDateTime(date)}</>,
         },
     ];
 
@@ -97,7 +102,7 @@ function FinalReportsDetails({ order_id }) {
             label: `Final Reports`,
             children: (
                 <>
-                    <Table columns={columns} dataSource={finalReportData} pagination={false} loading={loading} />
+                    <Table className="tableSectionScroll" columns={columns} dataSource={finalReportData} pagination={false} loading={loading} />
                 </>
             ),
         }
@@ -106,10 +111,10 @@ function FinalReportsDetails({ order_id }) {
     return (
         <>
             <>
-                <h3>Lists of Final Report details:</h3>
+                
                 {finalReportData && finalReportData.length > 0
                     ? <Collapse items={collapseItems} />
-                    : <h5 className='text-center'>Final report not generated</h5>
+                    : ""
                 }
             </>
         </>

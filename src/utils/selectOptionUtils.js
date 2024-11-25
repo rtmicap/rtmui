@@ -31,7 +31,7 @@ export const receiptConfirmation = [
 export const finalProductStatus = [
     { value: 'pending_approval', label: 'Pending Approval' },
     { value: 'approved', label: 'Approved' },
-    { value: 'rework', label: 'Reword' },
+    { value: 'rework', label: 'Rework' },
     { value: 'rejected', label: 'Rejected' }
 ];
 

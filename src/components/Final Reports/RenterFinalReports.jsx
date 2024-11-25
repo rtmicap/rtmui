@@ -37,7 +37,13 @@ function RenterFinalReports() {
             }
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
-            message.error("Error while fetching final report!");
+            setLoading(false);
+            if (response.data.results.length==0){
+                
+            }
+            else{
+              message.error("Error while fetching final report!");
+            }
         }
     }
 
@@ -278,10 +284,10 @@ function RenterFinalReports() {
 
                         <div className="row">
                             <div className="col text-center">
-                                <Button type='primary' htmlType="submit">Send Order Completion Report</Button>
+                                <Button type='primary' htmlType="submit" disabled={fileFinalReportLoading?true:false}>Send Order Completion Report</Button>
                             </div>
                         </div>
-
+                        <hr/>
                         {/* Lists of Final Reports details */}
                         <FinalReportsDetails order_id={order.order_id} />
                     </div>

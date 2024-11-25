@@ -1,3 +1,4 @@
+@import "../../app.scss";
 .dateLabel{
     font-weight: bold;
 }
@@ -9,7 +10,4 @@
 }
 .quoteAction{
     min-width:135px;
-}
-.tableSection{
-    overflow:auto;
 }
