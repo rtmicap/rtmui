@@ -7,6 +7,7 @@ import { GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReloadOutlined } from "@ant-design/icons";
+import "./orders.scss";
 
 function Orders() {
 
@@ -106,6 +107,7 @@ function Orders() {
       label: 'Customer Orders',
       children: (
         <Table
+          className="tableSectionScroll"
           dataSource={customerOrders}
           columns={columns}
           rowKey="order_id"
@@ -132,6 +134,7 @@ function Orders() {
           return (
             <Collapse.Panel header={`${category} - ${type}`} key={`${groupKey}-${index}`}>
               <Table
+                className="tableSectionScroll"
                 dataSource={groupedOrders[groupKey]}
                 columns={columns}
                 rowKey={(record) => `${record.order_id}-${groupKey}`}

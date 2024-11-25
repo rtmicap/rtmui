@@ -560,7 +560,6 @@ function HirerShipmentPage() {
                                                                         <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
                                                                     </Upload>
                                                                 </Form.Item>
-
                                                             </div>
                                                             }
 
@@ -601,11 +600,13 @@ function HirerShipmentPage() {
                     {/* Submit Buttons */}
                     <div className="row">
                         <div className="col">
+                        
                             <Form.Item>
-                                <Button type="primary" htmlType="submit">
+                                <Button type="primary" htmlType="submit" disabled={(!invoiceFile || imageFileIsLoading)?true:false} >
                                     Submit
                                 </Button>
                             </Form.Item>
+                        
                         </div>
                     </div>
                 </Form>

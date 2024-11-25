@@ -60,7 +60,10 @@ function HirerFinalReports() {
             }
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
-            message.error("Error while fetching final report!");
+            setLoading(false);
+            if (response.data.results.length!=0){
+                message.error("Error while fetching final report!");
+              }
         }
     }
 
@@ -254,7 +257,7 @@ function HirerFinalReports() {
                                 <Form.Item label="Prod Lot Inspection Report" name={'prod_lot_inspection_report'}>
                                     <Flex gap="small" wrap>
                                         {form.getFieldValue('prod_lot_inspection_report') ?
-                                            <Link to={form.getFieldValue('prod_lot_inspection_report')} target={'_blank'}>View prod file</Link>
+                                            <Link to={form.getFieldValue('prod_lot_inspection_report')} target={'_blank'}>View</Link>
                                             : <p style={{ color: 'red' }}>File not updated</p>}
                                     </Flex>
                                 </Form.Item>

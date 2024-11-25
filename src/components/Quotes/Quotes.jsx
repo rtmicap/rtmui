@@ -310,7 +310,7 @@ function Quotes() {
         <Collapse accordion className="accordianSection">
             {Object.keys(groupedQuotes).map((key) => (
                 <Collapse.Panel header={key} key={key}>
-                    <Table className="tableSection"
+                    <Table className="tableSectionScroll"
                         columns={columns}
                         dataSource={groupedQuotes[key]}
                         rowKey="quote_id"

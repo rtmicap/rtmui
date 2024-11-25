@@ -254,14 +254,13 @@ function RenterSampleReports() {
                         </div>
                         <div className="row">
                             <div className="col">
-                                <Button type='primary' htmlType="submit">Share FSIR to Hirer</Button>
+                                <Button type='primary' htmlType="submit" disabled={fileReportLoading?true:false}>Share FSIR to Hirer</Button>
                             </div>
                         </div>
                     </div>
                 </Form>
-                <hr />
                 {/* Lists of Sample Reports details */}
-                <SampleReportsDetails order_id={order.order_id} />
+                {/* {<SampleReportsDetails order_id={order.order_id} />} */}
             </div>
         </>
     )
