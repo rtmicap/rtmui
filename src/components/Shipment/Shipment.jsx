@@ -27,6 +27,7 @@ import moment from 'moment/moment';
 import HirerShipmentPage from './Details Page/HirerShipmentPage';
 import RenterShipmentPage from './Details Page/RenterShipmentPage';
 
+
 function Shipment() {
     const location = useLocation();
     const { authUser } = useAuth();

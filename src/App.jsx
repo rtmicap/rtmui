@@ -42,6 +42,7 @@ import OrderDetailPage from './components/Orders/Order Detail Page/OrderDetailPa
 import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
+import './App.scss';
 
 const App = () => {
   // const {

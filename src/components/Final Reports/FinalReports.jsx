@@ -11,6 +11,7 @@ import moment from 'moment/moment';
 import { formattedDateTime } from '../../utils/utils';
 import HirerFinalReports from './HirerFinalReports';
 import RenterFinalReports from './RenterFinalReports';
+
 const { TextArea } = Input;
 
 function FinalReports() {
@@ -64,7 +65,10 @@ function FinalReports() {
             }
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
-            message.error("Error while fetching final report!");
+            setLoading(false);
+            if (response.data.results.length!=0){
+                message.error("Error while fetching final report!");
+              }
         }
     }
 

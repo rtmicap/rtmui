@@ -6,10 +6,11 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import { useState, useEffect } from 'react';
 import { GET_FIRST_SAMPLE_REPORT_ORDERID_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
-import { formattedDateTime } from '../../utils/utils';
+import { formattedDateTime,firstChrUpperCase } from '../../utils/utils';
 import moment from 'moment/moment';
 import HirerSampleReports from './HirerSampleReports';
 import RenterSampleReports from './RenterSampleReports';
+
 
 function SampleReports() {
     const location = useLocation();
@@ -42,12 +43,12 @@ function SampleReports() {
         key: item.id,
         label: `Part Number: ${item.part_number} (${item.part_name})`,
         children: (
-            <div className='row'>
+            <div className='row tableSectionScroll'>
                 <div className="col">
                     <p><strong>Quantity:</strong> {item.first_sample_quantity}</p>
-                    <p><strong>UOM:</strong> {item.UOM}</p>
+                    <p><strong>UOM:</strong> {firstChrUpperCase(item.UOM)}</p>
                     <p><strong>Inspection Date:</strong> {formattedDateTime(item.inspection_date_time)}</p>
-                    <p><strong>Disposition:</strong> {item.first_sample_disposition}</p>
+                    <p><strong>Disposition:</strong> {firstChrUpperCase(item.first_sample_disposition)}</p>
                     <p><strong>Report:</strong> <a href={item.first_sample_inspection_report} target="_blank" rel="noopener noreferrer">View Report</a></p>
                     {item.first_sample_remarks && (
                         <p><strong>Remarks:</strong> {item.first_sample_remarks}</p>
@@ -74,7 +75,7 @@ function SampleReports() {
                     <>
                         <hr />
                         <h6>Lists of updated sample reports:</h6>
-                        <Collapse items={collapseItems} />
+                       { <Collapse items={collapseItems} />}
                     </>
                 }
             </div>
