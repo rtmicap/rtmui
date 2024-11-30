@@ -8,6 +8,8 @@ import axios from '../../api/axios';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { uomChoices } from '../../utils/selectOptionUtils';
 import SampleReportsDetails from '../Detail Pages/SampleReportsDetails';
+import FileUploadComponent from '../FileUploadComponent/FileUploadComponent';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
 
 function RenterSampleReports() {
     const location = useLocation();
@@ -47,46 +49,19 @@ function RenterSampleReports() {
         });
     };
 
-    const fileUpload = async (file) => {
+    const handleFileUpload = async (file, name) => {
+        setFileReportLoading(true);
         try {
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            };
-            const formData = new FormData();
-            formData.append("fileName", file.originFileObj);
-            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            return response.data;
-        } catch (error) {
-            return error;
+            const fileUrl = await uploadFileToServer(file, name);
+            console.log('Uploaded file URL:', fileUrl);
+            setViewInspectionReportFile(fileUrl);
+            return fileUrl;
+        } finally {
+            setFileReportLoading(false);
         }
-    }
+    };
 
-    const handleInspectionReportFileChange = async (info) => {
-        let fileList = [...info.fileList];
-        // Limit to only one file
-        fileList = fileList.slice(-1);
-        // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
-        // Display an error message if more than one file is uploaded
-        if (fileList.length > 1) {
-            message.error('You can only upload one file');
-        } else {
-            setInspectionReportFileList(fileList);
-            if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
-                setFileReportLoading(true);
-                // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
-                // console.log("fileRes: ", fileRes);
-                message.success("Inspection Report File Uploaded!")
-                setViewInspectionReportFile(fileRes.fileUrl);
-                setFileReportLoading(false);
-            } else {
-                message.error('File size must less than 3 MB');
-            }
-        }
-    }
-
-    const handleInspectionReportRemove = () => {
-        setInspectionReportFileList([]);
+    const handleRemoveFile = () => {
         setViewInspectionReportFile('');
         form.setFieldsValue({
             first_sample_inspection_report: '',  // Reset the specific field by setting it to an empty string
@@ -101,6 +76,7 @@ function RenterSampleReports() {
     const onOk = (value) => {
         console.log('onOk: ', value);
     };
+
 
     return (
         <>
@@ -119,7 +95,7 @@ function RenterSampleReports() {
                                     name={'orderid'}
                                 >
                                     <Tooltip title={`Order ID is ${order.order_id}. You can't modify.`}>
-                                    <div>{order.quote_id} </div>
+                                        <div>{order.quote_id} </div>
                                     </Tooltip>
                                 </Form.Item>
                             </div>
@@ -223,8 +199,8 @@ function RenterSampleReports() {
 
                         <div className="row">
                             <div className="col">
-                                <Form.Item label="Attach Inspection Report (Max: 3 MB Size)" required name={'first_sample_inspection_report'} tooltip={{
-                                    title: 'This is a required field'
+                                <Form.Item label="Attach Inspection Report" required name={'first_sample_inspection_report'} tooltip={{
+                                    title: 'File size should be maximum 3 MB'
                                 }}
                                     rules={[
                                         {
@@ -233,8 +209,8 @@ function RenterSampleReports() {
                                         },
                                     ]}
                                 >
-                                    <Flex gap="small" wrap>
-                                        <Upload
+                                    <Flex gap="large" wrap>
+                                        {/* <Upload
                                             fileList={inspectionReportFileList}
                                             onChange={handleInspectionReportFileChange}
                                             maxCount={1}
@@ -246,6 +222,19 @@ function RenterSampleReports() {
                                         </Upload>
                                         {viewInspectionReportFile &&
                                             <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
+                                        } */}
+
+                                        <FileUploadComponent
+                                            name="first_sample_inspection_report"
+                                            accept=".pdf,.csv"
+                                            buttonText="Attach Inspection Report"
+                                            loading={fileReportLoading}
+                                            onFileUpload={handleFileUpload}
+                                            handleRemoveFile={handleRemoveFile}
+                                        />
+
+                                        {viewInspectionReportFile &&
+                                            <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
                                         }
                                     </Flex>
                                 </Form.Item>
@@ -254,7 +243,7 @@ function RenterSampleReports() {
                         </div>
                         <div className="row">
                             <div className="col">
-                                <Button type='primary' htmlType="submit" disabled={fileReportLoading?true:false}>Share FSIR to Hirer</Button>
+                                <Button type='primary' htmlType="submit" disabled={fileReportLoading ? true : false}>Share FSIR to Hirer</Button>
                             </div>
                         </div>
                     </div>
