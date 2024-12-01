@@ -52,6 +52,7 @@ function HirerShipmentPage() {
 
     const [imageFileIsLoading, setImageFileIsLoading] = useState({});
     const [fileIsLoading, setFileIsLoading] = useState(false);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
     // if (!order) {
     //     return <div>No order data found!</div>;
@@ -175,6 +176,7 @@ function HirerShipmentPage() {
         try {
             // setImageFileIsLoading(true);
             setImageFileIsLoading((prev) => ({ ...prev, [key]: true })); // Set loading for the specific key
+            setIsSubmitDisabled(true); // submit button disabled
             // const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
             const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png'].includes(info.fileList[0].type);
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
@@ -184,11 +186,13 @@ function HirerShipmentPage() {
                 message.warning('You can only upload JPEG, JPG, PNG files!');
                 console.warn('You can only upload JPEG, JPG, PNG files!');
                 setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
             } else if (!isLt2M) {
                 // Show error message for files larger than 2MB
                 message.warning('File must be smaller than 2MB!');
                 console.warn('File must be smaller than 2MB!');
                 setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
             } else {
                 const fileUrl = await uploadImageFileToServer(info.fileList[0].originFileObj, key);
                 setFileUrls((prev) => ({
@@ -196,12 +200,14 @@ function HirerShipmentPage() {
                     [key]: fileUrl,
                 }));
                 setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
                 message.success(`Image File Uploaded!`);
             }
         } catch (error) {
             console.error('File upload error:', error);
             message.error('File upload failed. Please try again.');
             setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+            setIsSubmitDisabled(false);
         }
     };
 
@@ -581,7 +587,7 @@ function HirerShipmentPage() {
                         <div className="col">
 
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" disabled={!invoiceFile ? true : false} >
+                                <Button type="primary" htmlType="submit" disabled={(!invoiceFile || isSubmitDisabled) ? true : false} >
                                     Submit
                                 </Button>
                             </Form.Item>
