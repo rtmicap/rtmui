@@ -9,6 +9,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { uomChoices } from '../../utils/selectOptionUtils';
 import FinalReportsDetails from '../Detail Pages/FinalReportsDetails';
+import FileUploadComponent from '../FileUploadComponent/FileUploadComponent';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
 const { TextArea } = Input;
 
 function RenterFinalReports() {
@@ -38,7 +40,7 @@ function RenterFinalReports() {
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
-            if (response.data.results.length!=0){
+            if (response.data.results.length != 0) {
                 message.error("Error while fetching final report!");
             }
         }
@@ -81,59 +83,28 @@ function RenterFinalReports() {
         console.log('onOk: ', value);
     };
 
-    const fileUpload = async (file) => {
-        try {
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            };
-            const formData = new FormData();
-            formData.append("fileName", file.originFileObj);
-            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            return response.data;
-        } catch (error) {
-            return error;
-        }
-    }
-
-    const handleProdLotInspectionReportFileChange = async (info) => {
-        try {
-            let fileList = [...info.fileList];
-            // Limit to only one file
-            fileList = fileList.slice(-1);
-            // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
-            // Display an error message if more than one file is uploaded
-            if (fileList.length > 1) {
-                message.error('You can only upload one file');
-            } else {
-                setProdInspectionReportFileList(fileList);
-                if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
-                    setFileFinalReportLoading(true);
-                    // update file upload api
-                    const fileRes = await fileUpload(fileList[0]);
-                    // console.log("fileRes: ", fileRes);
-                    message.success("Final Inspection Report File Uploaded!")
-                    setViewProdLotInspectionReportFile(fileRes.fileUrl);
-                    setFileFinalReportLoading(false);
-                } else {
-                    message.error('File size must less than 3 MB');
-                }
-            }
-        } catch (error) {
-            message.error('Error while uploading the file!');
-        }
-    }
-
-    const handleProdLotInspectionReportRemove = () => {
-        setProdInspectionReportFileList([]);
-        setViewProdLotInspectionReportFile('');
-        form.setFieldValue({
-            prod_lot_inspection_report: '' // empty the file list
-        });
-    };
-
     const disabledDate = (current) => {
         // Can not select days before today and today
         return current && current < dayjs().startOf('day');
+    };
+
+    const handleFileUpload = async (file, name) => {
+        setFileFinalReportLoading(true);
+        try {
+            const fileUrl = await uploadFileToServer(file, name);
+            console.log('Uploaded file URL:', fileUrl);
+            setViewProdLotInspectionReportFile(fileUrl);
+            return fileUrl;
+        } finally {
+            setFileFinalReportLoading(false);
+        }
+    };
+
+    const handleRemoveFile = () => {
+        setViewProdLotInspectionReportFile('');
+        form.setFieldsValue({
+            prod_lot_inspection_report: '' // empty the file list
+        });
     };
 
     return (
@@ -156,7 +127,7 @@ function RenterFinalReports() {
                                     name={'orderid'}
                                 >
                                     <Tooltip title={`Cannot change Order ID.`}>
-                                    <div>{order.quote_id} </div>
+                                        <div>{order.quote_id} </div>
                                         {/* <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly /> */}
                                     </Tooltip>
                                 </Form.Item>
@@ -250,8 +221,8 @@ function RenterFinalReports() {
 
                         <div className="row">
                             <div className="col">
-                                <Form.Item label="Prod Lot Inspection Report (Max: 3 MB Size)" required name={'prod_lot_inspection_report'} tooltip={{
-                                    title: 'This is a required field'
+                                <Form.Item label="Prod Lot Inspection Report" required name={'prod_lot_inspection_report'} tooltip={{
+                                    title: 'File size should be maximum 3 MB'
                                 }}
                                     rules={[
                                         {
@@ -260,8 +231,8 @@ function RenterFinalReports() {
                                         },
                                     ]}
                                 >
-                                    <Flex gap="small" wrap>
-                                        <Upload
+                                    <Flex gap="large" wrap>
+                                        {/* <Upload
                                             fileList={prodInspectionReportFileList}
                                             onChange={handleProdLotInspectionReportFileChange}
                                             maxCount={1}
@@ -270,7 +241,15 @@ function RenterFinalReports() {
                                             accept=".pdf,.csv"
                                         >
                                             <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
-                                        </Upload>
+                                        </Upload> */}
+
+                                        <FileUploadComponent
+                                            accept=".pdf,.csv"
+                                            buttonText="Attach Final Report"
+                                            loading={fileFinalReportLoading}
+                                            onFileUpload={handleFileUpload}
+                                            handleRemoveFile={handleRemoveFile}
+                                        />
                                         {viewProdLotInspectionReportFile &&
                                             <Link to={viewProdLotInspectionReportFile} target={'_blank'}>View File</Link>
                                         }
@@ -281,10 +260,10 @@ function RenterFinalReports() {
 
                         <div className="row">
                             <div className="col text-center">
-                                <Button type='primary' htmlType="submit" disabled={fileFinalReportLoading?true:false}>Send Order Completion Report</Button>
+                                <Button type='primary' htmlType="submit" disabled={fileFinalReportLoading ? true : false}>Send Order Completion Report</Button>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         {/* Lists of Final Reports details */}
                         <FinalReportsDetails order_id={order.order_id} />
                     </div>

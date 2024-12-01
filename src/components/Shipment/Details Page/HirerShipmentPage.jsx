@@ -26,6 +26,8 @@ import { formattedDateTime } from '../../../utils/utils';
 import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
 import { typesOfGoods, uomChoices } from '../../../utils/selectOptionUtils';
 import ShipmentDetails from '../ShipmentDetails/ShipmentDetails';
+import uploadFileToServer from '../../FileUploadComponent/uploadFileToServer';
+import FileUploadComponent from '../../FileUploadComponent/FileUploadComponent';
 
 function HirerShipmentPage() {
     const location = useLocation();
@@ -48,8 +50,9 @@ function HirerShipmentPage() {
     // shipment data
     const [shipmentData, setShipmentData] = useState([]);
 
-    const [imageFileIsLoading, setImageFileIsLoading] = useState(false);
+    const [imageFileIsLoading, setImageFileIsLoading] = useState({});
     const [fileIsLoading, setFileIsLoading] = useState(false);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
     // if (!order) {
     //     return <div>No order data found!</div>;
@@ -145,8 +148,8 @@ function HirerShipmentPage() {
         console.log('onOk: ', value);
     };
 
-    // File Upload API
-    const uploadFileToServer = async (file, name) => {
+    // Image File Upload API
+    const uploadImageFileToServer = async (file, name) => {
         const formData = new FormData();
         formData.append('fileName', file);
         try {
@@ -160,7 +163,6 @@ function HirerShipmentPage() {
                 ...prev,
                 [name]: response.data.fileUrl,
             }));
-
             return response.data.fileUrl;
         } catch (error) {
             console.error("Error uploading file: ", error);
@@ -169,42 +171,12 @@ function HirerShipmentPage() {
         }
     };
 
-    const handleInvoiceChange = async (info, name) => {
+    const handleImageChange = async (info, key) => {
         console.log("handleInvoiceChange: ", info);
         try {
-            setInvoiceFileLoading(true);
-            const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj);
-            const isPdf = info.fileList[0].type === 'application/pdf';
-            const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
-
-            if (!isPdf) {
-                // Show error message for non-PDF files
-                message.warning('You can only upload PDF file!');
-                console.warn('You can only upload PDF file!');
-                setInvoiceFileLoading(false);
-            } else if (!isLt2M) {
-                // Show error message for files larger than 2MB
-                message.warning('File must be smaller than 2MB!');
-                console.warn('File must be smaller than 2MB!');
-                setInvoiceFileLoading(false);
-            } else {
-                setInvoiceFileList(info.fileList);
-                setInvoiceFile(fileUrl);
-                setInvoiceFileLoading(false);
-                message.success("Invoice File Uploaded!");
-            }
-
-        } catch (error) {
-            console.error('File upload error:', error);
-            message.error('File upload failed. Please try again.');
-            setInvoiceFileLoading(false);
-        }
-    };
-
-    const handleImageChange = async (info, name) => {
-        console.log("handleInvoiceChange: ", info);
-        try {
-            setImageFileIsLoading(true);
+            // setImageFileIsLoading(true);
+            setImageFileIsLoading((prev) => ({ ...prev, [key]: true })); // Set loading for the specific key
+            setIsSubmitDisabled(true); // submit button disabled
             // const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
             const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png'].includes(info.fileList[0].type);
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
@@ -213,25 +185,29 @@ function HirerShipmentPage() {
                 // Show error message for non-PDF files
                 message.warning('You can only upload JPEG, JPG, PNG files!');
                 console.warn('You can only upload JPEG, JPG, PNG files!');
-                setImageFileIsLoading(false);
+                setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
             } else if (!isLt2M) {
                 // Show error message for files larger than 2MB
                 message.warning('File must be smaller than 2MB!');
                 console.warn('File must be smaller than 2MB!');
-                setImageFileIsLoading(false);
+                setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
             } else {
-                const fileUrl = await uploadFileToServer(info.fileList[0].originFileObj, name);
+                const fileUrl = await uploadImageFileToServer(info.fileList[0].originFileObj, key);
                 setFileUrls((prev) => ({
                     ...prev,
-                    [name]: fileUrl,
+                    [key]: fileUrl,
                 }));
-                setImageFileIsLoading(false);
+                setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+                setIsSubmitDisabled(false);
                 message.success(`Image File Uploaded!`);
             }
         } catch (error) {
             console.error('File upload error:', error);
             message.error('File upload failed. Please try again.');
-            setImageFileIsLoading(false);
+            setImageFileIsLoading((prev) => ({ ...prev, [key]: false }));
+            setIsSubmitDisabled(false);
         }
     };
 
@@ -320,7 +296,7 @@ function HirerShipmentPage() {
     };
 
     const handleInvoiceRemove = () => {
-        setInvoiceFileList([]);
+        // setInvoiceFileList([]);
         setInvoiceFile('');
         form.setFieldsValue({
             invoice: '',  // Reset the specific field by setting it to an empty string
@@ -348,9 +324,21 @@ function HirerShipmentPage() {
         ),
     }));
 
+    const handleFileUpload = async (file, name) => {
+        setInvoiceFileLoading(true);
+        try {
+            const fileUrl = await uploadFileToServer(file, name);
+            console.log('Uploaded file URL:', fileUrl);
+            setInvoiceFile(fileUrl);
+            return fileUrl;
+        } finally {
+            setInvoiceFileLoading(false);
+        }
+    };
+
     return (
         <>
-{/*             <h3 className='text-center'>Hirer shipment page</h3>
+            {/*             <h3 className='text-center'>Hirer shipment page</h3>
             <hr /> */}
             <div className="container">
                 <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
@@ -416,24 +404,17 @@ function HirerShipmentPage() {
                                 ]}
                             >
                                 <Flex gap="small" wrap>
-                                    {!invoiceFile && (
-                                        <Upload
-                                            fileList={invoiceFileList}
-                                            onChange={(info) => handleInvoiceChange(info, 'invoice')}
-                                            beforeUpload={() => false}
-                                            accept=".pdf"
-                                            maxCount={1}
-                                        >
-                                            <Button loading={invoiceFileLoading} type={'primary'} icon={<PlusCircleOutlined />}>{invoiceFileLoading ? 'Uploading...' : 'Attach invoice'} </Button>
-                                            <p>Max: 2 MB (Only PDF Format)</p>
-                                        </Upload>
-                                    )}
-
+                                    <FileUploadComponent
+                                        accept=".pdf,.csv"
+                                        buttonText="Attach Invoice"
+                                        loading={invoiceFileLoading}
+                                        onFileUpload={handleFileUpload}
+                                        handleRemoveFile={handleInvoiceRemove}
+                                    />
                                     {invoiceFile && (
                                         <div className='col-auto'>
                                             <div>
                                                 <Link to={invoiceFile} target={'_blank'}>View Invoice File</Link>
-                                                <Button type="link" onClick={handleInvoiceRemove}>Remove</Button>
                                             </div>
                                         </div>
                                     )}
@@ -537,10 +518,14 @@ function HirerShipmentPage() {
                                                                 </Form.Item>
                                                             </div>
 
-                                                            {!fileUrls[name] && <div className="col-auto mt-4">
+                                                            {!fileUrls[name] && <div className="col">
                                                                 <Form.Item
                                                                     {...restField}
                                                                     name={[name, 'image']}
+                                                                    label={'Attach Image File'}
+                                                                    tooltip={{
+                                                                        title: 'Image file size should be maximum 2 MB'
+                                                                    }}
                                                                 >
                                                                     <Upload
                                                                         valuePropName="file"
@@ -550,14 +535,14 @@ function HirerShipmentPage() {
                                                                             }
                                                                             return e && e.file;
                                                                         }}
-                                                                        onChange={(info) => handleImageChange(info, name)}
+                                                                        onChange={(info) => handleImageChange(info, key)}
                                                                         beforeUpload={() => false}
                                                                         accept=".jpg,.jpeg,.png"
                                                                         maxCount={1}
                                                                         showUploadList={false}
                                                                     >
-                                                                        <Button loading={imageFileIsLoading} type={'primary'} icon={<PlusCircleOutlined />}>{imageFileIsLoading ? 'Uploading...' : 'Attach Image'} </Button>
-                                                                        <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p>
+                                                                        <Button loading={imageFileIsLoading[key]} type={'link'} icon={<UploadOutlined />}>{imageFileIsLoading[key] ? 'Uploading...' : 'Attach Image'} </Button>
+                                                                        {/* <p>Max: 2 MB (Accept jpg,jpeg,png Formats)</p> */}
                                                                     </Upload>
                                                                 </Form.Item>
                                                             </div>
@@ -600,13 +585,13 @@ function HirerShipmentPage() {
                     {/* Submit Buttons */}
                     <div className="row">
                         <div className="col">
-                        
+
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" disabled={(!invoiceFile || imageFileIsLoading)?true:false} >
+                                <Button type="primary" htmlType="submit" disabled={(!invoiceFile || isSubmitDisabled) ? true : false} >
                                     Submit
                                 </Button>
                             </Form.Item>
-                        
+
                         </div>
                     </div>
                 </Form>
