@@ -1466,7 +1466,7 @@ const RegistrationAccount = () => {
                                         message: 'Please enter your bank IFSC code (Ex: IDIB000A090 or SBIN0005943)',
                                     },
                                     {
-                                        pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/,
+                                        pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{7}$/,
                                         message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
                                     },
                                 ]}
