@@ -40,21 +40,10 @@ function Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-sm-6 col-lg-3">
-                        Three
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
-                        Three
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
-                        Three
-                    </div>
+                    
                 </div>
                 <div className='row'>
-                    <div className="col-sm-6 col-lg-3">
-                        Two
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
+                      <div className="col-sm-6 col-lg-3">
                         <div className="card border-success mb-3" style={{ maxWidth: '18rem' }}>
                             <div className="card-header">Header</div>
                             <div className="card-body text-success">
