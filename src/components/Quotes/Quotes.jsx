@@ -29,7 +29,7 @@ function Quotes() {
     const [selectedType, setSelectedType] = useState('');
     const [filteredQuotes, setFilteredQuotes] = useState([]); // State for storing filtered quotes
     const [hirerCompany, setHirerCompany] = useState(null);
-
+    const [renterCompany, setRenterCompany] = useState(null);
     const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const navigate = useNavigate();
@@ -37,6 +37,7 @@ function Quotes() {
 
     const showModal = (quote) => {
         getCompanyDetailsById(quote.hirer_company_id, setHirerCompany);
+        getCompanyDetailsById(quote.renter_company_id, setRenterCompany);
         setSelectedQuote(quote); // Set the selected quote
         setAttachModal(true); // Show the modal
     };
@@ -407,6 +408,7 @@ function Quotes() {
                         // title="Files"
                         open={attachModal}
                         onOk={handleOk}  // Close modal on "Okay"
+                        className="quoteViewModal"
                         onCancel={handleCancel}
                         footer={[
                             <Button key="ok" type="primary" onClick={handleOk}>
@@ -414,11 +416,17 @@ function Quotes() {
                             </Button>,
                         ]}
                     >
-                        <h6>Company Details: ID({selectedQuote.hirer_company_id})</h6>
+                        {/* <h6>Company Details: ID({selectedQuote.hirer_company_id})</h6> */}
                         <ul className="list-group">
-                            <li className="list-group-item">Company Name: <strong>{hirerCompany?hirerCompany.companyName:"Not Available"}</strong></li>
-                            <li className="list-group-item">Company Office Email: <strong>{hirerCompany?hirerCompany.offEmail:"Not Available"}</strong></li>
+                            <li className="list-group-item">Hirer Company: <strong>{hirerCompany?hirerCompany.companyName:"Not Available"}</strong></li>
+                            <li className="list-group-item">Office Email: <strong>{hirerCompany?hirerCompany.offEmail:"Not Available"}</strong></li>
                         </ul>
+                        <br/>
+                        <ul className="list-group">
+                            <li className="list-group-item">Renter Company: <strong>{renterCompany?renterCompany.companyName:"Not Available"}</strong></li>
+                            <li className="list-group-item">Office Email: <strong>{renterCompany?renterCompany.offEmail:"Not Available"}</strong></li>
+                        </ul>
+                        
                         <hr />
                         <h6>Files:</h6>
                         <ul className="list-group">
