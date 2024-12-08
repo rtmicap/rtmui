@@ -619,6 +619,15 @@ const RegistrationAccount = () => {
         console.log("eequal: ", e.target.value == 'ABCTY1234D');
     };
 
+    const validateIfscCode = (_, value) => {
+        const ifscPattern = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!value || ifscPattern.test(value)) {
+            return Promise.resolve();
+        }
+        return Promise.reject(new Error('Invalid IFSC code. It must be 11 characters, in the format SBIN0005943 (or) IDIB000A090.'));
+    };
+
+
     const steps = [
         {
             title: 'General Information',
@@ -1465,13 +1474,14 @@ const RegistrationAccount = () => {
                                         required: true,
                                         message: 'Please enter your bank IFSC code (Ex: IDIB000A090 or SBIN0005943)',
                                     },
-                                    {
-                                        pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{7}$/,
-                                        message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
-                                    },
+                                    { validator: validateIfscCode },
+                                    // {
+                                    //     pattern: /^[A-Za-z]{4}0[A-Za-z0-9]{7}$/,
+                                    //     message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
+                                    // },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" maxLength={10} />
+                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" maxLength={11} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -1586,6 +1596,7 @@ const RegistrationAccount = () => {
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
                         <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
+                        <Button type='primary' onClick={() => navigate("/login")} >Back to Login Page</Button>
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
                                 message="Informational Notes"
@@ -1627,7 +1638,7 @@ const RegistrationAccount = () => {
                     <b>Note:</b> If you want to modify click cancel and update your email.
                 </p>
             </Modal>
-        </div>
+        </div >
     );
 };
 

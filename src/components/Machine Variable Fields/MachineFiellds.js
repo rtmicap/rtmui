@@ -10,8 +10,8 @@ export const machineFields = {
             { name: 'max_cut_feed_length_in_mm', label: 'Max Cut Feed Length', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutter_motor_power_in_kw', label: 'Cutter Motor Power', type: 'text', placeholder: "Enter in Kw", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutting_speed_in_mmin', label: 'Cutting Speed', type: 'text', placeholder: "Enter in m/min", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'number', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/, maxLength: 3 },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'number', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/, maxLength: 3 },
         ],
         PowerHackSaw: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -26,8 +26,8 @@ export const machineFields = {
             { name: 'bundling_possible', label: 'Bundling Possible', type: 'select', placeholder: "Please choose type", options: ['Yes', 'No'] },
             { name: 'cutter_motor_power_in_kw', label: 'Cutter Motor Power', type: 'text', placeholder: "Enter in Kw", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutting_speed', label: 'Cutting Speed', type: 'text', placeholder: "Enter in Strokes/min", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         CircularSaw: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -41,8 +41,8 @@ export const machineFields = {
             { name: 'max_cut_feed_length_in_mm', label: 'Max Cut Feed Length', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutter_motor_power_in_kw', label: 'Cutter Motor Power', type: 'text', placeholder: "Enter in Kw", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutting_speed_in_mmin', label: 'Cutting Speed', type: 'text', placeholder: "Enter in m/min", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
     },
     Drilling: {
@@ -60,8 +60,8 @@ export const machineFields = {
             { name: 'taping_possible', label: 'Taping Possible', type: 'select', placeholder: "Please choose type", options: ['Yes', 'No'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ]
     },
     Machining: {
@@ -83,8 +83,8 @@ export const machineFields = {
             { name: 'automatic_pallet_changer', label: 'Automatic Pallet Changer', type: 'select', placeholder: "Please choose type", options: ['Linear', 'Rotary', 'Disc Miles', 'Others'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         HorizontalMachiningCenters: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -104,8 +104,8 @@ export const machineFields = {
             { name: 'automatic_pallet_changer', label: 'Automatic Pallet Changer', type: 'select', placeholder: "Please choose type", options: ['Linear', 'Rotary', 'Disc Miles', 'Others'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         DrillTapMachiningCenters: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -125,8 +125,8 @@ export const machineFields = {
             { name: 'automatic_pallet_changer', label: 'Automatic Pallet Changer', type: 'select', placeholder: "Please choose type", options: ['Linear', 'Rotary', 'Disc Miles', 'Others'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
     },
     Turning: {
@@ -141,8 +141,8 @@ export const machineFields = {
             { name: 'cutter_motor_power_in_kw', label: 'Cutter Motor Power', type: 'text', placeholder: "Enter in Kw", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'cutting_speed_in_mmin', label: 'Cutting Speed', type: 'text', placeholder: "Enter in m/min", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         CncLathe: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -157,8 +157,8 @@ export const machineFields = {
             { name: 'od_turning_toolsize_in_mm', label: 'OD Turning Tool Size', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         TurretLathe: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -173,8 +173,8 @@ export const machineFields = {
             { name: 'quill_stroke_dia_in_mm', label: 'Quill Stroke', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         CapstanLathe: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -189,8 +189,8 @@ export const machineFields = {
 
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         Automat: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -204,8 +204,8 @@ export const machineFields = {
             { name: 'length_bar_in_mm', label: 'Length of the Bar(Max)', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         SlidingHeadAutomat: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -220,8 +220,8 @@ export const machineFields = {
 
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         MultispindleAutomat: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -234,8 +234,8 @@ export const machineFields = {
             { name: 'length_bar_in_mm', label: 'Length of the Bar(Max)', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         VerticalTurningLathe: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -252,8 +252,8 @@ export const machineFields = {
             { name: 'positioning_accuracy', label: 'Positioning Accuracy', type: 'text', placeholder: "+/- in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in value", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ]
     },
     Grinding: {
@@ -271,8 +271,8 @@ export const machineFields = {
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Fanuc', 'Siemens'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         InternalGrindingMachine: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -287,8 +287,8 @@ export const machineFields = {
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Fanuc', 'Siemens'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         CenterlessGrindingMachine: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -302,8 +302,8 @@ export const machineFields = {
             { name: 'cncControl', label: 'CNC Control', type: 'select', placeholder: "Please choose type", options: ['Fanuc', 'Siemens'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ]
     },
     Milling: {
@@ -323,8 +323,8 @@ export const machineFields = {
             { name: 'type_of_feed', label: 'Type Of Feed', type: 'select', placeholder: "Please choose type", options: ['Manual', 'Automated'] },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ]
     },
     Plastics: {
@@ -344,8 +344,8 @@ export const machineFields = {
             { name: 'space_between_tie_bars_in_mm', label: 'Space Between Tie Bars (HxIV)', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ],
         BlowMouldingMachine: [
             { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Enter Brand', pattern: /^[a-zA-Z0-9\s]+$/, maxLength: 50 },
@@ -363,8 +363,8 @@ export const machineFields = {
             { name: 'thickness_in_mm', label: 'Thickness', type: 'text', placeholder: "Dimension in mm", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
             { name: 'ppk', label: 'PPK', type: 'text', placeholder: "Enter in number", pattern: /^(?:\d{1,4}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 7 },
 
-            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^(?:\d{1,5}(?:\.\d{1,2})?|\.\d{1,2})$/, maxLength: 8 },
-            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^\d{1,3}$/ },
+            { name: 'machineHourRate', label: 'Machine Hour Rate', type: 'text', placeholder: "Enter machine hour rate in Rupees", pattern: /^((?:[1-9]\d{0,4}|\d{1,5}\.\d{1,2})|\.\d{1,2})$/, maxLength: 8 },
+            { name: 'noOfMachines', label: 'No. Of Machines', type: 'text', placeholder: "Enter no. of machine", pattern: /^(?:[1-9]\d{0,2})$/ },
         ]
     }
 }
