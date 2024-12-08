@@ -116,7 +116,6 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
-        {
           {
             label: 'Renter Email ID',
             children: (
