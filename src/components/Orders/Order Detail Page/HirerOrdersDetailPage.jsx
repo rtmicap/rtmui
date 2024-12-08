@@ -90,6 +90,14 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
+           {
+            label: 'Hirer Email ID',
+            children: (
+                <>
+                    <span>{hirerCompany ? `${hirerCompany.factoryEmail}` : '-'}</span>
+                </>
+            ),
+        },
         {
             label: 'Hirer Email ID',
             children: (
@@ -108,7 +116,7 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
-        {
+          {
             label: 'Renter Email ID',
             children: (
                 <>
