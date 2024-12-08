@@ -537,7 +537,7 @@ function HirerShipmentPage() {
                                                                         }}
                                                                         onChange={(info) => handleImageChange(info, key)}
                                                                         beforeUpload={() => false}
-                                                                        accept=".jpg,.jpeg,.png"
+                                                                        accept=".jpg,.jpeg,.png,.pdf"
                                                                         maxCount={1}
                                                                         showUploadList={false}
                                                                     >
