@@ -114,7 +114,6 @@ function RenterOrdersDetailPage() {
                 </>
             ),
         },
-        {
            {
             label: 'Renter Email ID',
             children: (
