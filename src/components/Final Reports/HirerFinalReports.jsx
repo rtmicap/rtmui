@@ -61,14 +61,15 @@ function HirerFinalReports() {
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
-            if (response.data.results.length!=0){
+            if (response.data.results.length != 0) {
                 message.error("Error while fetching final report!");
-              }
+            }
         }
     }
 
     useEffect(() => {
         getFinalReportsByOrderId();
+        console.log("check form data: ", form.getFieldsValue());
     }, []);
 
 
@@ -161,7 +162,7 @@ function HirerFinalReports() {
                                     name={'orderid'}
                                 >
                                     <Tooltip title={`Cannot change Order ID.`}>
-                                    <div>{order.quote_id} </div>
+                                        <div>{order.quote_id} </div>
                                         {/* <Input placeholder="input placeholder" defaultValue={order.order_id} style={{ width: '100%' }} readOnly /> */}
                                     </Tooltip>
                                 </Form.Item>
@@ -292,23 +293,19 @@ function HirerFinalReports() {
                                         },
                                     ]}
                                 >
-                                    {form.getFieldValue('final_goods_planned_pickup_datetime')
-                                        ? formattedDateTime(form.getFieldValue('final_goods_planned_pickup_datetime'))
-                                        : <DatePicker
-                                            disabledDate={disabledDate}
-                                            showTime={{
-                                                format: 'hh:mm A',
-                                                use12Hours: true,
-                                            }}
-                                            onChange={(value, dateString) => {
-                                                console.log('Selected Time: ', value);
-                                                console.log('Formatted goods pick Selected Time: ', dateString);
-                                                setGoodsPickUpDateTime(dateString);
-                                            }}
-                                            onOk={onOk}
-                                        />
-                                    }
-
+                                    <DatePicker
+                                        disabledDate={disabledDate}
+                                        showTime={{
+                                            format: 'hh:mm A',
+                                            use12Hours: true,
+                                        }}
+                                        onChange={(value, dateString) => {
+                                            console.log('Selected Time: ', value);
+                                            console.log('Formatted goods pick Selected Time: ', dateString);
+                                            setGoodsPickUpDateTime(dateString);
+                                        }}
+                                        onOk={onOk}
+                                    />
                                 </Form.Item>
                             </div>
                         </div>

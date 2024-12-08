@@ -97,6 +97,14 @@ function RenterOrdersDetailPage() {
             ),
         },
         {
+            label: 'Hirer Email ID',
+            children: (
+                <>
+                    <span>{hirerCompany ? `${hirerCompany.factoryEmail}` : '-'}</span>
+                </>
+            ),
+        },
+        {
             label: 'Renter Company ID',
             children: (
                 <>
@@ -106,6 +114,7 @@ function RenterOrdersDetailPage() {
                 </>
             ),
         },
+        {
            {
             label: 'Renter Email ID',
             children: (

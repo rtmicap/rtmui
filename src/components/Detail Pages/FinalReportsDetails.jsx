@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { GET_FINAL_SAMPLE_REPORT_ORDERID_URL, GET_FIRST_SAMPLE_REPORT_ORDERID_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
-import { firstChrUpperCase,formattedDateTime } from '../../utils/utils';
+import { firstChrUpperCase, formattedDateTime } from '../../utils/utils';
 
 function FinalReportsDetails({ order_id }) {
     const [finalReportData, setFinalReportData] = useState([]);
@@ -24,8 +24,8 @@ function FinalReportsDetails({ order_id }) {
         } catch (error) {
             console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
-           if (response.data.results.length!=0){
-              message.error("Error while fetching final report!");
+            if (response.data.results.length != 0) {
+                message.error("Error while fetching final report!");
             }
         }
     }
@@ -33,7 +33,7 @@ function FinalReportsDetails({ order_id }) {
     useEffect(() => {
         getFinalReportsByOrderId();
     }, []);
-    let qtyUom="";
+    let qtyUom = "";
     const columns = [
         /* {
             title: 'Sample Report ID',
@@ -89,7 +89,7 @@ function FinalReportsDetails({ order_id }) {
             title: 'Goods Pickup Date/Time',
             key: 'final_goods_planned_pickup_date_time',
             dataIndex: 'final_goods_planned_pickup_date_time',
-            render: (date) => <>{formattedDateTime(date)}</>,
+            render: (date) => <>{formattedDateTime(date) == "Invalid date" ? "Not Available" : formattedDateTime(date)}</>,
         },
     ];
 
@@ -108,7 +108,7 @@ function FinalReportsDetails({ order_id }) {
     return (
         <>
             <>
-                
+
                 {finalReportData && finalReportData.length > 0
                     ? <Collapse items={collapseItems} />
                     : ""

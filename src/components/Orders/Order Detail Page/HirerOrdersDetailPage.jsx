@@ -28,12 +28,12 @@ function HirerOrdersDetailPage() {
             message.error("Error fetching Company Details");
         }
     };
-    var load=true;
+    var load = true;
     useEffect(() => {
-        if (load){
-        getCompanyDetailsById(order.hirer_company_id, setHirerCompany);
-        getCompanyDetailsById(order.renter_company_id, setRenterCompany);
-        load=false;
+        if (load) {
+            getCompanyDetailsById(order.hirer_company_id, setHirerCompany);
+            getCompanyDetailsById(order.renter_company_id, setRenterCompany);
+            load = false;
         }
     }, []);
 
@@ -99,6 +99,14 @@ function HirerOrdersDetailPage() {
             ),
         },
         {
+            label: 'Hirer Email ID',
+            children: (
+                <>
+                    <span>{hirerCompany ? `${hirerCompany.factoryEmail}` : '-'}</span>
+                </>
+            ),
+        },
+        {
             label: 'Renter Company ID',
             children: (
                 <>
@@ -108,6 +116,7 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
+        {
           {
             label: 'Renter Email ID',
             children: (
