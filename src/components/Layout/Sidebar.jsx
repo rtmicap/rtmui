@@ -1,13 +1,14 @@
 import { Layout, Menu, message, theme, Spin } from 'antd';
-import React from 'react'
 import { Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const { Header, Content, Footer, Sider } = Layout;
 import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { useEffect, useState } from "react";
 
 
 function getItem(label, key, icon, children) {
+
     return {
         key,
         icon,
@@ -15,6 +16,7 @@ function getItem(label, key, icon, children) {
         label,
     };
 }
+
 
 
 
@@ -54,6 +56,7 @@ const items = [
 ]
 
 function Sidebar() {
+    const [sideNav, setSideNav] = useState("sidebar");
     const { userSignOut, authUser } = useAuth();
     const navigate = useNavigate();
 
@@ -87,17 +90,19 @@ function Sidebar() {
                 <Sider
                     breakpoint="lg"
                     collapsedWidth="0"
+                    className={sideNav}
                     onBreakpoint={(broken) => {
                         console.log(broken);
                     }}
                     onCollapse={(collapsed, type) => {
                         console.log(collapsed, type);
+                        !collapsed? setSideNav("sidebar"):setSideNav("");
                     }}
                 >
                     <div className="demo-logo-vertical">
                         <h3 style={{ color: 'white', textAlign: 'center' }}>Logo</h3>
                     </div>
-                    <span style={{ color: 'white', textAlign: 'center' }}>{authUser && authUser.companyName}</span>
+                    <div style={{ color: 'white', textAlign: 'center' }}>{authUser && authUser.companyName}</div>
                     <Menu theme="dark" mode="inline" defaultSelectedKeys={window.location.pathname} onClick={navigateMenuItems} items={items} />
                 </Sider>
 
