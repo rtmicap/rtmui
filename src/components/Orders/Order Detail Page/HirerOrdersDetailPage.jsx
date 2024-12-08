@@ -28,10 +28,13 @@ function HirerOrdersDetailPage() {
             message.error("Error fetching Company Details");
         }
     };
-
+    var load=true;
     useEffect(() => {
+        if (load){
         getCompanyDetailsById(order.hirer_company_id, setHirerCompany);
         getCompanyDetailsById(order.renter_company_id, setRenterCompany);
+        load=false;
+        }
     }, []);
 
 

@@ -7,7 +7,7 @@ import { GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReloadOutlined } from "@ant-design/icons";
-
+import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 
 function Orders() {
 
@@ -73,6 +73,16 @@ function Orders() {
     { title: 'Status', dataIndex: 'order_status', key: 'order_status' },
     { title: 'Goods Status', dataIndex: 'goods_status', key: 'goods_status' },
     { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
+    { 
+      title: 'Date', 
+      key:'date',
+      render: (_, record) => (
+        <>
+          <div><span className="dateLabel">From: </span><div className="dateValue">{formattedDateTime(record.actual_start_date_time)}</div></div>
+          <div><span className="dateLabel">To: </span><div className="dateValue">{formattedDateTime(record.actual_end_date_time)}</div></div>
+        </>
+      ),
+    },
     { title: 'Planned Hours', dataIndex: 'planned_hours', key: 'planned_hours' },
     { title: 'Actual Hours', dataIndex: 'actual_hours', key: 'actual_hours' },
     {
@@ -89,7 +99,7 @@ function Orders() {
   ];
 
   // Define the tab items
-  const items = [
+  /* const items = [
     {
       key: '1',
       label: 'My Orders',
@@ -98,7 +108,7 @@ function Orders() {
           dataSource={myOrders}
           columns={columns}
           rowKey="order_id"
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       ),
     },
@@ -111,11 +121,11 @@ function Orders() {
           dataSource={customerOrders}
           columns={columns}
           rowKey="order_id"
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       ),
     },
-  ];
+  ]; */
 
   // Pagination config for tables
   const paginationConfig = {

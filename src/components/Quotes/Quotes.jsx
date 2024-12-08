@@ -164,15 +164,14 @@ function Quotes() {
                 hirerCompanyId: quote.hirer_company_id
             }
             const response = await axios.patch(UPDATE_QUOTE_URL, (reqItem));
-            console.log("acceptAndRejectQuote: ", reqItem);
-            console.log("accepted: ", response);
-            message.success(`${quote.quote_id} Quote Accepted! Please visit order page for more details.`);
+            message.success(`${quote.quote_id} Quote ${value}! Please visit order page for more details.`);
             // navigate('/orders', { replace: true });
             // setIsLoading(false);
+            return;
         } catch (error) {
-            console.log("accepted error: ", error);
             message.error("Something error while accepting the quote!");
             // setIsLoading(false);
+            return;
         }
     }
 
@@ -180,10 +179,10 @@ function Quotes() {
         confirm({
             title: `Are you sure you want to ${value} this quote?`,
             content: `You have selected the option: ${value}. Please confirm your action.`,
-            onOk() {
+            async onOk() {
                 // Handle confirmed action here
                 console.log(`${value} confirmed`);
-                acceptAndRejectQuote(value, quote);
+                await acceptAndRejectQuote(value, quote);
                 getAllQuotesWithoutLoading();
             },
             onCancel() {
@@ -288,9 +287,7 @@ function Quotes() {
 
     // Pagination config for tables
     const paginationConfig = {
-        pageSize: 5,
-        showSizeChanger: true,
-        pageSizeOptions: ['5', '10', '20'],
+        pageSize: 10,
     };
 
     const handleSearch = () => {
