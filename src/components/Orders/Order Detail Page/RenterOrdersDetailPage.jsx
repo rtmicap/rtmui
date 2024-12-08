@@ -182,12 +182,12 @@ function RenterOrdersDetailPage() {
 
                         {/* Sample Reports */}
                         <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}>
-                            Create Sample Report
+                            Sample Report
                         </button>
 
                         {/* Final Reports */}
                         <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'finalReports')}>
-                            Create Final Report
+                            Final Report
                         </button>
                     </Space>
                 </div>
