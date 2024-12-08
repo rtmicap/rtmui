@@ -79,7 +79,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
             key: 'action',
             render: (_, record) => (
                 <Space Space size="middle" >
-                    <Button block onClick={() => onEditMachine(record)}>Edit</Button>
+                    <Button block onClick={() => onEditMachine(record)} disabled>Edit</Button>
                     <Button type='primary' onClick={() => onRemoveMachine(record)} danger>Remove</Button>
                     <a>Delete {console.log("recoed: ", record)}</a>
                 </Space >

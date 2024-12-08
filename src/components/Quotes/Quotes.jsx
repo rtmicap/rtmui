@@ -65,6 +65,9 @@ function Quotes() {
         try {
             setQuoteLoading(true);
             const response = await axios.get(GET_ALL_QUOTES_URL);
+            await response.data.result.sort((d1,d2)=>{
+                return new Date(d1.planned_start_date_time)- new Date(d2.planned_start_date_time);
+              })
             setAllQuotes(response.data.result);
             setQuoteLoading(false);
             return response.data.result;
@@ -78,6 +81,9 @@ function Quotes() {
     const getAllQuotesWithoutLoading = async () => {
         try {
             const response = await axios.get(GET_ALL_QUOTES_URL);
+            await response.data.result.sort((d1,d2)=>{
+                return new Date(d1.planned_start_date_time)- new Date(d2.planned_start_date_time);
+              })
             setAllQuotes(response.data.result);
             return response.data.result;
         } catch (error) {
