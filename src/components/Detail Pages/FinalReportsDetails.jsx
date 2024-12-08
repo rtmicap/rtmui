@@ -89,7 +89,7 @@ function FinalReportsDetails({ order_id }) {
             title: 'Goods Pickup Date/Time',
             key: 'final_goods_planned_pickup_date_time',
             dataIndex: 'final_goods_planned_pickup_date_time',
-            render: (date) => <>{formattedDateTime(date)=="Invalid date"?"Not Available":formattedDateTime(date)}</>,
+            render: (date) => <>{formattedDateTime(date)}</>,
         },
     ];
 
