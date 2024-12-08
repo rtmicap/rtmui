@@ -175,18 +175,24 @@ function RegistrationMachines() {
         // console.log("newFileList: ", newFileList[0].uid);
         try {
             if (newFileList && newFileList.length > 0) {
-                const configHeaders = {
-                    headers: { "content-type": "multipart/form-data" },
-                };
-                // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
-                const baseUrl = FILE_UPLOAD_URL;
-                const formData = new FormData();
-                formData.append("fileName", newFileList[0].originFileObj);
-                var response = await axios.post(baseUrl, formData, configHeaders);
-                console.log("responseData Image: ", response);
-                setImageBase64(response.data.fileUrl)
+                if (newFileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+                    setFileList(newFileList);
+
+                    const configHeaders = {
+                        headers: { "content-type": "multipart/form-data" },
+                    };
+                    // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
+                    const baseUrl = FILE_UPLOAD_URL;
+                    const formData = new FormData();
+                    formData.append("fileName", newFileList[0].originFileObj);
+                    var response = await axios.post(baseUrl, formData, configHeaders);
+                    console.log("responseData Image: ", response);
+                    setImageBase64(response.data.fileUrl)
+                } else {
+                    setFileList([]);
+                    message.error('File size must less than 2 MB');
+                }
             }
-            setFileList(newFileList);
 
         } catch (error) {
             console.log("responseData error: ", error);
@@ -382,14 +388,13 @@ function RegistrationMachines() {
                         <div className="col-sm-6 col-lg-4">
                             {category && type && machineInputFields && machineInputFields.length > 0 &&
                                 <Form.Item
-                                    label="Upload Your Machine Image"
+                                    label="Upload Your Machine Image. (Image Size Max: 2MB )"
                                     name="Machine_Photo"
                                     valuePropName="fileList"
                                     getValueFromEvent={(e) => e && e.fileList}
-                                    rules={[{ required: true, message: 'Please upload your machine photo!' }]}
+                                    rules={[{ required: true, message: 'Please upload machine photo!' }]}
                                 >
                                     <Upload
-                                        // action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
                                         listType="picture-card"
                                         fileList={fileList}
                                         onPreview={handlePreview}
