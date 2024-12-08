@@ -88,7 +88,7 @@ function RenterOrdersDetailPage() {
                 </>
             ),
         },
-           {
+        {
             label: 'Hirer Email ID',
             children: (
                 <>
@@ -115,7 +115,6 @@ function RenterOrdersDetailPage() {
             ),
         },
         {
-           {
             label: 'Renter Email ID',
             children: (
                 <>
