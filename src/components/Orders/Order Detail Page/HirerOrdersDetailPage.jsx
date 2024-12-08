@@ -90,7 +90,7 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
-           {
+        {
             label: 'Hirer Email ID',
             children: (
                 <>
@@ -116,7 +116,7 @@ function HirerOrdersDetailPage() {
                 </>
             ),
         },
-          {
+        {
             label: 'Renter Email ID',
             children: (
                 <>
