@@ -14,7 +14,7 @@ import axios from "../../api/axios";
 const RegistrationAccount = () => {
     const navigate = useNavigate();
 
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState(2);
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -618,6 +618,15 @@ const RegistrationAccount = () => {
         setPanNumber(e.target.value.toUpperCase());
         console.log("eequal: ", e.target.value == 'ABCTY1234D');
     };
+
+    const validateIfscCode = (_, value) => {
+        const ifscPattern = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!value || ifscPattern.test(value)) {
+            return Promise.resolve();
+        }
+        return Promise.reject(new Error('Invalid IFSC code. It must be 11 characters, in the format SBIN0005943 (or) IDIB000A090.'));
+    };
+
 
     const steps = [
         {
@@ -1465,13 +1474,14 @@ const RegistrationAccount = () => {
                                         required: true,
                                         message: 'Please enter your bank IFSC code (Ex: IDIB000A090 or SBIN0005943)',
                                     },
-                                    {
-                                        pattern: /^[A-Za-z]{4}0[A-Z0-9a-z]{7}$/,
-                                        message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
-                                    },
+                                    { validator: validateIfscCode },
+                                    // {
+                                    //     pattern: /^[A-Za-z]{4}0[A-Za-z0-9]{7}$/,
+                                    //     message: 'Please enter a valid bank IFSC code! (Ex: IDIB000A090 or SBIN0005943)',
+                                    // },
                                 ]}
                             >
-                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" maxLength={10} />
+                                <Input placeholder="Enter your bank branch IFSC Code (Ex: IDIB000A090 or SBIN0005943)" maxLength={11} />
                             </Form.Item>
                         </Col>
                     </Row>
