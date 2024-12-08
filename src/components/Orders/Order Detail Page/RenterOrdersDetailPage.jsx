@@ -88,12 +88,30 @@ function RenterOrdersDetailPage() {
                 </>
             ),
         },
+           {
+            label: 'Hirer Email ID',
+            children: (
+                <>
+                    <span>{hirerCompany ? `${hirerCompany.factoryEmail}` : '-'}</span>
+                </>
+            ),
+        },
         {
             label: 'Renter Company ID',
             children: (
                 <>
                     <>
                         <span>{renterCompany ? `${renterCompany.companyName} (${order.renter_company_id})` : '-'}</span>
+                    </>
+                </>
+            ),
+        },
+           {
+            label: 'Renter Email ID',
+            children: (
+                <>
+                    <>
+                        <span>{renterCompany ? `${renterCompany.factoryEmail}` : '-'}</span>
                     </>
                 </>
             ),
