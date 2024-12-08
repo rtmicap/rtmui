@@ -487,6 +487,7 @@ function BookingMachines() {
                                         name={'comments'}
                                         rules={[
                                             {
+                                                required: true,
                                                 message: 'Please provide your planned shipment details!',
                                             },
                                         ]}
