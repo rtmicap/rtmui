@@ -19,10 +19,8 @@ function Login() {
             } else if (res && res.status && res.admin) {
                 navigate('/admin/dashboard');
             } if (res && !res.status && !res.admin) {
-                message.error(res.response.message ? res.response.message : "Unable to login! Please contact support");
-            } else {
-                message.error(res.response.message ? res.response.message : "Unable to login! Please contact support");
-            }
+                message.error(res && res.response && res.response.message ? res.response.message : "Unable to login! Please contact support");
+            } 
         });
     };
     const onFinishFailed = (errorInfo) => {
