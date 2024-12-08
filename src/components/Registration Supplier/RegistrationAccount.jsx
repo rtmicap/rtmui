@@ -14,7 +14,7 @@ import axios from "../../api/axios";
 const RegistrationAccount = () => {
     const navigate = useNavigate();
 
-    const [currentStep, setCurrentStep] = useState(2);
+    const [currentStep, setCurrentStep] = useState(0);
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -1596,6 +1596,7 @@ const RegistrationAccount = () => {
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
                         <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
+                        <Button type='primary' onClick={() => navigate("/login")} >Back to Login Page</Button>
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
                                 message="Informational Notes"
@@ -1637,7 +1638,7 @@ const RegistrationAccount = () => {
                     <b>Note:</b> If you want to modify click cancel and update your email.
                 </p>
             </Modal>
-        </div>
+        </div >
     );
 };
 

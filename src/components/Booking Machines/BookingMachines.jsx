@@ -9,6 +9,7 @@ import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
+const { TextArea } = Input;
 
 function BookingMachines() {
     const location = useLocation();
@@ -478,6 +479,21 @@ function BookingMachines() {
                                         </Flex>
                                     </Form.Item>
 
+                                </div>
+
+                                <div className="col-lg-6">
+                                    <Form.Item
+                                        label="Please provide planned shipment details"
+                                        name={'comments'}
+                                        rules={[
+                                            {
+                                                message: 'Please provide your planned shipment details!',
+                                            },
+                                        ]}
+                                        required
+                                    >
+                                        <TextArea rows={3} placeholder="Enter your planned shipment details (max: 500 words)" maxLength={500} showCount />
+                                    </Form.Item>
                                 </div>
                             </div>
                             <Form.Item

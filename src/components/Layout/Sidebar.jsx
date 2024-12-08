@@ -30,8 +30,8 @@ const items = [
         getItem('My Registered Machines', 'my-registered-machines', <CalendarOutlined />),
     ]),
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
-    getItem('My Quotes', 'quotes', <ContactsOutlined />),
-    getItem('My Orders', 'orders', <UnorderedListOutlined />),
+    getItem('Quotes', 'quotes', <ContactsOutlined />),
+    getItem('Orders', 'orders', <UnorderedListOutlined />),
     /* getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
     getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
