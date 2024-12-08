@@ -203,7 +203,7 @@ function RegistrationMachines() {
         const formDataToSubmit = new FormData();
         values.machineId = Math.floor(Math.random() * 10);
         values.companyId = authUser.CompanyId;
-        values.variable_fields = "test";
+        //values.variable_fields = "test";
         values.Machine_Photo = imageBase64;
         values.identical = isChecked;
 
