@@ -27,6 +27,9 @@ function Orders() {
       setOrderLoading(true);
       const response = await axios.get(GET_ALL_ORDERS_URL);
       // const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
+      await response.data.results.sort((d1,d2)=>{
+        return new Date(d1.actual_start_date_time)- new Date(d2.actual_start_date_time);
+      })
       setAllOrders(response.data.results);
       setOrderLoading(false);
       return response.data.results;
