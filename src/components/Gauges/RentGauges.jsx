@@ -2,7 +2,10 @@ import React from 'react'
 
 function RentGauges() {
   return (
-    <div>RentGauges</div>
+    <div>
+      <h1>RentGauges</h1><br />
+      <h3>In Progress.....</h3>
+    </div>
   )
 }
 

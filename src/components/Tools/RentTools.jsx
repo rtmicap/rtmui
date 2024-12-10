@@ -2,7 +2,10 @@ import React from 'react'
 
 function RentTools() {
   return (
-    <div>RentTools</div>
+    <div>
+      <h1>RentTools</h1><br />
+      <h3>In Progress.....</h3>
+    </div>
   )
 }
 
