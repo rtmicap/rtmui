@@ -32,7 +32,7 @@ const items = [
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
-    getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
+    // getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
     // getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
