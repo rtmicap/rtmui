@@ -32,8 +32,8 @@ const items = [
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
-    /* getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
-    getItem('Payment', 'payment', <CreditCardOutlined />),
+    getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
+    // getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
         getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),
@@ -46,12 +46,12 @@ const items = [
     ]),
     getItem('Sell Raw Material', 'sell-raw-materials', <FormatPainterOutlined />),
     getItem('Sell Scrap', 'sell-scrap', <ScissorOutlined />),
-    getItem('Documents', 'documents', <BookOutlined />, [
-        getItem('View Legal Agreement', 'view-legal-docs'),
-        getItem('View Code of Conduct', 'view-code-conduct'),
-        getItem('View Company Guidelines', 'view-company-guidelines', null),
-    ]),
-    getItem('Settings', 'settings', <SettingOutlined />), */
+    // getItem('Documents', 'documents', <BookOutlined />, [
+    //     getItem('View Legal Agreement', 'view-legal-docs'),
+    //     getItem('View Code of Conduct', 'view-code-conduct'),
+    //     getItem('View Company Guidelines', 'view-company-guidelines', null),
+    // ]),
+    // getItem('Settings', 'settings', <SettingOutlined />),
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
@@ -96,7 +96,7 @@ function Sidebar() {
                     }}
                     onCollapse={(collapsed, type) => {
                         console.log(collapsed, type);
-                        !collapsed? setSideNav("sidebar"):setSideNav("");
+                        !collapsed ? setSideNav("sidebar") : setSideNav("");
                     }}
                 >
                     <div className="demo-logo-vertical">
