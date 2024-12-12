@@ -44,4 +44,7 @@ export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
 // ******************************///*****************///
 //Admin URLS
 
-export const GET_COMPANY_DETAILS = '/admin/getCompanyDetails';
+export const GET_COMPANY_DETAILS = '/user/getCompanyDetails';
+
+// admin password changes
+export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
