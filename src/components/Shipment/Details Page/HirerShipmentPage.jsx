@@ -178,7 +178,7 @@ function HirerShipmentPage() {
             setImageFileIsLoading((prev) => ({ ...prev, [key]: true })); // Set loading for the specific key
             setIsSubmitDisabled(true); // submit button disabled
             // const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
-            const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png'].includes(info.fileList[0].type);
+            const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png','application/pdf'].includes(info.fileList[0].type);
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
 
             if (!isImageFormat) {
@@ -524,7 +524,7 @@ function HirerShipmentPage() {
                                                                     name={[name, 'image']}
                                                                     label={'Attach Image File'}
                                                                     tooltip={{
-                                                                        title: 'Image file size should be maximum 2 MB'
+                                                                        title: 'Image file size should be maximum 2 MB (Type: .jpg, .png, .pdf)'
                                                                     }}
                                                                 >
                                                                     <Upload

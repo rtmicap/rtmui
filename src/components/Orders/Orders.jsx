@@ -181,7 +181,7 @@ function Orders() {
   return (
     <>
       <div className="container-fluid">
-        <h3 class="card-title text-center">Orders</h3>
+        <h3 className="card-title text-center">Orders</h3>
         <div className='row'>
           <div className="col text-end">
             <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Orders</Button>
