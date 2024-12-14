@@ -5,7 +5,7 @@ import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { actionButtons } from './QuotesUtils';
+import { actionButtons, actionButtons_hirer } from './QuotesUtils';
 import dayjs from 'dayjs';
 import { useAuth } from '../../contexts/AuthContext';
 import { GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls';
@@ -219,7 +219,7 @@ function Quotes() {
                         hirerCompanyId: selectedQuote.hirer_company_id,
                         plannedstartdatetime: values.plannedstartdatetime ? dayjs(values.plannedstartdatetime).utc().format() : null,
                         plannedenddatetime: values.plannedenddatetime ? dayjs(values.plannedenddatetime).utc().format() : null,
-                        quotestatus: 'order_date_change_requested',
+                        quotestatus: 'change_request',
                         quantity: values.quantity
                     }
                     const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
@@ -283,6 +283,12 @@ function Quotes() {
             render: (_, record) => (
                 <>
                     {(record.hirer_company_id == authUser.CompanyId && record.quote_status=="pending")?
+                    <div>Under Review</div>
+                    :
+                    (record.hirer_company_id == authUser.CompanyId && record.quote_status!="pending")?
+                    <Select className="quoteAction" placeholder="-Select-" options={actionButtons_hirer} onChange={(value) => handleActionChange(value, record)} />
+                    :
+                    (record.renter_company_id == authUser.CompanyId && record.quote_status!="pending")?
                     <div>Under Review</div>
                     :
                     <Select className="quoteAction" placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
