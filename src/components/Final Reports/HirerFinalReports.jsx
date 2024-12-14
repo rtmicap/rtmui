@@ -52,7 +52,7 @@ function HirerFinalReports() {
                             final_product_disposition: latestDetail.final_product_disposition,
                             final_report_remarks: latestDetail.final_completion_remarks,
                             prod_lot_inspection_report: latestDetail.final_inspection_report,
-                            final_goods_planned_pickup_datetime: moment(latestDetail.final_goods_planned_pickup_date_time),
+                            final_goods_planned_pickup_datetime: latestDetail.final_goods_planned_pickup_date_time ? moment(latestDetail.final_goods_planned_pickup_date_time) : '',
                             final_report_id: latestDetail.id
                         });
                     }
