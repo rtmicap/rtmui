@@ -362,7 +362,7 @@ function HirerShipmentPage() {
                 >
                     {/* Shipment Date Time */}
                     <div className='row'>
-                        <div className="col">
+                        <div className="col-3">
                             <Form.Item
                                 label="Shipment Date Time"
                                 name="shipment_datetime"
