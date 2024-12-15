@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FileAddOutlined, UserOutlined, BookOutlined, LogoutOutlined, RestOutlined, DashboardOutlined, ContainerOutlined, SnippetsOutlined } from '@ant-design/icons';
-import { Menu, theme } from 'antd';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Menu, message, theme } from 'antd';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Login from './components/Login/Login';
 import PrivateRoutes from './utils/PrivateRoutes';
 import Dashboard from './components/Layout/Dashboard';
@@ -45,13 +45,24 @@ import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
 
 const App = () => {
-  // const {
-  //   token: { colorBgContainer, borderRadiusLG },
-  // } = theme.useToken();
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  const token = localStorage.getItem('authToken');
+  console.log("from localStorage: ", token);
 
-  // const token = localStorage.getItem('authToken');
-  // console.log("localStorage.getItem('authToken'): ", token);
+  // const { authUser } = useAuth();
+
+  if (token) {
+    console.log("test auth error- Token available.");
+  } else {
+    if (location.pathname !== '/login') {
+      console.log("No token: Redirecting to login...");
+      message.warning("Your session has expired. Please login again!");
+      navigate('/login');
+      return;
+    }
+  }
 
   return (
     <>
@@ -60,7 +71,7 @@ const App = () => {
         {/* With Auth */}
         <Route element={<PrivateRoutes />}>
           <Route path="/*" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+            <Route index element={<Dashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
             <Route path="register-machine" element={<RegistrationMachines />} />
             <Route path="my-registered-machines" element={<MyRegisteredMachines />} />
