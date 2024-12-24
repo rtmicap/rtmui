@@ -45,6 +45,7 @@ const RegistrationAccount = () => {
 
     useEffect(() => {
         getAllCountries();
+        console.log("formData12: ", formData);
     }, []);
 
     const handleCheckboxChange = (e) => {
@@ -274,7 +275,7 @@ const RegistrationAccount = () => {
 
     const descriptive = [
         {
-            label: (<h4>Company Name</h4>),
+            label: (<h6>Company Name</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -282,7 +283,7 @@ const RegistrationAccount = () => {
             children: formData.companyname,
         },
         {
-            label: (<h4>Company Website</h4>),
+            label: (<h6>Company Website</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -290,26 +291,39 @@ const RegistrationAccount = () => {
             children: formData.website ? formData.website : '-',
         },
         {
-            label: (<h4>ISO Certified</h4>),
+            label: (<h6>ISO Certified</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.isoCert ? formData.isoCert : '-',
         },
         {
-            label: (<h4>TS Certified</h4>),
-
+            label: (<h6>TS Certified</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.tsCert ? formData.tsCert : '-',
         },
         {
-            label: (<h4>ISO 4001 Certified</h4>),
-
+            label: (<h6>ISO 4001 Certified</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.iso14001 ? formData.iso14001 : '-',
         },
         {
-            label: (<h4>Company Turnover</h4>),
-
+            label: (<h6>Company Turnover</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.turnover + ' Lakhs',
         },
         {
-            label: (<h4>Major Customer Served</h4>),
+            label: (<h6>Major Customer Served</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -325,7 +339,7 @@ const RegistrationAccount = () => {
             children: ''
         },
         {
-            label: (<h4>Office Country</h4>),
+            label: (<h6>Office Country</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -333,7 +347,7 @@ const RegistrationAccount = () => {
             children: formData.officeCountry,
         },
         {
-            label: (<h4>Factory Country</h4>),
+            label: (<h6>Factory Country</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -341,7 +355,7 @@ const RegistrationAccount = () => {
             children: formData.factoryCountry,
         },
         {
-            label: (<h4>Office Address</h4>),
+            label: (<h6>Office Address</h6>),
             // children: formData.officeAddress,
             span: {
                 xs: 1,
@@ -354,7 +368,7 @@ const RegistrationAccount = () => {
             children: formData.officeAddress,
         },
         {
-            label: (<h4>Factory Address</h4>),
+            label: (<h6>Factory Address</h6>),
             // children: formData.factoryAddress,
             span: {
                 xs: 1,
@@ -367,7 +381,7 @@ const RegistrationAccount = () => {
             children: formData.factoryAddress,
         },
         {
-            label: (<h4>Office State</h4>),
+            label: (<h6>Office State</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -375,7 +389,7 @@ const RegistrationAccount = () => {
             children: formData.officeState,
         },
         {
-            label: (<h4>Factory State</h4>),
+            label: (<h6>Factory State</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -383,7 +397,7 @@ const RegistrationAccount = () => {
             children: formData.factoryState,
         },
         {
-            label: (<h4>Office City</h4>),
+            label: (<h6>Office City</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -391,7 +405,7 @@ const RegistrationAccount = () => {
             children: formData.officeCity,
         },
         {
-            label: (<h4>Factory City</h4>),
+            label: (<h6>Factory City</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -399,7 +413,7 @@ const RegistrationAccount = () => {
             children: formData.factoryCity,
         },
         {
-            label: (<h4>Office Area</h4>),
+            label: (<h6>Office Area</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -407,7 +421,7 @@ const RegistrationAccount = () => {
             children: formData.officeArea,
         },
         {
-            label: (<h4>Factory Area</h4>),
+            label: (<h6>Factory Area</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -415,7 +429,7 @@ const RegistrationAccount = () => {
             children: formData.factoryArea,
         },
         {
-            label: (<h4>Office PIN Code</h4>),
+            label: (<h6>Office PIN Code</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -423,7 +437,7 @@ const RegistrationAccount = () => {
             children: formData.offPinCode,
         },
         {
-            label: (<h4>Factory PIN Code</h4>),
+            label: (<h6>Factory PIN Code</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -431,34 +445,82 @@ const RegistrationAccount = () => {
             children: formData.facPinCode,
         },
         {
-            label: (<h4>Office Telephone</h4>),
+            label: (<h6>Office Telephone</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
             },
             children: `${formData.officeTelephoneStd} ${formData.officeTelephone}`,
-        }
+        },
+        {
+            label: (<h6>Factory Email</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryEmailAddress,
+        },
+        {
+            label: (<h6>Office Email</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeEmailAddress,
+        },
+        {
+            label: (<h6>Factory Cell Phone</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.factoryMobile,
+        },
+        {
+            label: (<h6>Office Cell Phone</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.officeMobile,
+        },
     ];
 
     const bankDescriptive = [
         {
-            label: (<h4>Title of Account</h4>),
+            label: (<h6>Title of Account</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.bankTitle
         },
         {
-            label: (<h4>Type of Account</h4>),
+            label: (<h6>Type of Account</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.bankAccType
         },
         {
-            label: (<h4>Bank Account Number</h4>),
+            label: (<h6>Bank Account Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.bankAccNum
         },
         {
-            label: (<h4>Bank Contact Number</h4>),
+            label: (<h6>Bank Contact Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.bankContact ? formData.bankContact : '-'
         },
         {
-            label: (<h4>Bank Address</h4>),
+            label: (<h6>Bank Address</h6>),
             span: {
                 xs: 1,
                 sm: 2,
@@ -473,11 +535,11 @@ const RegistrationAccount = () => {
 
     const documentDescriptive = [
         {
-            label: (<h4>Ownership</h4>),
+            label: (<h6>Ownership</h6>),
             children: formData.ownership
         },
         {
-            label: (<h4>Year of Establishment</h4>),
+            label: (<h6>Year of Establishment</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -485,7 +547,7 @@ const RegistrationAccount = () => {
             children: formData.yearEstablished
         },
         {
-            label: (<h4>CIN Number</h4>),
+            label: (<h6>CIN Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -493,7 +555,7 @@ const RegistrationAccount = () => {
             children: formData.indLicNum
         },
         {
-            label: (<h4>GSTIN Number</h4>),
+            label: (<h6>GSTIN Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -501,7 +563,7 @@ const RegistrationAccount = () => {
             children: formData.GSTIN
         },
         {
-            label: (<h4>PAN Number</h4>),
+            label: (<h6>PAN Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -509,7 +571,7 @@ const RegistrationAccount = () => {
             children: formData.PAN
         },
         {
-            label: (<h4>CIN Uploaded File</h4>),
+            label: (<h6>CIN Uploaded File</h6>),
             span: {
                 xs: 1,
                 sm: 2,
@@ -523,7 +585,7 @@ const RegistrationAccount = () => {
             )
         },
         {
-            label: (<h4>GSTIN Uploaded File</h4>),
+            label: (<h6>GSTIN Uploaded File</h6>),
             span: {
                 xs: 1,
                 sm: 2,
@@ -537,7 +599,7 @@ const RegistrationAccount = () => {
             )
         },
         {
-            label: (<h4>PAN Uploaded File</h4>),
+            label: (<h6>PAN Uploaded File</h6>),
             span: {
                 xs: 1,
                 sm: 2,
@@ -1596,9 +1658,9 @@ const RegistrationAccount = () => {
             <Layout>
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
-                    <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                        <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
                         <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
-                        
+
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
                                 message="Informational Notes"
