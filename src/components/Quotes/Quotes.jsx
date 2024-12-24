@@ -1,7 +1,7 @@
 import { Button, Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Table, Tabs, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { ReloadOutlined } from "@ant-design/icons";
-import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL } from '../../api/apiUrls';
+import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL, GET_ALL_ORDERS_URL} from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
@@ -64,19 +64,35 @@ function Quotes() {
     const getAllQuotes = async () => {
         try {
             setQuoteLoading(true);
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
             const response = await axios.get(GET_ALL_QUOTES_URL);
             await response.data.result.sort((d1,d2)=>{
                 return new Date(d1.planned_start_date_time)- new Date(d2.planned_start_date_time);
               })
+            // console.log("Quote response", response.status);
             setAllQuotes(response.data.result);
             setQuoteLoading(false);
             return response.data.result;
         } catch (error) {
             setAllQuotes([]);
             setQuoteLoading(false);
+            // console.log(error);
             message.error("Error on loading quotes..");
+            navigate("/login");
         }
     };
+
+    const getAllOrders = async (quote_id) => {
+        try {
+          const filteredData = allQuotes.filter((item) => item.quote_id == quote_id);
+          return(filteredData[0]);
+        } catch (error) {
+            //navigate('/login');
+            // console.log(error);
+            return ({});
+        }
+      };
 
     const getAllQuotesWithoutLoading = async () => {
         try {
@@ -130,11 +146,11 @@ function Quotes() {
     }
 
     const onChange = (key) => {
-        console.log(key);
+        // console.log(key);
     };
 
     const handleActionChange = (value, quote) => {
-        console.log("handleActionChange: ", value);
+        // console.log("handleActionChange: ", value);
         if (value === 'accepted' || value === 'rejected') {
             showConfirm(value, quote); // Show confirmation modal based on the selected value
         } else { // change booking date modal
@@ -147,6 +163,17 @@ function Quotes() {
             setBookingDateModalOpen(true);
             setSelectedQuote(quote);
         }
+    }
+
+    const handleAcceptedOrder=async (order)=>{
+        let orderDetails=(await getAllOrders(order));
+        // console.log(orderDetails);
+        if (orderDetails){
+         navigate(`/order-details/${orderDetails.order_id}`, {
+            state: {
+              order: orderDetails,
+            },
+          }); }
     }
 
     const onChangePage = (page) => {
@@ -188,13 +215,13 @@ function Quotes() {
             content: `You have selected the option: ${value}. Please confirm your action.`,
             async onOk() {
                 // Handle confirmed action here
-                console.log(`${value} confirmed`);
+                // console.log(`${value} confirmed`);
                 await acceptAndRejectQuote(value, quote);
                 getAllQuotesWithoutLoading();
             },
             onCancel() {
                 // Handle cancel action here
-                console.log(`${value} canceled`);
+                // console.log(`${value} canceled`);
             },
             okText: 'Yes',
             cancelText: 'No',
@@ -225,12 +252,12 @@ function Quotes() {
                     const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
                     message.success("Your order change request has been sent to Hirer successfully. You will get their response shortly for their acceptance!");
                     setBookingLoading(false);
-                    console.log("updateBookingDate: ", response);
+                    // console.log("updateBookingDate: ", response);
                     setBookingDateModalOpen(false);
                 })
                 .catch(info => {
                     setBookingLoading(false);
-                    console.log('Validation Failed:', info);
+                    // console.log('Validation Failed:', info);
                     setBookingDateModalOpen(false);
                 });
         } catch (error) {
@@ -282,7 +309,9 @@ function Quotes() {
             key: 'actions',
             render: (_, record) => (
                 <>
-                    {(record.hirer_company_id == authUser.CompanyId && record.quote_status=="pending")?
+                {(record.quote_status=="accepted")?
+                <div><Button className="orderDetailLink" type='link' onClick={()=> handleAcceptedOrder(record.quote_id)}>Order Details</Button></div>:
+                    (record.hirer_company_id == authUser.CompanyId && record.quote_status=="pending")?
                     <div>Under Review</div>
                     :
                     (record.hirer_company_id == authUser.CompanyId && record.quote_status!="pending")?
@@ -450,6 +479,9 @@ function Quotes() {
                             {selectedQuote.order_spec && <li className="list-group-item">View Specs/Standard File -&nbsp;<Link to={selectedQuote.order_spec} target="_blank">View File</Link></li>}
                             {selectedQuote.other_attachments && <li className="list-group-item">View Others File -&nbsp;<Link to={selectedQuote.other_attachments} target="_blank">View File</Link></li>}
                         </ul>
+                        <hr />
+                        <h6>Comments / Planned Shipment Details:</h6>
+                        <div className="quoteComment">{selectedQuote.comments}</div>
                     </Modal>
                 )}
 

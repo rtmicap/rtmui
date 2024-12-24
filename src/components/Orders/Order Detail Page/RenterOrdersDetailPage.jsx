@@ -23,7 +23,7 @@ function RenterOrdersDetailPage() {
             const response = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
                 params: { companyId }
             });
-            console.log("company details: ", response.data.data);
+            // console.log("company details: ", response.data.data);
             setter(response.data.data);
         } catch (error) {
             message.error("Error fetching Company Details");
@@ -39,7 +39,7 @@ function RenterOrdersDetailPage() {
     if (!order) {
         return <div>No order data found!</div>;
     }
-    console.log("order: ", order);
+    // console.log("order: ", order);
 
     const items = [
         {
@@ -58,14 +58,22 @@ function RenterOrdersDetailPage() {
         {
             label: 'Goods Status',
             children:
-                (
-                    <>
-                        {order.goods_status ?
-                            <Tag color='magenta'>{order.goods_status.toUpperCase()}</Tag>
-                            : '-'
-                        }
-                    </>
-                )
+            (
+                <>
+                {(order.goods_status!="" && order.goods_status!="goods_in_return")?
+                <div className="processFlow">
+                {order.goods_status=="goods_in_transit"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">GOODS_IN_TRANSIT</div>}
+                {order.goods_status=="first_sample_preparation"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">FIRST SAMPLE PREPARATION</div>}
+                {order.goods_status=="under_first_sample_approval"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">UNDER FIRST SAMPLE APPROVAL</div>}
+                {order.goods_status=="first_sample_repeat"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">FIRST SAMPLE REPEAT</div>}
+                {order.goods_status=="production_in_progress"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">PRODUCTION IN PROGRESS</div>}
+                {order.goods_status=="production_complete"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">PRODUCTION COMPLETE</div>}
+                </div>
+                :
+                 order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag></div>:<div className="goodsstatus">SHIPMENT_PENDING</div>
+                }
+                </>
+            )
 
         },
         {
@@ -85,14 +93,6 @@ function RenterOrdersDetailPage() {
             children: (
                 <>
                     <span>{hirerCompany ? `${hirerCompany.companyName} (${order.hirer_company_id})` : '-'}</span>
-                </>
-            ),
-        },
-        {
-            label: 'Hirer Email ID',
-            children: (
-                <>
-                    <span>{hirerCompany ? `${hirerCompany.factoryEmail}` : '-'}</span>
                 </>
             ),
         },

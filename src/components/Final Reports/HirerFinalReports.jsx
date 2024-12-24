@@ -30,7 +30,7 @@ function HirerFinalReports() {
     const getFinalReportsByOrderId = async () => {
         try {
             const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order.order_id}`)
-            console.log("getFinalReportsByOrderId: ", response.data);
+            // console.log("getFinalReportsByOrderId: ", response.data);
             if (response && response.data && response.data.results.length > 0) {
                 setFinalReportData(response.data.results);
                 // Sort the results array by inspection_date_time in descending order to get the latest record
@@ -39,7 +39,7 @@ function HirerFinalReports() {
                 );
                 // console.log("sortedDetails: ", sortedDetails);
                 const latestDetail = sortedDetails[0];
-                console.log("latestDetail: ", latestDetail);
+                // console.log("latestDetail: ", latestDetail);
                 if (latestDetail) {
                     // Set form fields based on the latest record data
                     if (authUser.CompanyId == order.hirer_company_id) {
@@ -59,7 +59,7 @@ function HirerFinalReports() {
                 }
             }
         } catch (error) {
-            console.log("getFinalReportsByOrderId err: ", error);
+            // console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
             if (response.data.results.length != 0) {
                 message.error("Error while fetching final report!");
@@ -69,12 +69,12 @@ function HirerFinalReports() {
 
     useEffect(() => {
         getFinalReportsByOrderId();
-        console.log("check form data: ", form.getFieldsValue());
+        // console.log("check form data: ", form.getFieldsValue());
     }, []);
 
 
     const onFinishFailedFinalReport = (errorInfo) => {
-        console.log('onFinishFailedFinalReport Failed:', errorInfo);
+        // console.log('onFinishFailedFinalReport Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });
@@ -88,7 +88,7 @@ function HirerFinalReports() {
     };
 
     const onOk = (value) => {
-        console.log('onOk: ', value);
+        // console.log('onOk: ', value);
     };
 
 
@@ -116,7 +116,7 @@ function HirerFinalReports() {
                 setFinalReportDispositionStatus(value);
             },
             onCancel: () => {
-                console.log('Status change canceled');
+                // console.log('Status change canceled');
             },
         });
     };
@@ -130,14 +130,14 @@ function HirerFinalReports() {
                 data.final_report_disposition = finalReportDispositionStatus;
                 data.orderid = order.order_id;
                 data.final_report_id = form.getFieldValue("final_report_id");
-                console.log("final report datta: ", data);
+                // console.log("final report datta: ", data);
                 const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
-                console.log("updated submitFinalReportStatus: ", response.data);
+                // console.log("updated submitFinalReportStatus: ", response.data);
                 message.success(response.data ? response.data.message : response.message);
                 navigate(-1);
             }
         } catch (error) {
-            console.log("error final report: ", error);
+            // console.log("error final report: ", error);
             message.error("There is some error while updating final report!");
         }
     }
@@ -300,8 +300,8 @@ function HirerFinalReports() {
                                             use12Hours: true,
                                         }}
                                         onChange={(value, dateString) => {
-                                            console.log('Selected Time: ', value);
-                                            console.log('Formatted goods pick Selected Time: ', dateString);
+                                            // console.log('Selected Time: ', value);
+                                            // console.log('Formatted goods pick Selected Time: ', dateString);
                                             setGoodsPickUpDateTime(dateString);
                                         }}
                                         onOk={onOk}

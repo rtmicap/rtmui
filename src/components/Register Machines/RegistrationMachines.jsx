@@ -73,7 +73,7 @@ function RegistrationMachines() {
             setOptionsCategory(keys.sort());
             // console.log("setOptionsCategory fields:", keys);
         } catch (error) {
-            console.log("error fields:", error);
+            // console.log("error fields:", error);
         }
     }
     useEffect(() => {
@@ -81,7 +81,7 @@ function RegistrationMachines() {
     }, [])
 
     const handleMachineCategory = async (e) => {
-        console.log("handleMachineCategory: ", e);
+        // console.log("handleMachineCategory: ", e);
         setType('');
         setCategory(e);
         // console.log("machineInputs: ", machineFieldsApi)
@@ -103,13 +103,13 @@ function RegistrationMachines() {
 
 
     const onChangeTypeMachine = async (value) => {
-        console.log(`selected ${value}`);
+        // console.log(`selected ${value}`);
         // const setValue = value == "BlowMouldingMachine" ? "BlowMoulding" : value == "InjectionMoulding" ? "InjectionMoulding" : value;
         setType(value);
         // console.log("category: ", category);
         if (category == "Cutting") {
             const cutting = Cutting[formatPascalCase(value)];
-            console.log("cutting fields: ", cutting);
+            // console.log("cutting fields: ", cutting);
             setMachineInputFields(cutting);
         } else if (category == "Turning") {
             const turning = Turning[formatPascalCase(value)];
@@ -138,7 +138,7 @@ function RegistrationMachines() {
     };
 
     const handleInputChange = (e) => {
-        console.log("e.target: ", e);
+        // console.log("e.target: ", e);
 
         if (e.target.id == "noOfMachines") {
             if (e.target.value > 1) {
@@ -150,12 +150,12 @@ function RegistrationMachines() {
     }
 
     const handleSelectChange = (value) => {
-        console.log("handleSelectCHange: ", value);
+        // console.log("handleSelectCHange: ", value);
         setSelectedOption(value);
     }
 
     const handleCheckboxChange = (e) => {
-        console.log("e.target: ", e.target);
+        // console.log("e.target: ", e.target);
         setIsChecked(e.target.checked);
     };
 
@@ -164,7 +164,7 @@ function RegistrationMachines() {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
-        console.log("handlePreview2: ", file);
+        // console.log("handlePreview2: ", file);
         setPreviewImage(file.thumbUrl || file.preview);
         setPreviewOpen(true);
         setPreviewTitle(file.name);
@@ -186,7 +186,7 @@ function RegistrationMachines() {
                     const formData = new FormData();
                     formData.append("fileName", newFileList[0].originFileObj);
                     var response = await axios.post(baseUrl, formData, configHeaders);
-                    console.log("responseData Image: ", response);
+                    // console.log("responseData Image: ", response);
                     setImageBase64(response.data.fileUrl)
                 } else {
                     setFileList([]);
@@ -195,7 +195,7 @@ function RegistrationMachines() {
             }
 
         } catch (error) {
-            console.log("responseData error: ", error);
+            // console.log("responseData error: ", error);
             message.error(`Error while uploading the Image ${error.message}`);
         }
 
@@ -204,8 +204,8 @@ function RegistrationMachines() {
 
     const onFinish = async (values) => {
         // Handle form submission here
-        console.log('Received values:', values);
-        console.log('authUser authUser:', authUser);
+        // console.log('Received values:', values);
+        // console.log('authUser authUser:', authUser);
         const formDataToSubmit = new FormData();
         values.machineId = Math.floor(Math.random() * 10);
         values.companyId = authUser.CompanyId;
@@ -223,7 +223,7 @@ function RegistrationMachines() {
             formDataObject[key] = value;
         });
 
-        console.log('formDataObject values:', formDataObject);
+        // console.log('formDataObject values:', formDataObject);
 
 
 
@@ -231,7 +231,7 @@ function RegistrationMachines() {
 
         // Add the new form data to the array
         existingFormDataArray.push(formDataObject);
-        console.log("existingFormDataArray: ", existingFormDataArray);
+        // console.log("existingFormDataArray: ", existingFormDataArray);
         localStorage.setItem('machines', JSON.stringify(existingFormDataArray));
         if (existingFormDataArray && existingFormDataArray.length > 0) {
             setOpenSummary(true);
@@ -241,8 +241,8 @@ function RegistrationMachines() {
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-        console.log('Form submission failed:', errorInfo);
+        // console.log('Failed:', errorInfo);
+        // console.log('Form submission failed:', errorInfo);
         // Extract error messages from errorInfo and display them
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
@@ -279,8 +279,8 @@ function RegistrationMachines() {
         <>
             <Form form={form} layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
                 <div className="container-fluid">
-                    <div className="row">
-                        <HeaderTitle title={'Register Machine(s)'} />
+                    <div>
+                        <HeaderTitle title={'Register Machines'} />
                     </div>
                     <div className='row'>
                         <div className="col-sm-6 col-lg-6">

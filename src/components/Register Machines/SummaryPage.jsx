@@ -24,23 +24,23 @@ function SummaryPage({ setOpenSummary, resetForm }) {
         setOpen(false);
     };
     const onEditMachine = (machine) => {
-        console.log("machineId: ", machine);
+        // console.log("machineId: ", machine);
         const filteredData = getAllMachines.filter((data) => data.machineId == machine.machineId);
         setEditedData(filteredData);
-        console.log("filteredData: ", filteredData);
+        // console.log("filteredData: ", filteredData);
         setOpen(true);
     }
 
     const onRemoveMachine = (machine) => {
-        console.log("machineId: ", machine);
+        // console.log("machineId: ", machine);
         const filteredMachines = getAllMachines.filter((data) => data.machineId !== machine.machineId);
-        console.log("filteredMachines: ", filteredMachines);
+        // console.log("filteredMachines: ", filteredMachines);
         localStorage.setItem('machines', JSON.stringify(filteredMachines));
         setMachines(filteredMachines);
     }
 
     const getAllMachines = JSON.parse(localStorage.getItem("machines"));
-    console.log("getAllMachines: ", getAllMachines);
+    // console.log("getAllMachines: ", getAllMachines);
 
     useEffect(() => {
         const getAllMachines = JSON.parse(localStorage.getItem("machines"));
@@ -81,7 +81,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
                 <Space Space size="middle" >
                     <Button block onClick={() => onEditMachine(record)} disabled>Edit</Button>
                     <Button type='primary' onClick={() => onRemoveMachine(record)} danger>Remove</Button>
-                    <a>Delete {console.log("recoed: ", record)}</a>
+                    <a>Delete</a>
                 </Space >
             ),
         },
@@ -98,12 +98,12 @@ function SummaryPage({ setOpenSummary, resetForm }) {
     }
 
     const onFinish = (values) => {
-        console.log("onFinish: ", values);
+        // console.log("onFinish: ", values);
         onSave(values);
     };
 
     const onSave = (valuesSaved) => {
-        console.log("onSave: ", valuesSaved);
+        // console.log("onSave: ", valuesSaved);
     }
 
     function formatString(input) {
@@ -116,7 +116,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
             var outputArray = [];
             getAllMachines.forEach((item) => {
                 if (item.noOfMachines > 1) {
-                    console.log("item123: ", item);
+                    // console.log("item123: ", item);
                     for (let i = 1; i <= item.noOfMachines; i++) {
                         const machineName = `m${i}`;
                         const variableFields = Object.keys(item).reduce((acc, key) => {

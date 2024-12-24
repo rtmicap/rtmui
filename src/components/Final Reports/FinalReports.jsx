@@ -36,7 +36,7 @@ function FinalReports() {
     const getFinalReportsByOrderId = async () => {
         try {
             const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order.order_id}`)
-            console.log("getFinalReportsByOrderId: ", response.data);
+            // console.log("getFinalReportsByOrderId: ", response.data);
             if (response && response.data && response.data.results.length > 0) {
                 setFinalReportData(response.data.results);
                 // Sort the results array by inspection_date_time in descending order to get the latest record
@@ -45,7 +45,7 @@ function FinalReports() {
                 );
                 // console.log("sortedDetails: ", sortedDetails);
                 const latestDetail = sortedDetails[0];
-                console.log("latestDetail: ", latestDetail);
+                // console.log("latestDetail: ", latestDetail);
                 if (latestDetail) {
                     // Set form fields based on the latest record data
                     if (authUser.CompanyId == order.hirer_company_id) {
@@ -64,7 +64,7 @@ function FinalReports() {
                 }
             }
         } catch (error) {
-            console.log("getFinalReportsByOrderId err: ", error);
+            // console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
             if (response.data.results.length!=0){
                 message.error("Error while fetching final report!");
@@ -86,14 +86,14 @@ function FinalReports() {
 
     const onFinishFinalReport = async (values) => {
         const data = form.getFieldsValue();
-        console.log("get Data: ", data);
+        // console.log("get Data: ", data);
         values.orderid = order.order_id;
         values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
         values.completion_date_time = orderCompletionDateTime;
         values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
         values.final_product_disposition = "pending_approval";
         values.first_sample_id = form.getFieldValue("first_sample_id");
-        console.log('onFinishFinalReport:', values);
+        // console.log('onFinishFinalReport:', values);
         const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
         message.success(`${response.data.message}`);
         navigate(-1);
@@ -105,19 +105,19 @@ function FinalReports() {
             data.final_product_disposition = value;
             data.orderid = order.order_id;
             data.final_report_id = form.getFieldValue("final_report_id");
-            console.log("final report datta: ", data);
+            // console.log("final report datta: ", data);
             const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
-            console.log("updated submitFinalReportStatus: ", response.data);
+            // console.log("updated submitFinalReportStatus: ", response.data);
             message.success(response.data ? response.data.message : response.message);
             navigate(-1);
         } catch (error) {
-            console.log("error final report: ", error);
+            // console.log("error final report: ", error);
             message.error("There is some error in final report!");
         }
     }
 
     const onFinishFailedFinalReport = (errorInfo) => {
-        console.log('onFinishFailedFinalReport Failed:', errorInfo);
+        // console.log('onFinishFailedFinalReport Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });
@@ -132,7 +132,7 @@ function FinalReports() {
     };
 
     const onOk = (value) => {
-        console.log('onOk: ', value);
+        // console.log('onOk: ', value);
     };
 
     const fileUpload = async (file) => {

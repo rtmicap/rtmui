@@ -11,9 +11,9 @@ function Login() {
     const { isLoading, error, userLogin } = useAuth();
 
     const onFinish = async (values) => {
-        console.log('Success:', values);
+        // console.log('Success:', values);
         userLogin(values, (res) => {
-            console.log("test u: ", res);
+            // console.log("test u: ", res);
             if (res && res.status && !res.admin) {
                 navigate('/');
             } else if (res && res.status && res.admin) {
@@ -31,10 +31,8 @@ function Login() {
     };
 
     return (
-        <>
-            <h2>Login Page</h2>
-            <br />
-            <Button type='primary' onClick={() => navigate('/register-account')}>Register Account</Button>
+        <div className="loginCard">
+            
             <Layout>
                 <Content style={{ padding: 40 }}>
                     <Card
@@ -52,19 +50,19 @@ function Login() {
                             wrapperCol={{
                                 span: 16,
                             }}
-                            style={{
-                                maxWidth: 600,
-                            }}
+                            
                             initialValues={{
                                 remember: true,
                             }}
                             onFinish={onFinish}
                             onFinishFailed={onFinishFailed}
+                            className="loginMainContainer"
                         // autoComplete="off"
                         >
                             <Form.Item
                                 label="Username"
                                 name="username"
+                                className="loginContainer"
                                 rules={[
                                     {
                                         required: true,
@@ -72,12 +70,13 @@ function Login() {
                                     },
                                 ]}
                             >
-                                <Input autoComplete='off' />
+                                <Input autoComplete='off' className="credTextbox"/>
                             </Form.Item>
 
                             <Form.Item
                                 label="Password"
                                 name="password"
+                                className="loginContainer"
                                 rules={[
                                     {
                                         required: true,
@@ -85,24 +84,29 @@ function Login() {
                                     },
                                 ]}
                             >
-                                <Input.Password />
+                                <Input.Password className="credTextbox"/>
                             </Form.Item>
-
+                            
                             <Form.Item
                                 wrapperCol={{
                                     offset: 8,
                                     span: 16,
                                 }}
                             >
-                                <Button type="primary" htmlType="submit">
+                                <div className="btnContainer">
+                                <Button className="loginBtn" type="primary" htmlType="submit">
                                     {isLoading ? 'Logging...' : 'Submit'}
                                 </Button>
+                                <Button className="registerBtn" type='secondary' onClick={() => navigate('/register-account')}>Register</Button>
+                                </div>
                             </Form.Item>
+                            
+                         
                         </Form>
                     </Card>
                 </Content>
             </Layout>
-        </>
+        </div>
     )
 }
 

@@ -65,12 +65,12 @@ function HireMachines() {
             setTotalPages(response.data.totalItems);
             message.success(response.data.message);
             setLoading(false);
-            console.log('Response data:', response.data);
+            // console.log('Response data:', response.data);
         } catch (error) {
             // Handle errors
             setLoading(false);
             message.error("There is some error while searching the machine!", error.message);
-            console.error('Error fetching data:', error);
+            // console.error('Error fetching data:', error);
         }
     };
 
@@ -78,7 +78,7 @@ function HireMachines() {
         try {
             const response = await axios.get(GET_MACHINE_CAT_TYPE);
             const machineCategories = response.data;
-            console.log("categoryNames: ", machineCategories);
+            // console.log("categoryNames: ", machineCategories);
             const machinesKey = Object.keys(machineCategories);
             setCategoryAndType(machineCategories);
             const options = machinesKey.map(category => ({
@@ -86,11 +86,11 @@ function HireMachines() {
                 label: <span>{category}</span>
             }));
             setCategories(options);
-            console.log("machinesKey log: ", machinesKey);
-            console.log("options: ", options);
+            // console.log("machinesKey log: ", machinesKey);
+            // console.log("options: ", options);
         } catch (error) {
             // Handle errors
-            console.error('Error getAllMachinesCategory data:', error);
+            // console.error('Error getAllMachinesCategory data:', error);
         }
     }
 
@@ -107,12 +107,12 @@ function HireMachines() {
             setTotalPages(machinesData.data.totalItems);
             message.success(machinesData.data.message);
             setLoading(false);
-            console.log("all machinesData: ", machinesData);
+            // console.log("all machinesData: ", machinesData);
         } catch (error) {
             // Handle errors
             setLoading(false);
             message.error("There is some error!", error.message);
-            console.error('Error machinesData data:', error);
+            // console.error('Error machinesData data:', error);
         }
     }
 
@@ -126,7 +126,7 @@ function HireMachines() {
             }));
             setMachineTypes(transformedOptions);
             // setMachineTypes(values);
-            console.log("setMachineTypes: ", values);
+            // console.log("setMachineTypes: ", values);
             setSelectedMachineCategory(value);
         } else {
             setMachineTypes([]);
@@ -134,7 +134,7 @@ function HireMachines() {
     };
 
     const handleTypeChange = (value) => {
-        console.log("handleTypeChange", value);
+        // console.log("handleTypeChange", value);
         setSelectedMachineType(value);
     };
 
@@ -151,7 +151,7 @@ function HireMachines() {
     }
 
     const handleViewDetail = (machine) => {
-        console.log("handleViewDetail: ", machine);
+        // console.log("handleViewDetail: ", machine);
         setOpen(true);
         setShowViewModal(true);
         setPassData(machine);
@@ -169,7 +169,7 @@ function HireMachines() {
     }
 
     const onShowSizeChange = (current, pageSize) => {
-        console.log("onShowSizeChange:", current, pageSize);
+        // console.log("onShowSizeChange:", current, pageSize);
     };
 
     const handlePageChange = (page, pageSize) => {
@@ -180,7 +180,7 @@ function HireMachines() {
             // alert("get all");
             getAllMachines(page);
         }
-        console.log("handlePageChange:", page, pageSize);
+        // console.log("handlePageChange:", page, pageSize);
     }
 
     const searchData =
@@ -231,7 +231,7 @@ function HireMachines() {
     return (
         <>
             <div className="container-fluid">
-                <div className="row">
+                <div>
                     <HeaderTitle title={'Hire a Machine'} />
                 </div>
                 <Form form={form} layout='vertical'>

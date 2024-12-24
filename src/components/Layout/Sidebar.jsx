@@ -5,6 +5,7 @@ const { Header, Content, Footer, Sider } = Layout;
 import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useEffect, useState } from "react";
+import Navbar from '../Navbar/Navbar'
 
 
 function getItem(label, key, icon, children) {
@@ -24,12 +25,13 @@ const items = [
     getItem('Dashboard', '/', <DashboardOutlined />),
     // getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
     // getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
-    getItem('Machine(s)', 'machines', <ToolOutlined />, [
-        getItem('Register a Machine(s)', 'register-machine', <FileAddOutlined />),
-        getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
+    getItem('Machines', 'machines', <ToolOutlined />, [
+        getItem('Register Machines', 'register-machine', <FileAddOutlined />),
+        
         getItem('My Registered Machines', 'my-registered-machines', <CalendarOutlined />),
     ]),
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
+    getItem('Hire Machines', 'hire-machine', <CalendarOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
     // getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
@@ -61,13 +63,12 @@ function Sidebar() {
     const navigate = useNavigate();
 
     const navigateMenuItems = (value) => {
-        console.log("value: ", value);
+        // console.log("value: ", value);
         if (value.key == 'logout') { // if key is logout 
             userSignOut((response) => {
-                console.log("logout: ", response);
+                // console.log("logout: ", response);
                 if (response && response.status) {
                     navigate('/login');
-                    message.success("Thank you! Please visit again")
                 }
             });
         } else { // navigate to other component
@@ -92,7 +93,7 @@ function Sidebar() {
                     collapsedWidth="0"
                     className={sideNav}
                     onBreakpoint={(broken) => {
-                        console.log(broken);
+                        // console.log(broken);
                     }}
                     onCollapse={(collapsed, type) => {
                         console.log(collapsed, type);
@@ -108,7 +109,9 @@ function Sidebar() {
 
                 {/* Content Goes here */}
                 <Layout>
-                    <Content style={{ margin: '24px 16px 0' }}>
+                
+                    <Content className="contentPage">
+                        
                         <div
                             style={{
                                 padding: 24,
@@ -121,7 +124,9 @@ function Sidebar() {
                             <Outlet />
                         </div>
                     </Content>
+                    
                 </Layout>
+                
             </Layout>
         </>
     )
