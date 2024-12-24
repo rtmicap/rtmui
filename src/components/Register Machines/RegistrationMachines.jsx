@@ -388,7 +388,7 @@ function RegistrationMachines() {
                         <div className="col-sm-6 col-lg-4">
                             {category && type && machineInputFields && machineInputFields.length > 0 &&
                                 <Form.Item
-                                    label="Upload Your Machine Image. (Image Size Max: 2MB )"
+                                    label="Upload Machine Image. (Size Max: 2MB )"
                                     name="Machine_Photo"
                                     valuePropName="fileList"
                                     getValueFromEvent={(e) => e && e.fileList}
@@ -400,7 +400,8 @@ function RegistrationMachines() {
                                         onPreview={handlePreview}
                                         onChange={handleImageChange}
                                         beforeUpload={() => false}
-                                        accept=".png,.jpeg,.jpg"
+                                        accept=".png,.jpeg,.jpg,.pdf"
+                                        maxCount={1}
                                     >
                                         {fileList.length >= 8 ? null : uploadButton}
                                     </Upload>
