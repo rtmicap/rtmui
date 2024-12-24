@@ -1,6 +1,10 @@
 import React from 'react'
 import HeaderTitle from '../../utils/HeaderTitle'
-
+import planbud from '../../assets/planned_budget.jpg'
+import ratbreak from '../../assets/Rating_breakdown.jpg'
+import rentdur from '../../assets/Rental_duration.jpg'
+import totrev from '../../assets/Total_Revenue.jpg'
+import hiredur from '../../assets/Hired_duration.jpg'
 
 function Dashboard() {
     return (
@@ -14,12 +18,12 @@ function Dashboard() {
 
                 <div className="imageContainer">
 
-                    <img className="imagebox"  src="../../src/assets/planned_budget.jpg" alt="Chart"></img>
-                    <img className="imagebox"  src="../../src/assets/Rating_breakdown.jpg" alt="Chart"></img>
-                    <img className="imagebox"  src="../../src/assets/Rental_duration.jpg" alt="Chart"></img>
-                    <img className="imagebox"  src="../../src/assets/Total_revenue.jpg" alt="Chart"></img>
+                    <img className="imagebox"  src={planbud} alt="Chart"></img>
+                    <img className="imagebox"  src={ratbreak} alt="Chart"></img>
+                    <img className="imagebox"  src={rentdur} alt="Chart"></img>
+                    <img className="imagebox"  src={totrev} alt="Chart"></img>
 
-                    <img className="imagebox" src="../../src/assets/Hired_duration.jpg" alt="Chart"></img>
+                    <img className="imagebox" src={hiredur} alt="Chart"></img>
                 </div>
 
                 {/* <div className='row'>
