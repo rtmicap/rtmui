@@ -53,16 +53,16 @@ const App = () => {
 
   // const { authUser } = useAuth();
 
-  if (token) {
-    // console.log("test auth error- Token available.");
+  /*if (token) {
+    console.log("test auth error- Token available.");
   } else {
     if (location.pathname !== '/login') {
-      // console.log("No token: Redirecting to login...");
+      console.log("No token: Redirecting to login...");
       message.warning("Your session has expired. Please login again!");
       navigate('/login');
       return;
     }
-  }
+  } */
 
   return (
     <>

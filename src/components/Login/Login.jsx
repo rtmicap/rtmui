@@ -95,7 +95,7 @@ function Login() {
                             >
                                 <div className="btnContainer">
                                 <Button className="loginBtn" type="primary" htmlType="submit">
-                                    {isLoading ? 'Logging...' : 'Submit'}
+                                    {isLoading ? 'Logging...' : 'Login'}
                                 </Button>
                                 <Button className="registerBtn" type='secondary' onClick={() => navigate('/register-account')}>Register</Button>
                                 </div>

@@ -211,8 +211,8 @@ function Quotes() {
 
     const showConfirm = (value, quote) => {
         confirm({
-            title: `Are you sure you want to ${value} this quote?`,
-            content: `You have selected the option: ${value}. Please confirm your action.`,
+            title: `Are you sure you want to ${value=='accepted'?"accept":"reject"} this quote?`,
+            content: `You have selected the option: ${value.toUpperCase()}. Please confirm your action.`,
             async onOk() {
                 // Handle confirmed action here
                 // console.log(`${value} confirmed`);
