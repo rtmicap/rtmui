@@ -1,15 +1,32 @@
 import React from 'react'
 import HeaderTitle from '../../utils/HeaderTitle'
+import planbud from '../../assets/planned_budget.jpg'
+import ratbreak from '../../assets/Rating_breakdown.jpg'
+import rentdur from '../../assets/Rental_duration.jpg'
+import totrev from '../../assets/Total_Revenue.jpg'
+import hiredur from '../../assets/Hired_duration.jpg'
 
 function Dashboard() {
     return (
         <>
-            <div className="container-fluid">
+
+
+            <div className="container-fluid dashboardpage">
                 <div>
                     <HeaderTitle title={'Dashboard'} />
                 </div>
 
-                <div className='row'>
+                <div className="imageContainer">
+
+                    <img className="imagebox"  src={planbud} alt="Chart"></img>
+                    <img className="imagebox"  src={ratbreak} alt="Chart"></img>
+                    <img className="imagebox"  src={rentdur} alt="Chart"></img>
+                    <img className="imagebox"  src={totrev} alt="Chart"></img>
+
+                    <img className="imagebox" src={hiredur} alt="Chart"></img>
+                </div>
+
+                {/* <div className='row'>
                     <div className="col-sm-6 col-lg-3">
                         <div className="card text-center">
                             <div className="card-header">
@@ -61,7 +78,7 @@ function Dashboard() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
         </>

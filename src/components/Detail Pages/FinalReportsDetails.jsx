@@ -13,7 +13,7 @@ function FinalReportsDetails({ order_id }) {
         try {
             setLoading(true);
             const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order_id}`)
-            console.log("getFinalReportsByOrderId: ", response.data);
+            // console.log("getFinalReportsByOrderId: ", response.data);
             if (response && response.data && response.data.results.length > 0) {
                 setFinalReportData(response.data.results);
                 setLoading(false);
@@ -22,7 +22,7 @@ function FinalReportsDetails({ order_id }) {
                 setFinalReportData([]);
             }
         } catch (error) {
-            console.log("getFinalReportsByOrderId err: ", error);
+            // console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
             if (response.data.results.length != 0) {
                 message.error("Error while fetching final report!");

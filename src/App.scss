@@ -1,14 +1,14 @@
 @media (max-width: 575px) {
-    .site-layout {
-      margin-left: 0 !important;
-    }
+  .site-layout {
+    margin-left: 0 !important;
   }
-  
-  @media (min-width: 576px) {
-    .site-layout {
-      margin-left: 80px !important;
-    }
+}
+
+@media (min-width: 576px) {
+  .site-layout {
+    margin-left: 80px !important;
   }
+}
   
   .tableSectionScroll{
     overflow:auto;
@@ -20,3 +20,110 @@
   .quoteViewModal>div>div{
     margin-top:25px;
   }
+  .header{
+    //border:1px solid red;
+    height:100px;
+    //width:1200px;
+  }
+
+  //*************** Login page **********************
+  .loginBtn{
+    width:100px;
+  }
+  .registerBtn{
+    border:1px solid rgb(163, 163, 163);
+    margin-left:20px;
+    width:100px;
+  }
+  .loginCard{
+    //border:1px solid red;
+    width: 800px;
+    margin:0 auto;
+    padding-top:200px;
+  }
+  .credTextbox{
+    width:250px;
+  }
+  //*************** Login page **********************
+
+  //*************** Content Layout page **********************
+  #root{
+    width:1400px;
+    margin:0 auto;
+    //border:1px solid red;
+    height:100vh;
+
+  }
+  .contentPage{
+    margin:24px;
+  }
+  .footer{
+    border:1px solid blue;
+    height:150px;
+  }
+  //*************** Content Layout page **********************
+
+  //*************** Order page **********************
+  .under_first_sample_approval{
+    background-color:rgb(255, 193, 7);
+    color:black
+  }
+  .production_complete,.order_in_progress,.order_initiated,.order_completed{
+    background-color:teal;
+    color:white;
+  }
+  .production_in_progress{
+    background-color:rgb(25, 110, 207);
+    color:white;
+  }
+  .goods_in_transit,.first_sample_repeat,.first_sample_preparation{
+    background-color:rgb(255, 173, 210);
+    opacity:75%;
+    //color: rgb(196, 29, 127);
+    color:black
+  }
+  .quoteComment{
+    min-height:50px;
+    border:1px solid rgb(222, 226, 230);
+    border-radius: 5px;
+    padding:8px 16px 8px 16px;
+    white-space: pre-wrap;
+  }
+  .order_cancelled,.goods_in_return{
+    color:red;
+    background-color: rgb(221, 246, 255);
+  }
+  .orderDetailLink{
+    padding:0;
+  }
+
+  //orderdetail process flow
+
+  .processFlow{
+    padding:10px;
+  }
+  .goodsstatus{
+    border:1px solid rgb(222, 226, 230);
+    border-radius: 5px;
+    margin-top  :10px;
+    margin-bottom:10px;
+    padding:0px 7px;
+    width:210px;
+    font-size: 13px;
+  }
+
+  //*************** Order page **********************
+
+  //************Dashboard Page ***************
+
+  .imagebox{
+    margin:10px 10px 10px 10px;
+    border:10px;
+    border-radius:10px;
+    width:460px;
+    height:375px;
+  }
+.dashboardpage{
+  
+}
+  //************Dashboard Page ***************

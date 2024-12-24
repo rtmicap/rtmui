@@ -15,12 +15,12 @@ function MyRegisteredMachines() {
     try {
       setLoading(true);
       const response = await axios.get(GET_MACHINES_BY_ID);
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       setMachinesData(response.data.result);
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log("getMachinesByCompanyId err: ", error);
+      // console.log("getMachinesByCompanyId err: ", error);
       message.error("Error while fetching your machines!");
     }
   }

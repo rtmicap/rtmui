@@ -25,7 +25,7 @@ function ListOfUsers() {
     };
 
     const getCompanyDetailsFN = async (email) => {
-        console.log("values: ", email);
+        // console.log("values: ", email);
         if(email){
             const params = {
                 factoryEmail: email
@@ -36,10 +36,10 @@ function ListOfUsers() {
                 });
                 message.success(`${response.data.result}`);
                 setData(response.data);
-                console.log("getCompanyDetailsFN: ", response);
+                // console.log("getCompanyDetailsFN: ", response);
     
             } catch (error) {
-                console.log("getCompanyDetailsFN error: ", error);
+                // console.log("getCompanyDetailsFN error: ", error);
                 message.error(`${error && error.response ? error.response.data : 'There was an error! Please check the email or maybe email does not exist'}`);
                 setData(null);
             }
@@ -49,7 +49,7 @@ function ListOfUsers() {
     }
 
     const updatePassword = async (email) => {
-        console.log("updatePassword: ", email);
+        // console.log("updatePassword: ", email);
         setUserEmail(email);
         setIsModalOpen(true);
     }
@@ -85,14 +85,14 @@ function ListOfUsers() {
             }
             const response = await axios.patch(ADMIN_PASSWORD_CHANGE, reqItem);
             message.success(response.data);
-            console.log('response:', response);
+            // console.log('response:', response);
             if (response && response.status == 200) {
                 form.resetFields();
                 // getCompanyDetailsFN(userEmail);
             }
-            console.log('Success:', values);
+            // console.log('Success:', values);
         } catch (error) {
-            console.log("ADMIN_PASSWORD_CHANGE error: ", error);
+            // console.log("ADMIN_PASSWORD_CHANGE error: ", error);
             message.error(`${error && error.response ? error.response.data : 'There was an error! Please check the password code!'}`);
             form.resetFields();
         }
@@ -100,13 +100,13 @@ function ListOfUsers() {
     };
 
     const handleSearch = (value) => {
-        console.log("handleSearch: ", value);
+        // console.log("handleSearch: ", value);
         setUserEmail(value);
         getCompanyDetailsFN(value);
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        // console.log('Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });

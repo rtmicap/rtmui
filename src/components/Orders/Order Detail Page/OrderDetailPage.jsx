@@ -18,7 +18,7 @@ function OrderDetailPage() {
     if (!order) {
         return <div>No order data found!</div>;
     }
-    console.log("order: ", order);
+    // console.log("order: ", order);
 
     return (
         <>
