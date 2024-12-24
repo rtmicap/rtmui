@@ -70,7 +70,8 @@ function HireMachines() {
             // Handle errors
             setLoading(false);
             message.error("There is some error while searching the machine!", error.message);
-            // console.error('Error fetching data:', error);
+            //console.error('Error fetching data:', error);
+            navigate("/login");
         }
     };
 
