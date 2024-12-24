@@ -4,6 +4,7 @@ import { UploadOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 const { Step } = Steps;
 const { Content } = Layout;
 import Countries from '../../utils/Countries and States/countries.json';
+import { LeftCircleOutlined } from "@ant-design/icons";
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 import config from "../../env.json";
@@ -1595,8 +1596,9 @@ const RegistrationAccount = () => {
             <Layout>
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
+                    <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
                         <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
-                        <Button type='primary' onClick={() => navigate("/login")} >Back to Login Page</Button>
+                        
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
                                 message="Informational Notes"
