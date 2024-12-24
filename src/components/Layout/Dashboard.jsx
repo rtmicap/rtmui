@@ -1,15 +1,28 @@
 import React from 'react'
 import HeaderTitle from '../../utils/HeaderTitle'
 
+
 function Dashboard() {
     return (
         <>
-            <div className="container-fluid">
+
+
+            <div className="container-fluid dashboardpage">
                 <div>
                     <HeaderTitle title={'Dashboard'} />
                 </div>
 
-                <div className='row'>
+                <div className="imageContainer">
+
+                    <img className="imagebox"  src="../../src/assets/planned_budget.jpg" alt="Chart"></img>
+                    <img className="imagebox"  src="../../src/assets/Rating_breakdown.jpg" alt="Chart"></img>
+                    <img className="imagebox"  src="../../src/assets/Rental_duration.jpg" alt="Chart"></img>
+                    <img className="imagebox"  src="../../src/assets/Total_revenue.jpg" alt="Chart"></img>
+
+                    <img className="imagebox" src="../../src/assets/Hired_duration.jpg" alt="Chart"></img>
+                </div>
+
+                {/* <div className='row'>
                     <div className="col-sm-6 col-lg-3">
                         <div className="card text-center">
                             <div className="card-header">
@@ -61,7 +74,7 @@ function Dashboard() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
         </>

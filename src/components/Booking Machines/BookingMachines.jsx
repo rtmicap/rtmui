@@ -14,9 +14,9 @@ const { TextArea } = Input;
 function BookingMachines() {
     const location = useLocation();
     const navigate = useNavigate();
-    console.log("location: ", location);
+    // console.log("location: ", location);
     const { machineId } = useParams();
-    console.log("machineId: ", machineId);
+    // console.log("machineId: ", machineId);
     const [form] = Form.useForm();
     const [plannedStartDateTime, setPlannedStartDateTime] = useState('');
     const [plannedEndDateTime, setPlannedEndDateTime] = useState('');
@@ -57,7 +57,7 @@ function BookingMachines() {
             const formData = new FormData();
             formData.append("fileName", file.originFileObj);
             var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            console.log("responseFileData: ", response);
+            // console.log("responseFileData: ", response);
             // setFileLoading(false);
             // setProcessFileLoading(false);
             // setProgramFileLoading(false);
@@ -71,7 +71,7 @@ function BookingMachines() {
     }
 
     const onOk = (value) => {
-        console.log('onOk: ', value);
+        // console.log('onOk: ', value);
     };
     const onFinish = async (values) => {
         try {
@@ -84,7 +84,7 @@ function BookingMachines() {
             values.orderprogramsheet = viewProgramSheetFile;
             values.orderspec = viewSpecsFile;
             values.otherattachments = viewOthersFile;
-            console.log('onFinish:', values);
+            // console.log('onFinish:', values);
             const response = await axios.post(QUOTE_SAVE_URL, values);
             // console.log("save quote: ", response);
             message.success(`${response.data.message}`);
@@ -99,7 +99,7 @@ function BookingMachines() {
             };
         } catch (error) {
             message.error(`${error.response.data && error.response.data.detailType ? error.response.data.detailType : 'Error while updating the quote. Please try again!'}`);
-            console.log("quote error: ", error);
+            // console.log("quote error: ", error);
             setStep(1);
             setLoading(false);
         }
@@ -107,7 +107,7 @@ function BookingMachines() {
     }
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        // console.log('Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });
@@ -299,9 +299,9 @@ function BookingMachines() {
                                             }}
                                             onChange={(value, dateString) => {
                                                 const utcDate = dayjs(value).utc().format(); // Convert to UTC
-                                                console.log('Selected utcDate: ', utcDate);
-                                                console.log('Selected Time: ', value);
-                                                console.log('dateString Selected Time: ', dateString);
+                                                // console.log('Selected utcDate: ', utcDate);
+                                                // console.log('Selected Time: ', value);
+                                                // console.log('dateString Selected Time: ', dateString);
                                                 setPlannedStartDateTime(utcDate);
                                             }}
                                             onOk={onOk}
@@ -328,9 +328,9 @@ function BookingMachines() {
                                             }}
                                             onChange={(value, dateString) => {
                                                 const utcEndDate = dayjs(value).utc().format(); // Convert to UTC
-                                                console.log('Selected utcEndDate: ', utcEndDate);
-                                                console.log('Selected Time: ', value);
-                                                console.log('dateString Selected Time: ', dateString);
+                                                // console.log('Selected utcEndDate: ', utcEndDate);
+                                                // console.log('Selected Time: ', value);
+                                                // console.log('dateString Selected Time: ', dateString);
                                                 setPlannedEndDateTime(utcEndDate);
                                             }}
                                             onOk={onOk}

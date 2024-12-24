@@ -28,16 +28,16 @@ function AdminSidebar() {
     const navigate = useNavigate();
 
     const navigateMenuItems = (value) => {
-        console.log("value: ", value);
+        // console.log("value: ", value);
         if (value.key == 'logout') { // if key is logout 
             userSignOut((response) => {
-                console.log("logout: ", response);
+                // console.log("logout: ", response);
                 if (response && response.status) {
                     navigate('/login')
                 }
             });
         } else { // navigate to other component
-            console.log('/admin/' + value.key);
+            // console.log('/admin/' + value.key);
             navigate(value.key)
         }
     }
@@ -53,10 +53,10 @@ function AdminSidebar() {
                     breakpoint="lg"
                     collapsedWidth="0"
                     onBreakpoint={(broken) => {
-                        console.log(broken);
+                        // console.log(broken);
                     }}
                     onCollapse={(collapsed, type) => {
-                        console.log(collapsed, type);
+                        // console.log(collapsed, type);
                     }}
                 >
                     <div className="demo-logo-vertical">

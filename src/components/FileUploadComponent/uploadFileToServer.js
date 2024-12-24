@@ -12,7 +12,7 @@ const uploadFileToServer = async (file, name) => {
         });
         return response.data.fileUrl; // Returning the file URL from the server response
     } catch (error) {
-        console.error('Error uploading file: ', error);
+        // console.error('Error uploading file: ', error);
         throw error;
     }
 };

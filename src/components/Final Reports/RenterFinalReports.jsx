@@ -33,12 +33,12 @@ function RenterFinalReports() {
     const getFinalReportsByOrderId = async () => {
         try {
             const response = await axios.get(`${GET_FINAL_SAMPLE_REPORT_ORDERID_URL}/${order.order_id}`)
-            console.log("getFinalReportsByOrderId: ", response.data);
+            // console.log("getFinalReportsByOrderId: ", response.data);
             if (response && response.data && response.data.results.length > 0) {
                 setFinalReportData(response.data.results);
             }
         } catch (error) {
-            console.log("getFinalReportsByOrderId err: ", error);
+            // console.log("getFinalReportsByOrderId err: ", error);
             setLoading(false);
             if (response.data.results.length != 0) {
                 message.error("Error while fetching final report!");
@@ -52,21 +52,21 @@ function RenterFinalReports() {
 
     const onFinishFinalReport = async (values) => {
         const data = form.getFieldsValue();
-        console.log("get Data: ", data);
+        // console.log("get Data: ", data);
         values.orderid = order.order_id;
         values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
         values.completion_date_time = orderCompletionDateTime;
         values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
         values.final_product_disposition = "pending_approval";
         values.first_sample_id = form.getFieldValue("first_sample_id");
-        console.log('onFinishFinalReport:', values);
+        // console.log('onFinishFinalReport:', values);
         const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
         message.success(`${response.data.message}`);
         navigate(-1);
     }
 
     const onFinishFailedFinalReport = (errorInfo) => {
-        console.log('onFinishFailedFinalReport Failed:', errorInfo);
+        // console.log('onFinishFailedFinalReport Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
             message.error(fieldError.errors[0]);
         });
@@ -80,7 +80,7 @@ function RenterFinalReports() {
     };
 
     const onOk = (value) => {
-        console.log('onOk: ', value);
+        // console.log('onOk: ', value);
     };
 
     const disabledDate = (current) => {
@@ -92,7 +92,7 @@ function RenterFinalReports() {
         setFileFinalReportLoading(true);
         try {
             const fileUrl = await uploadFileToServer(file, name);
-            console.log('Uploaded file URL:', fileUrl);
+            // console.log('Uploaded file URL:', fileUrl);
             setViewProdLotInspectionReportFile(fileUrl);
             return fileUrl;
         } finally {
@@ -152,8 +152,8 @@ function RenterFinalReports() {
                                             use12Hours: true,
                                         }}
                                         onChange={(value, dateString) => {
-                                            console.log('Selected Time: ', value);
-                                            console.log('Formatted Selected Time: ', dateString);
+                                            // console.log('Selected Time: ', value);
+                                            // console.log('Formatted Selected Time: ', dateString);
                                             setOrderCompletionDateTime(dateString);
                                         }}
                                         onOk={onOk}

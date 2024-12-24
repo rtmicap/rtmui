@@ -36,7 +36,7 @@ function MyBookings() {
 
     const getAllBookings = async () => {
         const response = await axios.get(getAllBookingsUrl);
-        console.log("res", response.data);
+        // console.log("res", response.data);
         const filteredData = response.data.results.filter((item) => item.hirer_company_id == authUser.CompanyId)
         return filteredData;
     };
@@ -45,9 +45,9 @@ function MyBookings() {
         queryKey: ['allBookings'], queryFn: getAllBookings
     })
 
-    console.log("isPending: ", isPending);
-    console.log("error: ", error);
-    console.log("data: ", data);
+    // console.log("isPending: ", isPending);
+    // console.log("error: ", error);
+    // console.log("data: ", data);
 
     if (isPending) return 'Loading Your Bookings...'
 
@@ -147,10 +147,10 @@ function MyBookings() {
 // View details 
 
 const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
-    console.log("items vie", items);
+    // console.log("items vie", items);
 
     const { authUser } = useAuth();
-    console.log("items authUser", authUser);
+    // console.log("items authUser", authUser);
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [size, setSize] = useState();
@@ -204,12 +204,12 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
 
 
             const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
-            console.log("accepted: ", response);
+            // console.log("accepted: ", response);
             message.success("Quote Accepted!");
             // setItems(response.data);
             setIsLoading(false);
         } catch (error) {
-            console.log("accepted error: ", error);
+            // console.log("accepted error: ", error);
             message.error("Something error while accepting the quote!");
             setIsLoading(false);
         }
@@ -326,28 +326,28 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
     }
 
     const onOk = (value) => {
-        console.log('onOk: ', value);
+        // console.log('onOk: ', value);
     };
 
     const onFinish = (values) => {
         values.shipment_datetime = shipmentDateTime;
         values.goods_status = "goods_in_transit";
-        console.log('Success:', values);
+        // console.log('Success:', values);
     };
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        // console.log('Failed:', errorInfo);
     };
 
     const props = {
         beforeUpload: (file) => {
-            console.log("file type: ", file);
+            // console.log("file type: ", file);
             const isPNG = file.type === 'application/pdf';
             if (!isPNG) {
                 message.error(`${file.name} is not a pdf file`);
             }
 
             const isSizeLimit = file.size / (1024 * 1024) > 2;
-            console.log("isSizeLimit: ", isSizeLimit);
+            // console.log("isSizeLimit: ", isSizeLimit);
             if (isSizeLimit) {
                 message.error(`"File size is too large (max 2 MB)`);
             }
@@ -355,7 +355,7 @@ const ViewModal = ({ isModalOpen, handleOk, handleCancel, items }) => {
             return isPNG || isSizeLimit || Upload.LIST_IGNORE;
         },
         onChange: (info) => {
-            console.log(info.fileList);
+            // console.log(info.fileList);
         },
     };
 

@@ -78,6 +78,9 @@ export const AuthContextProvider = ({ children }) => {
 
     const getAuthUser = () => {
         fetchStart();
+        console.log("Token ---- getauth ")
+        const token = localStorage.getItem('authToken');
+        axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
         axios.post(CURRENT_USER_URL)
             .then(({ data }) => {
                 console.log("currentUser: ", data);
@@ -93,7 +96,8 @@ export const AuthContextProvider = ({ children }) => {
                 console.log("error curr2: ", error);
                 axios.defaults.headers.common['authorization'] = '';
                 fetchError(error.message);
-            });
+                navigate('/login');
+            })
     };
 
 
@@ -101,9 +105,7 @@ export const AuthContextProvider = ({ children }) => {
     // component that utilizes this hook to re-render with the latest auth object.
     useEffect(() => {
         const token = localStorage.getItem('authToken');
-        if (token) {
-            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
-        }
+        axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
 
         axios.post(CURRENT_USER_URL)
             .then(({ data }) => {
@@ -116,7 +118,7 @@ export const AuthContextProvider = ({ children }) => {
                 localStorage.removeItem('authToken');
                 axios.defaults.headers.common['authorization'] = '';
                 setLoadingUser(false);
-            });
+            });//}
     }, []);
 
 

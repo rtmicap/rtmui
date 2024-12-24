@@ -1,4 +1,4 @@
-import { Button, Collapse, message, Table, Tabs } from 'antd';
+import { Button, Collapse, message, Table, Tabs,Tag } from 'antd';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 
 function Orders() {
 
-  const { authUser } = useAuth();
+  const { authUser,getAuthUser } = useAuth();
   const navigate = useNavigate();
 
   const [allOrders, setAllOrders] = useState([]);
@@ -24,23 +24,31 @@ function Orders() {
 
   const getAllOrders = async () => {
     try {
+      
       setOrderLoading(true);
+      const token = localStorage.getItem('authToken');
+      axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
       const response = await axios.get(GET_ALL_ORDERS_URL);
       // const filteredData = response.data.results.filter((item) => item.renter_company_id == authUser.CompanyId);
+      if (response && response.data.results){
       await response.data.results.sort((d1,d2)=>{
-        return new Date(d1.actual_start_date_time)- new Date(d2.actual_start_date_time);
+          return new Date(d1.actual_start_date_time)- new Date(d2.actual_start_date_time);
       })
       setAllOrders(response.data.results);
       setOrderLoading(false);
       return response.data.results;
+    }
     } catch (error) {
       setAllOrders([]);
       setOrderLoading(false);
       message.error("Error on loading orders..");
+      navigate('/login');
     }
   };
 
   useEffect(() => {
+    //console.log(authUser);
+    //getAuthUser();
     getAllOrders();
   }, []);
 
@@ -73,8 +81,16 @@ function Orders() {
   // Define columns for the orders table
   const columns = [
     { title: 'ID', dataIndex: 'quote_id', key: 'quote_id' },
-    { title: 'Status', dataIndex: 'order_status', key: 'order_status' },
-    { title: 'Goods Status', dataIndex: 'goods_status', key: 'goods_status' },
+    { title: 'Status', key: 'order_status',
+      render: (_, record) => (
+        <Tag className={record.order_status}><div>{record.order_status.toUpperCase()}</div></Tag>
+      )
+    },
+    { title: 'Goods Status', key: 'goods_status',
+      render: (_, record) => (
+        <Tag className={record.goods_status}><div>{record.goods_status.toUpperCase()}</div></Tag>
+      )
+    },
     { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
     { 
       title: 'Date', 

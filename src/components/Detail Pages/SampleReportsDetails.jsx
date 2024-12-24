@@ -22,7 +22,7 @@ function SampleReportsDetails({ order_id }) {
                 setSampleReportData([]);
             }
         } catch (error) {
-            console.log("getSampleReportsByOrderId err: ", error);
+            // console.log("getSampleReportsByOrderId err: ", error);
             setLoading(false);
             message.error("Error while fetching sample report!");
         }
