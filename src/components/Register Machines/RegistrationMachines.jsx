@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Row, Select, Form, Input, Upload, Button, Space, message, Image, Modal, Checkbox } from 'antd'
+import { Col, Row, Select, Form, Input, Upload, Button, Space, message, Image, Modal, Checkbox, Tooltip } from 'antd'
 import { machineFields } from '../Machine Variable Fields/MachineFiellds';
-import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 import { Cutting } from '../Machine Variable Fields/Cutting';
 import { Turning } from '../Machine Variable Fields/Turning';
@@ -171,7 +171,7 @@ function RegistrationMachines() {
     };
 
     const handleImageChange = async ({ fileList: newFileList }) => {
-        // console.log("newFileList: ", newFileList[0]);
+        console.log("newFileList: ", newFileList);
         // console.log("newFileList: ", newFileList[0].uid);
         try {
             if (newFileList && newFileList.length > 0) {
@@ -274,6 +274,17 @@ function RegistrationMachines() {
             <SummaryPage openSummary={openSummary} setOpenSummary={setOpenSummary} resetForm={resetForm} />
         )
     }
+
+    const handleDelete = (file) => {
+        setFileList((prevList) => prevList.filter((item) => item.uid !== file.uid));
+    };
+
+    const validateFileList = () => {
+        if (fileList.length === 0) {
+            return Promise.reject(new Error('Please upload a machine photo!'));
+        }
+        return Promise.resolve();
+    };
 
     return (
         <>
@@ -392,7 +403,7 @@ function RegistrationMachines() {
                                     name="Machine_Photo"
                                     valuePropName="fileList"
                                     getValueFromEvent={(e) => e && e.fileList}
-                                    rules={[{ required: true, message: 'Please upload machine photo!' }]}
+                                    rules={[{ required: true, validator: validateFileList }]}
                                 >
                                     <Upload
                                         listType="picture-card"
@@ -402,9 +413,38 @@ function RegistrationMachines() {
                                         beforeUpload={() => false}
                                         accept=".png,.jpeg,.jpg,.pdf"
                                         maxCount={1}
+                                        showUploadList={false}
                                     >
-                                        {fileList.length >= 8 ? null : uploadButton}
+                                        {fileList.length < 1 && uploadButton}
                                     </Upload>
+
+                                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                        {fileList.map((file) => (
+                                            <div key={file.uid} style={{ position: 'relative' }}>
+                                                <img
+                                                    src={URL.createObjectURL(file.originFileObj)}
+                                                    alt="uploaded"
+                                                    style={{ width: '100%', height: '100%', borderRadius: '4px' }}
+                                                />
+                                                <Tooltip title="Delete Image">
+                                                    <Button
+                                                        type="text"
+                                                        danger
+                                                        icon={<DeleteOutlined />}
+                                                        onClick={() => handleDelete(file)}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-10px',
+                                                            right: '-10px',
+                                                            background: '#fff',
+                                                            border: '1px solid #d9d9d9',
+                                                            borderRadius: '50%',
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                 </Form.Item>
                             }
