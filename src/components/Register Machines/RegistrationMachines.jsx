@@ -425,23 +425,27 @@ function RegistrationMachines() {
                                             if (file.type == "application/pdf") {
                                                 return (
                                                     <div key={file.uid} style={{ position: 'relative' }}>
-                                                        <Link to={imageBase64} target={'_blank'}>View File</Link>
-                                                        <Tooltip title="Delete File">
-                                                            <Button
-                                                                type="text"
-                                                                danger
-                                                                icon={<DeleteOutlined />}
-                                                                onClick={() => handleDelete(file)}
-                                                                style={{
-                                                                    position: 'absolute',
-                                                                    top: '-4px',
-                                                                    right: '-45px',
-                                                                    background: '#fff',
-                                                                    border: '1px solid #d9d9d9',
-                                                                    borderRadius: '50%',
-                                                                }}
-                                                            />
-                                                        </Tooltip>
+                                                        {imageBase64 &&
+                                                            <>
+                                                                <Link to={imageBase64} target={'_blank'}>View File</Link>
+                                                                <Tooltip title="Delete File">
+                                                                    <Button
+                                                                        type="text"
+                                                                        danger
+                                                                        icon={<DeleteOutlined />}
+                                                                        onClick={() => handleDelete(file)}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '-4px',
+                                                                            right: '-45px',
+                                                                            background: '#fff',
+                                                                            border: '1px solid #d9d9d9',
+                                                                            borderRadius: '50%',
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            </>
+                                                        }
                                                     </div>
                                                 )
                                             } else {
