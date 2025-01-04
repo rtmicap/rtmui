@@ -15,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import HeaderTitle from '../../utils/HeaderTitle';
 import SummaryPage from './SummaryPage';
 import { FILE_UPLOAD_URL, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
+import { Link } from 'react-router-dom';
 const getBase64 = (img) => {
     const reader = new FileReader();
     reader.readAsDataURL(img);
@@ -276,6 +277,7 @@ function RegistrationMachines() {
     }
 
     const handleDelete = (file) => {
+        setImageBase64(null)
         setFileList((prevList) => prevList.filter((item) => item.uid !== file.uid));
     };
 
@@ -419,31 +421,58 @@ function RegistrationMachines() {
                                     </Upload>
 
                                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                        {fileList.map((file) => (
-                                            <div key={file.uid} style={{ position: 'relative' }}>
-                                                <img
-                                                    src={URL.createObjectURL(file.originFileObj)}
-                                                    alt="uploaded"
-                                                    style={{ width: '100%', height: '100%', borderRadius: '4px' }}
-                                                />
-                                                <Tooltip title="Delete Image">
-                                                    <Button
-                                                        type="text"
-                                                        danger
-                                                        icon={<DeleteOutlined />}
-                                                        onClick={() => handleDelete(file)}
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '-10px',
-                                                            right: '-10px',
-                                                            background: '#fff',
-                                                            border: '1px solid #d9d9d9',
-                                                            borderRadius: '50%',
-                                                        }}
-                                                    />
-                                                </Tooltip>
-                                            </div>
-                                        ))}
+                                        {fileList.map((file) => {
+                                            if (file.type == "application/pdf") {
+                                                return (
+                                                    <div key={file.uid} style={{ position: 'relative' }}>
+                                                        <Link to={imageBase64} target={'_blank'}>View File</Link>
+                                                        <Tooltip title="Delete File">
+                                                            <Button
+                                                                type="text"
+                                                                danger
+                                                                icon={<DeleteOutlined />}
+                                                                onClick={() => handleDelete(file)}
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '-4px',
+                                                                    right: '-45px',
+                                                                    background: '#fff',
+                                                                    border: '1px solid #d9d9d9',
+                                                                    borderRadius: '50%',
+                                                                }}
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
+                                                )
+                                            } else {
+                                                return (
+                                                    <div key={file.uid} style={{ position: 'relative' }}>
+                                                        <img
+                                                            src={URL.createObjectURL(file.originFileObj)}
+                                                            alt="uploaded"
+                                                            style={{ width: '100%', height: '100%', borderRadius: '4px' }}
+                                                        />
+                                                        <Tooltip title="Delete Image">
+                                                            <Button
+                                                                type="text"
+                                                                danger
+                                                                icon={<DeleteOutlined />}
+                                                                onClick={() => handleDelete(file)}
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '-10px',
+                                                                    right: '-10px',
+                                                                    background: '#fff',
+                                                                    border: '1px solid #d9d9d9',
+                                                                    borderRadius: '50%',
+                                                                }}
+                                                            />
+                                                        </Tooltip>
+                                                    </div>
+                                                )
+                                            }
+                                        })}
+
                                     </div>
 
                                 </Form.Item>
