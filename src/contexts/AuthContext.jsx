@@ -73,7 +73,7 @@ export const AuthContextProvider = ({ children }) => {
         localStorage.removeItem('authToken');
         setAuthUser(false);
         fetchSuccess();
-        if (callbackFun) callbackFun({ status: true, message: "Logout Successfully" });
+        if (callbackFun) callbackFun({ status: true, message: "Logged Out Successfully" });
     };
 
     const getAuthUser = () => {

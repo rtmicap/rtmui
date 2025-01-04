@@ -68,6 +68,7 @@ function Sidebar() {
             userSignOut((response) => {
                 // console.log("logout: ", response);
                 if (response && response.status) {
+                    message.success(response.message);
                     navigate('/login');
                 }
             });
