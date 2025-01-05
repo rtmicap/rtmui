@@ -569,9 +569,9 @@ function HirerShipmentPage() {
                                                 );
                                             })}
                                             <Form.Item>
-                                                {fields.length < 4 && (
+                                                {fields.length < 12 && (
                                                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                                        Add more shipment details (Upto 4)
+                                                        Add more shipment details (Upto 12)
                                                     </Button>
                                                 )}
                                             </Form.Item>

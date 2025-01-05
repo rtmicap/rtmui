@@ -8,7 +8,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 import config from "../../env.json";
-import { REGISTER_ACCOUNT_URL } from '../../api/apiUrls';
+import { REGISTER_ACCOUNT_URL,CHECK_REGISTERED_USER } from '../../api/apiUrls';
 const { Text } = Typography;
 import axios from "../../api/axios";
 
@@ -953,7 +953,7 @@ const RegistrationAccount = () => {
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item
                                 name="factoryEmailAddress"
-                                label="Factory Email Address"
+                                label="Factory Email Address (This is your login Username)"
                                 rules={[
                                     {
                                         required: true,
@@ -1565,12 +1565,55 @@ const RegistrationAccount = () => {
     // const formData = new FormData();
 
     const handleNext = () => {
-        form.validateFields().then((values) => {
+        form.validateFields().then(async(values) => {
             console.log("form: ", values);
-            setFormData({ ...formData, ...values });
+            if(currentStep==0){
+            await validateUserName(values.factoryEmailAddress);
+            }
+            if(currentStep==1){
+            await validateDocDetails(values.GSTIN,values.PAN,values.indLicNum)
+            }
             setCurrentStep(currentStep + 1);
-        });
+            setFormData({ ...formData, ...values });
+        }).catch(error=>{
+            return
+        })
+       
     };
+
+    const validateUserName = async(value) => {
+        
+         let factoryEmail = value;
+            const response = await axios.get(CHECK_REGISTERED_USER, {
+                            params: { factoryEmail }
+            })
+            if (response.data.message=='UserId with provided information is already present in database'){
+                form.setFields([{ name: 'factoryEmailAddress',errors:['Factory Email is already registered.']}])
+                return Promise.reject(new Error('Factory Email is already registered.'));
+            }
+            else{
+                return Promise.resolve();
+            }
+  
+     }
+
+     const validateDocDetails = async(gstid,panid,cinid)=>{
+        console.log(gstid,panid,cinid);
+        const response = await axios.get(CHECK_REGISTERED_USER, {
+            params: { 
+                gst:gstid,
+                pan:panid,
+                cin:cinid 
+            }
+        })
+        if (response.data.message=='UserId with provided information is already present in database'){
+            form.setFields([{ name: 'indLicNum',errors:['CIN is already registered.']},{ name: 'GSTIN',errors:['GST is already registered.']},{ name: 'PAN',errors:['PAN is already registered.']}])
+            return Promise.reject(new Error('Factory Email is already registered.'));
+        }
+        else{
+            return Promise.resolve();
+        }
+     }
 
     const handlePrev = () => {
         setCurrentStep(currentStep - 1);
