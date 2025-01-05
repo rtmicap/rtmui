@@ -1,5 +1,6 @@
 // register account url
 export const REGISTER_ACCOUNT_URL = "/registration/saveuser";
+export const CHECK_REGISTERED_USER = "/registration/userexists";
 
 // login url
 export const LOGIN_URL = "/users/login";

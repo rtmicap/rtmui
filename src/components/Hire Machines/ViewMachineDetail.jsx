@@ -1,5 +1,6 @@
 import { Button, Descriptions, Modal } from 'antd'
 import React from 'react'
+import "./style.scss";
 
 function ViewMachineDetail({ open, setOpen, machine }) {
     console.log("view modal: ", machine);

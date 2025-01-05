@@ -35,12 +35,6 @@ function ShipmentDetails({ order_id }) {
     }, []);
 
     const columns = [
-        // {
-        //     title: 'Shipment ID',
-        //     dataIndex: 'shipment_id',
-        //     key: 'shipment_id',
-        //     //   render: (text) => <a>{text}</a>,
-        // },
         {
             title: 'Types of Goods',
             dataIndex: 'type_of_goods',

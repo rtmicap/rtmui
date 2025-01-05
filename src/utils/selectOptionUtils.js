@@ -3,6 +3,7 @@ export const typesOfGoods = [
     { value: 'fixtures', label: 'Fixtures' },
     { value: 'tools', label: 'Tools' },
     { value: 'gauges', label: 'Gauges' },
+    { value: 'other', label: 'Other' },
     // { value: 'invoice', label: 'Invoice' }
 ];
 
@@ -24,7 +25,8 @@ export const receiptConfirmation = [
     { value: 'received_in_full', label: 'Received in Full' },
     { value: 'received_short', label: 'Received Short' },
     { value: 'reject_goods_quality_issue', label: 'Rejected' },
-    { value: 'return_goods_wrong_parts', label: 'Wrong Parts' }
+    { value: 'return_goods_wrong_parts', label: 'Wrong Parts' },
+    { value: 'on_hold', label: 'On Hold' },
 ];
 
 

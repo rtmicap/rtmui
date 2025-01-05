@@ -11,7 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
 import { LikeOutlined, MessageOutlined, DownOutlined } from '@ant-design/icons';
 import { Avatar, List } from 'antd';
-import "./style.css";
+import "./style.scss";
 import axios from '../../api/axios';
 
 const { Title, Text } = Typography;
