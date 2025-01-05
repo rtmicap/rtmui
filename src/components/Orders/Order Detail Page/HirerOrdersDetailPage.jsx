@@ -72,7 +72,10 @@ function HirerOrdersDetailPage() {
                     {order.goods_status=="production_complete"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">PRODUCTION COMPLETE</div>}
                     </div>
                     :
-                     order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag></div>:<div className="goodsstatus">SHIPMENT_PENDING</div>
+                     order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag></div>
+                        :
+                            order.goods_status=="first_sample_repeat"? <Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>
+                                :<div className="goodsstatus">SHIPMENT_PENDING</div>
                     }
                     </>
                 )
