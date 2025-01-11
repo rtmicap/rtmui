@@ -1,7 +1,7 @@
 import { Button, Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Table, Tabs, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { ReloadOutlined } from "@ant-design/icons";
-import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL, GET_ALL_ORDERS_URL} from '../../api/apiUrls';
+import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL, GET_ALL_ORDERS_URL } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
@@ -67,9 +67,9 @@ function Quotes() {
             const token = localStorage.getItem('authToken');
             axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
             const response = await axios.get(GET_ALL_QUOTES_URL);
-            await response.data.result.sort((d1,d2)=>{
-                return new Date(d1.planned_start_date_time)- new Date(d2.planned_start_date_time);
-              })
+            await response.data.result.sort((d1, d2) => {
+                return new Date(d1.planned_start_date_time) - new Date(d2.planned_start_date_time);
+            })
             // console.log("Quote response", response.status);
             setAllQuotes(response.data.result);
             setQuoteLoading(false);
@@ -85,21 +85,21 @@ function Quotes() {
 
     const getAllOrders = async (quote_id) => {
         try {
-          const filteredData = allQuotes.filter((item) => item.quote_id == quote_id);
-          return(filteredData[0]);
+            const filteredData = allQuotes.filter((item) => item.quote_id == quote_id);
+            return (filteredData[0]);
         } catch (error) {
             //navigate('/login');
             // console.log(error);
             return ({});
         }
-      };
+    };
 
     const getAllQuotesWithoutLoading = async () => {
         try {
             const response = await axios.get(GET_ALL_QUOTES_URL);
-            await response.data.result.sort((d1,d2)=>{
-                return new Date(d1.planned_start_date_time)- new Date(d2.planned_start_date_time);
-              })
+            await response.data.result.sort((d1, d2) => {
+                return new Date(d1.planned_start_date_time) - new Date(d2.planned_start_date_time);
+            })
             setAllQuotes(response.data.result);
             return response.data.result;
         } catch (error) {
@@ -165,15 +165,16 @@ function Quotes() {
         }
     }
 
-    const handleAcceptedOrder=async (order)=>{
-        let orderDetails=(await getAllOrders(order));
+    const handleAcceptedOrder = async (order) => {
+        let orderDetails = (await getAllOrders(order));
         // console.log(orderDetails);
-        if (orderDetails){
-         navigate(`/order-details/${orderDetails.order_id}`, {
-            state: {
-              order: orderDetails,
-            },
-          }); }
+        if (orderDetails) {
+            navigate(`/order-details/${orderDetails.order_id}`, {
+                state: {
+                    order: orderDetails,
+                },
+            });
+        }
     }
 
     const onChangePage = (page) => {
@@ -211,7 +212,7 @@ function Quotes() {
 
     const showConfirm = (value, quote) => {
         confirm({
-            title: `Are you sure you want to ${value=='accepted'?"accept":"reject"} this quote?`,
+            title: `Are you sure you want to ${value == 'accepted' ? "accept" : "reject"} this quote?`,
             content: `You have selected the option: ${value.toUpperCase()}. Please confirm your action.`,
             async onOk() {
                 // Handle confirmed action here
@@ -247,7 +248,10 @@ function Quotes() {
                         plannedstartdatetime: values.plannedstartdatetime ? dayjs(values.plannedstartdatetime).utc().format() : null,
                         plannedenddatetime: values.plannedenddatetime ? dayjs(values.plannedenddatetime).utc().format() : null,
                         quotestatus: 'change_request',
-                        quantity: values.quantity
+                        quantity: values.quantity,
+                        proposedquantity: values.proposedquantity,
+                        changedenddate: values.changedenddate,
+                        changedstartdate: values.changedstartdate
                     }
                     const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
                     message.success("Your order change request has been sent to Hirer successfully. You will get their response shortly for their acceptance!");
@@ -300,7 +304,7 @@ function Quotes() {
             title: 'Files', key: 'files',
             render: (_, record) => (
                 <>
-                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
+                    <Button type='link' onClick={() => showModal(record)}>More Info</Button>
                 </>
             )
         },
@@ -309,18 +313,18 @@ function Quotes() {
             key: 'actions',
             render: (_, record) => (
                 <>
-                {(record.quote_status=="accepted")?
-                <div><Button className="orderDetailLink" type='link' onClick={()=> handleAcceptedOrder(record.quote_id)}>Order Details</Button></div>:
-                    (record.hirer_company_id == authUser.CompanyId && record.quote_status=="pending")?
-                    <div>Under Review</div>
-                    :
-                    (record.hirer_company_id == authUser.CompanyId && record.quote_status!="pending")?
-                    <Select className="quoteAction" placeholder="-Select-" options={actionButtons_hirer} onChange={(value) => handleActionChange(value, record)} />
-                    :
-                    (record.renter_company_id == authUser.CompanyId && record.quote_status!="pending")?
-                    <div>Under Review</div>
-                    :
-                    <Select className="quoteAction" placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
+                    {(record.quote_status == "accepted") ?
+                        <div><Button className="orderDetailLink" type='link' onClick={() => handleAcceptedOrder(record.quote_id)}>Order Details</Button></div> :
+                        (record.hirer_company_id == authUser.CompanyId && record.quote_status == "pending") ?
+                            <div>Under Review</div>
+                            :
+                            (record.hirer_company_id == authUser.CompanyId && record.quote_status != "pending") ?
+                                <Select className="quoteAction" placeholder="-Select-" options={actionButtons_hirer} onChange={(value) => handleActionChange(value, record)} />
+                                :
+                                (record.renter_company_id == authUser.CompanyId && record.quote_status != "pending") ?
+                                    <div>Under Review</div>
+                                    :
+                                    <Select className="quoteAction" placeholder="-Select-" options={actionButtons} onChange={(value) => handleActionChange(value, record)} />
                     }
                 </>
             ),
@@ -369,8 +373,8 @@ function Quotes() {
                         <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Quotes</Button>
                     </div>
                 </div>
-                
-{/*                 <div className='row'>
+
+                {/*                 <div className='row'>
                     <div className="col-auto">
                         <h6>Filter By:</h6>
                     </div>
@@ -446,7 +450,7 @@ function Quotes() {
                 {/* Attachments File Lists Modal */}
                 {selectedQuote && (
                     <Modal
-                        // title="Files"
+                        title="More Info"
                         open={attachModal}
                         onOk={handleOk}  // Close modal on "Okay"
                         className="quoteViewModal"
@@ -456,32 +460,49 @@ function Quotes() {
                                 Okay
                             </Button>,
                         ]}
+                        width={800}
                     >
-                        {/* <h6>Company Details: ID({selectedQuote.hirer_company_id})</h6> */}
-                        <ul className="list-group">
-                            <li className="list-group-item">Hirer Company: <strong>{hirerCompany?hirerCompany.companyName:"Not Available"}</strong></li>
-                            <li className="list-group-item">Office Email: <strong>{hirerCompany?hirerCompany.offEmail:"Not Available"}</strong></li>
-                        </ul>
-                        <br/>
-                        <ul className="list-group">
-                            <li className="list-group-item">Renter Company: <strong>{renterCompany?renterCompany.companyName:"Not Available"}</strong></li>
-                            <li className="list-group-item">Office Email: <strong>{renterCompany?renterCompany.offEmail:"Not Available"}</strong></li>
-                        </ul>
-                        
-                        <hr />
-                        <h6>Files:</h6>
-                        <ul className="list-group">
-                            <li className="list-group-item">
-                                View Part Drawing File -&nbsp;<Link to={selectedQuote.order_drawing} target="_blank">View File</Link>
-                            </li>
-                            {selectedQuote.order_program_sheet && <li className="list-group-item">View Program Sheet File -&nbsp;<Link to={selectedQuote.order_program_sheet} target="_blank">View File</Link></li>}
-                            {selectedQuote.order_process_sheet && <li className="list-group-item">View Process Sheet File -&nbsp;<Link to={selectedQuote.order_process_sheet} target="_blank">View File</Link></li>}
-                            {selectedQuote.order_spec && <li className="list-group-item">View Specs/Standard File -&nbsp;<Link to={selectedQuote.order_spec} target="_blank">View File</Link></li>}
-                            {selectedQuote.other_attachments && <li className="list-group-item">View Others File -&nbsp;<Link to={selectedQuote.other_attachments} target="_blank">View File</Link></li>}
-                        </ul>
-                        <hr />
-                        <h6>Comments / Planned Shipment Details:</h6>
-                        <div className="quoteComment">{selectedQuote.comments}</div>
+                        <div className='row'>
+                            <div className="col">
+                                <h6>Company Details:</h6>
+                                <ul className="list-group">
+                                    <li className="list-group-item">Hirer Company: <strong>{hirerCompany ? hirerCompany.companyName : "Not Available"}</strong></li>
+                                    <li className="list-group-item">Office Email: <strong>{hirerCompany ? hirerCompany.offEmail : "Not Available"}</strong></li>
+                                </ul>
+                                <br />
+                                <ul className="list-group">
+                                    <li className="list-group-item">Renter Company: <strong>{renterCompany ? renterCompany.companyName : "Not Available"}</strong></li>
+                                    <li className="list-group-item">Office Email: <strong>{renterCompany ? renterCompany.offEmail : "Not Available"}</strong></li>
+                                </ul>
+
+                                <hr />
+                                <h6>Files:</h6>
+                                <ul className="list-group">
+                                    <li className="list-group-item">
+                                        View Part Drawing File -&nbsp;<Link to={selectedQuote.order_drawing} target="_blank">View File</Link>
+                                    </li>
+                                    {selectedQuote.order_program_sheet && <li className="list-group-item">View Program Sheet File -&nbsp;<Link to={selectedQuote.order_program_sheet} target="_blank">View File</Link></li>}
+                                    {selectedQuote.order_process_sheet && <li className="list-group-item">View Process Sheet File -&nbsp;<Link to={selectedQuote.order_process_sheet} target="_blank">View File</Link></li>}
+                                    {selectedQuote.order_spec && <li className="list-group-item">View Specs/Standard File -&nbsp;<Link to={selectedQuote.order_spec} target="_blank">View File</Link></li>}
+                                    {selectedQuote.other_attachments && <li className="list-group-item">View Others File -&nbsp;<Link to={selectedQuote.other_attachments} target="_blank">View File</Link></li>}
+                                </ul>
+                                <hr />
+                                <h6>Comments / Planned Shipment Details:</h6>
+                                <div className="quoteComment">{selectedQuote.comments ? selectedQuote.comments : 'No comments updated'}</div>
+                            </div>
+                            {selectedQuote.changed_start_date &&
+                                <div className="col">
+                                    <h6>Changed Date/Time:</h6>
+                                    <ul className="list-group">
+                                        <li className="list-group-item">Changed Start Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_start_date) : "-"}</strong></li>
+                                        <li className="list-group-item">Changed End Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_end_date) : "-"}</strong></li>
+                                    </ul>
+                                    <br />
+                                    <h6>Proposed Quantity:</h6>
+                                    <div className="quoteComment">{selectedQuote.proposed_quantity}</div>
+                                </div>
+                            }
+                        </div>
                     </Modal>
                 )}
 
@@ -502,7 +523,7 @@ function Quotes() {
                     <Form form={form} layout="vertical">
                         <Form.Item
                             label="Planned Start Date and Time"
-                            name="plannedstartdatetime"
+                            name="changedstartdate"
                             rules={[{ required: true, message: 'Please select the start date and time!' }]}
                         >
                             <DatePicker
@@ -516,7 +537,7 @@ function Quotes() {
                         </Form.Item>
                         <Form.Item
                             label="Planned End Date and Time"
-                            name="plannedenddatetime"
+                            name="changedenddate"
                             rules={[{ required: true, message: 'Please select the end date and time!' }]}
                         >
                             <DatePicker
@@ -530,10 +551,10 @@ function Quotes() {
                         </Form.Item>
                         <Form.Item
                             label="Quantity"
-                            name="quantity"
+                            name="proposedquantity"
                             rules={[
                                 {
-                                    required: true, message: 'Please enter the quantity!',
+                                    required: true, message: 'Please enter the proposed quantity!',
                                 },
                                 {
                                     validator: (_, value) => validateOrderQuantity(_, value, selectedQuote), // Pass selectedQuote here
