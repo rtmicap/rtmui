@@ -1612,7 +1612,7 @@ const RegistrationAccount = () => {
             }
         })
         if (response.data.code==1){
-            form.setFields([{ name: 'indLicNum',errors:[]},{ name: 'GSTIN',errors:[]},{ name: 'PAN',errors:[]}])
+            form.setFields([{ name: 'indLicNum',errors:['']},{ name: 'GSTIN',errors:['']},{ name: 'PAN',errors:['']}])
             //message.error('CIN or PAN or GST is already linked with an account');
             setDocErrorMsg("docError");
             return Promise.reject(new Error('Error'));

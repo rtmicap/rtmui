@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Row, Select, Form, Input, Upload, Button, Space, message, Image, Modal, Checkbox, Tooltip } from 'antd'
 import { machineFields } from '../Machine Variable Fields/MachineFiellds';
-import { LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined, FilePdfOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 import { Cutting } from '../Machine Variable Fields/Cutting';
 import { Turning } from '../Machine Variable Fields/Turning';
@@ -427,7 +427,7 @@ function RegistrationMachines() {
                                                     <div key={file.uid} style={{ position: 'relative' }}>
                                                         {imageBase64 &&
                                                             <>
-                                                                <Link to={imageBase64} target={'_blank'}>View File</Link>
+                                                                <Link to={imageBase64} target={'_blank'}><FilePdfOutlined />&nbsp;View File</Link>
                                                                 <Tooltip title="Delete File">
                                                                     <Button
                                                                         type="text"
