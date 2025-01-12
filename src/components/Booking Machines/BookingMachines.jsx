@@ -43,14 +43,10 @@ function BookingMachines() {
     const [quoteResponse, setQuoteResponse] = useState({});
     // steps 
     const [step, setStep] = useState(1);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
     const fileUpload = async (file) => {
         try {
-            // setFileLoading(true);
-            // setProcessFileLoading(true);
-            // setProgramFileLoading(true);
-            // setSpecsFileLoading(true);
-            // setOthersFileLoading(true);
             const configHeaders = {
                 headers: { "content-type": "multipart/form-data" },
             };
@@ -58,14 +54,8 @@ function BookingMachines() {
             formData.append("fileName", file.originFileObj);
             var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
             // console.log("responseFileData: ", response);
-            // setFileLoading(false);
-            // setProcessFileLoading(false);
-            // setProgramFileLoading(false);
-            // setSpecsFileLoading(false);
-            // setOthersFileLoading(false);
             return response.data;
         } catch (error) {
-            // setFileLoading(false);
             return error;
         }
     }
@@ -126,12 +116,15 @@ function BookingMachines() {
             setPartDrawingFileList(fileList);
             if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                 setFileLoading(true);
+                setIsSubmitDisabled(true);
                 // update file upload api
                 const fileRes = await fileUpload(fileList[0]);
                 // console.log("fileRes: ", fileRes);
                 message.success("Part Drawing File Uploaded")
                 setViewPartDrawingFile(fileRes.fileUrl);
                 setFileLoading(false);
+                setIsSubmitDisabled(false);
+
             } else {
                 message.error('File size must less than 2 MB');
             }
@@ -150,12 +143,14 @@ function BookingMachines() {
             setProcessSheetFileList(fileList);
             if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                 setProcessFileLoading(true);
+                setIsSubmitDisabled(true);
                 // update file upload api
                 const fileRes = await fileUpload(fileList[0]);
                 // console.log("fileRes: ", fileRes);
                 message.success("Process Sheet File Uploaded!")
                 setViewProcessSheetFile(fileRes.fileUrl);
                 setProcessFileLoading(false);
+                setIsSubmitDisabled(false);
             } else {
                 message.error('File size must less than 2 MB');
             }
@@ -174,12 +169,14 @@ function BookingMachines() {
             setProgramSheetFileList(fileList);
             if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                 setProgramFileLoading(true);
+                setIsSubmitDisabled(true);
                 // update file upload api
                 const fileRes = await fileUpload(fileList[0]);
                 // console.log("fileRes: ", fileRes);
                 message.success("Program Sheet File Uploaded!")
                 setViewProgramSheetFile(fileRes.fileUrl);
                 setProgramFileLoading(false);
+                setIsSubmitDisabled(false);
             } else {
                 message.error('File size must less than 2 MB');
             }
@@ -198,12 +195,14 @@ function BookingMachines() {
             setSpecsFileList(fileList);
             if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                 setSpecsFileLoading(true);
+                setIsSubmitDisabled(true);
                 // update file upload api
                 const fileRes = await fileUpload(fileList[0]);
                 // console.log("fileRes: ", fileRes);
                 message.success("Specs/Standards File Uploaded!")
                 setViewSpecsFile(fileRes.fileUrl);
                 setSpecsFileLoading(false);
+                setIsSubmitDisabled(false);
             } else {
                 message.error('File size must less than 2 MB');
             }
@@ -223,12 +222,14 @@ function BookingMachines() {
             setOthersFileList(fileList);
             if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                 setOthersFileLoading(true);
+                setIsSubmitDisabled(true);
                 // update file upload api
                 const fileRes = await fileUpload(fileList[0]);
                 // console.log("fileRes: ", fileRes);
                 message.success("Others File Uploaded!")
                 setViewOthersFile(fileRes.fileUrl);
                 setOthersFileLoading(false);
+                setIsSubmitDisabled(false);
             } else {
                 message.error('File size must less than 2 MB');
             }
@@ -503,7 +504,7 @@ function BookingMachines() {
                                     span: 16,
                                 }}
                             >
-                                <Button type="primary" htmlType="submit">
+                                <Button type="primary" htmlType="submit" disabled={isSubmitDisabled ? true : false}>
                                     {loading ? 'Booking your quote..' : 'Submit'}
                                 </Button>
                             </Form.Item>
