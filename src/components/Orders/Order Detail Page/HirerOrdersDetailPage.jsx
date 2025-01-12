@@ -172,7 +172,7 @@ function HirerOrdersDetailPage() {
         }
         else{
             message.destroy();
-            message.error("Production is in progress")
+            message.error("Final Report is pending")
         }
     };
 
