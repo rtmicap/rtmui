@@ -301,10 +301,10 @@ function Quotes() {
             )
         },
         {
-            title: 'Files', key: 'files',
+            title: 'More Info', key: 'files',
             render: (_, record) => (
                 <>
-                    <Button type='link' onClick={() => showModal(record)}>More Info</Button>
+                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
                 </>
             )
         },
@@ -450,7 +450,7 @@ function Quotes() {
                 {/* Attachments File Lists Modal */}
                 {selectedQuote && (
                     <Modal
-                        title="More Info"
+                        title={<h4 className='text-center'>More Info</h4>}
                         open={attachModal}
                         onOk={handleOk}  // Close modal on "Okay"
                         className="quoteViewModal"
@@ -490,18 +490,24 @@ function Quotes() {
                                 <h6>Comments / Planned Shipment Details:</h6>
                                 <div className="quoteComment">{selectedQuote.comments ? selectedQuote.comments : 'No comments updated'}</div>
                             </div>
-                            {selectedQuote.changed_start_date &&
-                                <div className="col">
-                                    <h6>Changed Date/Time:</h6>
-                                    <ul className="list-group">
-                                        <li className="list-group-item">Changed Start Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_start_date) : "-"}</strong></li>
-                                        <li className="list-group-item">Changed End Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_end_date) : "-"}</strong></li>
-                                    </ul>
-                                    <br />
-                                    <h6>Proposed Quantity:</h6>
-                                    <div className="quoteComment">{selectedQuote.proposed_quantity}</div>
-                                </div>
-                            }
+                            <div className="col">
+                                <h6>Planned Date/Quantity:</h6>
+                                <ul className="list-group">
+                                    <li className="list-group-item">Planned Start Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.planned_start_date_time) : "-"}</strong></li>
+                                    <li className="list-group-item">Planned End Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.planned_end_date_time) : "-"}</strong></li>
+                                    <li className="list-group-item">Quantity: <strong>{selectedQuote.quantity}</strong></li>
+                                </ul>
+                                {selectedQuote.changed_start_date &&
+                                    <>
+                                        <h6>Changed Date/Quantity:</h6>
+                                        <ul className="list-group">
+                                            <li className="list-group-item">Changed Start Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_start_date) : "-"}</strong></li>
+                                            <li className="list-group-item">Changed End Date/Time: <strong>{selectedQuote ? formattedDateTime(selectedQuote.changed_end_date) : "-"}</strong></li>
+                                            <li className="list-group-item">New Quantity: <strong>{selectedQuote.proposed_quantity}</strong></li>
+                                        </ul>
+                                    </>
+                                }
+                            </div>
                         </div>
                     </Modal>
                 )}
