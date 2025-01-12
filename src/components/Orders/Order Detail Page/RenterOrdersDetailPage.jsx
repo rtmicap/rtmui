@@ -62,15 +62,15 @@ function RenterOrdersDetailPage() {
                 <>
                 {(order.goods_status!="" && order.goods_status!="goods_in_return")?
                 <div className="processFlow">
-                {order.goods_status=="goods_in_transit"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">GOODS_IN_TRANSIT</div>}
-                {order.goods_status=="first_sample_preparation"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">FIRST SAMPLE PREPARATION</div>}
-                {order.goods_status=="under_first_sample_approval"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">UNDER FIRST SAMPLE APPROVAL</div>}
-                {order.goods_status=="first_sample_repeat"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">FIRST SAMPLE REPEAT</div>}
-                {order.goods_status=="production_in_progress"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">PRODUCTION IN PROGRESS</div>}
-                {order.goods_status=="production_complete"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">PRODUCTION COMPLETE</div>}
+                {order.goods_status=="goods_in_transit"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">GOODS IN TRANSIT</div>}
+                {order.goods_status=="first_sample_preparation"?<Tag className={order.goods_status}>FIRST SAMPLE PREPARATION</Tag>:<div className="goodsstatus">FIRST SAMPLE PREPARATION</div>}
+                {order.goods_status=="under_first_sample_approval"?<Tag className={order.goods_status}>UNDER FIRST SAMPLE APPROVAL</Tag>:<div className="goodsstatus">UNDER FIRST SAMPLE APPROVAL</div>}
+                {order.goods_status=="first_sample_repeat"?<Tag className={order.goods_status}>FIRST SAMPLE REPEAT</Tag>:<div className="goodsstatus">FIRST SAMPLE REPEAT</div>}
+                {order.goods_status=="production_in_progress"?<Tag className={order.goods_status}>PRODUCTION IN PROGRESS</Tag>:<div className="goodsstatus">PRODUCTION IN PROGRESS</div>}
+                {order.goods_status=="production_complete"?<Tag className={order.goods_status}>PRODUCTION COMPLETE</Tag>:<div className="goodsstatus">PRODUCTION COMPLETE</div>}
                 </div>
                 :
-                 order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag></div>:<div className="goodsstatus">SHIPMENT_PENDING</div>
+                 order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>GOODS IN RETURN</Tag></div>:<div className="goodsstatus">SHIPMENT PENDING</div>
                 }
                 </>
             )
@@ -128,30 +128,51 @@ function RenterOrdersDetailPage() {
 
 
     const handleShipmentRedirect = (record, value) => {
+        if (record.goods_status!=""){
         navigate(`/order-details/${record.order_id}/shipment-details`, {
             state: {
                 order: record,
                 reviewShipment: value == "reviewMaterials" ? true : false
             },
         });
+        }
+        else{
+            message.destroy();
+            message.error("Shipment is pending")
+            
+        }
     };
 
     const handleSampleReportRedirect = (record, value) => {
+        let goods_status=["first_sample_repeat","first_sample_preparation"];
+        if (goods_status.indexOf(record.goods_status)>-1) {
         navigate(`/order-details/${record.order_id}/sample-report`, {
             state: {
                 order: record,
                 reviewSampleReports: value == "reviewSampleReports" ? true : false
             },
         });
+        }
+        else{
+            message.destroy();
+            message.error("First Sample Report is pending")
+        }
     };
 
     const handleFinalReportRedirect = (record, value) => {
+        let goods_status=["production_in_progress","production_complete"];
+        if (goods_status.indexOf(record.goods_status)>-1) {
         navigate(`/order-details/${record.order_id}/final-report`, {
             state: {
                 order: record,
                 reviewFinalReports: value == "reviewFinalReports" ? true : false
             },
         });
+        }
+        else{
+            message.destroy();
+            message.error("Final Report is pending")
+        }
     };
 
     return (
@@ -182,7 +203,7 @@ function RenterOrdersDetailPage() {
 
                         {/* Sample Reports */}
                         <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}>
-                            Sample Report
+                            First Sample Report
                         </button>
 
                         {/* Final Reports */}

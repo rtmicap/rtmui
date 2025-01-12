@@ -11,11 +11,13 @@ import config from "../../env.json";
 import { REGISTER_ACCOUNT_URL,CHECK_REGISTERED_USER } from '../../api/apiUrls';
 const { Text } = Typography;
 import axios from "../../api/axios";
+import "./registrationaccount.scss";
 
 const RegistrationAccount = () => {
     const navigate = useNavigate();
 
     const [currentStep, setCurrentStep] = useState(0);
+    const [docErrorMsg,setDocErrorMsg] = useState("");
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -1254,6 +1256,7 @@ const RegistrationAccount = () => {
             title: 'Documents Verification',
             content: (
                 <Form form={form} layout="vertical">
+                    
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1292,9 +1295,10 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                     </Row>
-
+                    
                     {/* CIN Input and file */}
-                    <Row gutter={[16, 16]}>
+                    <div className={docErrorMsg}>CIN or GST or PAN is already linked with an account</div>
+                    <Row gutter={[16, 18]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
                                 {
@@ -1303,7 +1307,7 @@ const RegistrationAccount = () => {
                                 },
                                 {
                                     required: true,
-                                    message: "Please enter your CIN number or UAM L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
+                                    message: "Please enter your CIN or UAM"
                                 },
                             ]} extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456">
                                 <Input placeholder="Enter your CIN number or UAM" maxLength={22} />
@@ -1335,11 +1339,11 @@ const RegistrationAccount = () => {
                             <Form.Item name={'GSTIN'} label="GSTIN (Goods and Services Tax Identification Number)" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your GSTIN number (05ABDCE1234F1Z2)"
+                                    message: "Please enter your GSTIN"
                                 },
                                 {
                                     pattern: /^([0][1-9]|[1-2][0-9]|[3][0-5])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1})([1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
-                                    message: "Please provide your valid GSTIN number (05ABDCE1234F1Z2)"
+                                    message: "Please provide your valid GSTIN"
                                 }
                             ]} extra="GSTIN Format: 05ABDCE1234F1Z2">
                                 <Input placeholder="Enter your GSTIN number" maxLength={15} />
@@ -1370,11 +1374,11 @@ const RegistrationAccount = () => {
                             <Form.Item name={'PAN'} label="PAN (Permanent Account Number)" rules={[
                                 {
                                     required: true,
-                                    message: "Please enter your PAN number (ABCTY1234D)"
+                                    message: "Please enter your PAN"
                                 },
                                 {
                                     pattern: /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/,
-                                    message: "Please provide your valid PAN number (ABCTY1234D)"
+                                    message: "Please provide your valid PAN"
                                 }
                             ]} extra="PAN Format: ABCTY1234D">
                                 <Input placeholder="Enter your PAN number" maxLength={10} />
@@ -1568,13 +1572,14 @@ const RegistrationAccount = () => {
         form.validateFields().then(async(values) => {
             console.log("form: ", values);
             if(currentStep==0){
-            await validateUserName(values.factoryEmailAddress);
+                setDocErrorMsg("docErrorHide");
+                await validateUserName(values.factoryEmailAddress);
             }
             if(currentStep==1){
-            await validateDocDetails(values.GSTIN,values.PAN,values.indLicNum)
+                await validateDocDetails(values.GSTIN,values.PAN,values.indLicNum)
             }
-            setCurrentStep(currentStep + 1);
-            setFormData({ ...formData, ...values });
+                setCurrentStep(currentStep + 1);
+                setFormData({ ...formData, ...values });
         }).catch(error=>{
             return
         })
@@ -1587,9 +1592,9 @@ const RegistrationAccount = () => {
             const response = await axios.get(CHECK_REGISTERED_USER, {
                             params: { factoryEmail }
             })
-            if (response.data.message=='UserId with provided information is already present in database'){
+            if (response.data.code==1){
                 form.setFields([{ name: 'factoryEmailAddress',errors:['Factory Email is already registered.']}])
-                return Promise.reject(new Error('Factory Email is already registered.'));
+                return Promise.reject(new Error('Error'));
             }
             else{
                 return Promise.resolve();
@@ -1606,11 +1611,14 @@ const RegistrationAccount = () => {
                 cin:cinid 
             }
         })
-        if (response.data.message=='UserId with provided information is already present in database'){
-            form.setFields([{ name: 'indLicNum',errors:['CIN is already registered.']},{ name: 'GSTIN',errors:['GST is already registered.']},{ name: 'PAN',errors:['PAN is already registered.']}])
-            return Promise.reject(new Error('Factory Email is already registered.'));
+        if (response.data.code==1){
+            form.setFields([{ name: 'indLicNum',errors:[]},{ name: 'GSTIN',errors:[]},{ name: 'PAN',errors:[]}])
+            //message.error('CIN or PAN or GST is already linked with an account');
+            setDocErrorMsg("docError");
+            return Promise.reject(new Error('Error'));
         }
         else{
+            setDocErrorMsg("docErrorHide");
             return Promise.resolve();
         }
      }
@@ -1702,7 +1710,7 @@ const RegistrationAccount = () => {
                 <Content style={{ padding: '60px' }}>
                     <div style={{ background: '#fff', padding: 40, minHeight: 280 }}>
                         <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
-                        <h2 style={{ textAlign: 'center' }}>Registration as Hirer/Renter</h2>
+                        <h2 className="pageHeader">Registration as Hirer/Renter</h2>
 
                         <div style={{ marginBottom: '1rem' }}>
                             <Alert
