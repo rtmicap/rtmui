@@ -1,5 +1,4 @@
-// BuyTools.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DetailCard from '../common/DetailCard'; 
 import CardSection from '../common/CardSection'; 
 import cardData from '../../api/tools_details.json';
