@@ -15,7 +15,7 @@ const CardSection = ({ data }) => {
             extra={<a href="#">More</a>}
             style={{ width: 300 }}
           >
-            <p>{card.description}</p>  {/* Corrected to match the description key */}
+            <p>Description: {card.description}</p>  {/* Corrected to match the description key */}
             <p>Condition: {card.condition}</p>  {/* Corrected to match condition */}
             <p>Year of Purchase: {card.yearofpurchase}</p>  {/* Corrected to match yearofpurchase */}
           </Card>
