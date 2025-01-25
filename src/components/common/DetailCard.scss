@@ -1,0 +1,42 @@
+// DetailCard.scss
+
+.detail-card {
+    width: 100%; // Ensures the parent takes up the full width of its container
+    padding: 20px 0; // Add padding to give the carousel some space from edges
+  
+    .carousel-container {
+      max-width: 1200px; /* Limit the maximum width of the carousel */
+      width: 100%; /* Ensures the carousel is responsive */
+      margin: 0 auto; /* Center the carousel container */
+    }
+  
+    .ant-carousel {
+      width: 100%; /* Ensures the carousel takes full width of its container */
+    }
+  
+    .ant-carousel .slick-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Set the width of each carousel item (this can be adjusted) */
+      width: 300px; /* Or use percentage e.g., 33.33% for 3 items per slide */
+    }
+  
+    .detail-card-carousel-content {
+      margin: 0;
+      height: 160px;
+      color: #fff;
+      line-height: 160px;
+      text-align: center;
+      background: #364d79;
+      width: 100%; /* Ensure the content takes full width of the slide */
+    }
+  
+    /* Optional: Add styles for responsiveness */
+    @media (max-width: 768px) {
+      .ant-carousel .slick-slide {
+        width: 80%; /* Reduce width for smaller screens */
+      }
+    }
+  }
+  
