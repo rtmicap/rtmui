@@ -1,42 +1,36 @@
 // DetailCard.scss
 
-.detail-card {
-    width: 100%; // Ensures the parent takes up the full width of its container
-    padding: 20px 0; // Add padding to give the carousel some space from edges
-  
-    .carousel-container {
-      max-width: 1200px; /* Limit the maximum width of the carousel */
-      width: 100%; /* Ensures the carousel is responsive */
-      margin: 0 auto; /* Center the carousel container */
-    }
-  
-    .ant-carousel {
-      width: 100%; /* Ensures the carousel takes full width of its container */
-    }
-  
-    .ant-carousel .slick-slide {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      /* Set the width of each carousel item (this can be adjusted) */
-      width: 300px; /* Or use percentage e.g., 33.33% for 3 items per slide */
-    }
-  
-    .detail-card-carousel-content {
-      margin: 0;
-      height: 160px;
-      color: #fff;
-      line-height: 160px;
-      text-align: center;
-      background: #364d79;
-      width: 100%; /* Ensure the content takes full width of the slide */
-    }
-  
-    /* Optional: Add styles for responsiveness */
-    @media (max-width: 768px) {
-      .ant-carousel .slick-slide {
-        width: 80%; /* Reduce width for smaller screens */
-      }
-    }
-  }
-  
+.carousel-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative; /* Needed to position arrows */
+}
+
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  z-index: 10; /* Ensure it's on top of the carousel */
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent background for arrows */
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.left-arrow {
+  left: 10px; /* Position for left arrow */
+}
+
+.right-arrow {
+  right: 10px; /* Position for right arrow */
+}
+
+.detail-card-carousel-content {
+  margin: 0;
+  height: 160px;
+  color: #fff;
+  line-height: 160px;
+  text-align: center;
+  background: #364d79;
+}
