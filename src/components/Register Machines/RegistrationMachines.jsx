@@ -427,7 +427,7 @@ function RegistrationMachines() {
                                                     <div key={file.uid} style={{ position: 'relative' }}>
                                                         {imageBase64 &&
                                                             <>
-                                                                <Link to={imageBase64} target={'_blank'}><FilePdfOutlined />&nbsp;View File</Link>
+                                                                <Link to={imageBase64} target={'_blank'}><span style={{ color: 'red' }}><FilePdfOutlined /></span> &nbsp;View File</Link>
                                                                 <Tooltip title="Delete File">
                                                                     <Button
                                                                         type="text"
