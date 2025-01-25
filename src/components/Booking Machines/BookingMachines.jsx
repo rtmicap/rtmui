@@ -239,6 +239,9 @@ function BookingMachines() {
     const handlePartDrawingRemove = () => {
         setPartDrawingFileList([]);
         setViewPartDrawingFile('');
+        form.setFieldsValue({
+            orderdrawing: '' // empty the file list
+        });
     };
     const handleProcessSheetRemove = () => {
         setProcessSheetFileList([]);
