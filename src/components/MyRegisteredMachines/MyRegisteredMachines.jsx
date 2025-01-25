@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LeftCircleOutlined, WechatOutlined, SearchOutlined } from "@ant-design/icons";
+import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography } from 'antd';
 import axios from '../../api/axios';
-import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID } from '../../api/apiUrls';
+import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import ViewMachineDetail from '../Hire Machines/ViewMachineDetail';
 const { Title, Text } = Typography;
 
@@ -22,7 +22,8 @@ function MyRegisteredMachines() {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-
+  const [categoryAndType, setCategoryAndType] = useState([]);
+  const [machineTypes, setMachineTypes] = useState([]);
 
   const getMachinesByCompanyId = async () => {
     try {
@@ -40,8 +41,16 @@ function MyRegisteredMachines() {
     }
   }
 
+  const getAllMachinesCategoryAndType = async () => {
+    const response = await axios.get(GET_MACHINES_BY_CAT_AND_TYPE_URL);
+    const machineCategories = response.data;
+    // console.log("categoryNames: ", machineCategories);
+    setCategoryAndType(machineCategories);
+    // console.log("machinesKey log: ", machinesKey);
+  }
 
   useEffect(() => {
+    getAllMachinesCategoryAndType();
     getMachinesByCompanyId();
   }, []);
 
@@ -53,7 +62,20 @@ function MyRegisteredMachines() {
   const typeOptions = types.map(type => ({ value: type, label: type }));
 
 
-  const handleCategoryChange = (value) => setSelectedCategory(value);
+  const handleCategoryChange = (value) => {
+    if (value) {
+      const values = categoryAndType[value];
+      const transformedOptions = values.map((item, index) => ({
+        value: item,
+        label: <span>{item}</span>,
+      }));
+      setMachineTypes(transformedOptions);
+      setSelectedCategory(value);
+    } else {
+      setMachineTypes([]);
+    }
+  }
+
   const handleTypeChange = (value) => setSelectedType(value);
 
   const applyFilters = () => {
@@ -65,10 +87,14 @@ function MyRegisteredMachines() {
     if (selectedType) {
       filtered = filtered.filter(item => item.Machine_Type === selectedType);
     }
-
     setFilteredData(filtered);
   };
 
+  const resetMachines = () => {
+    setSelectedCategory(null);
+    setSelectedType(null);
+    getMachinesByCompanyId();
+  }
 
 
   const columns = [
@@ -143,12 +169,13 @@ function MyRegisteredMachines() {
         <h5 className='text-center'>My Registered Machines</h5>
         <hr />
         {/* <Table columns={columns} dataSource={machinesData} /> */}
-        {/* <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
+        <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
           <Space style={{ marginBottom: 16 }}>
             <Select
               placeholder="Filter by Category"
               onChange={handleCategoryChange}
               style={{ width: 200 }}
+              value={selectedCategory}
               allowClear
               options={categoryOptions}
             />
@@ -156,22 +183,25 @@ function MyRegisteredMachines() {
               placeholder="Filter by Machine Type"
               onChange={handleTypeChange}
               style={{ width: 200 }}
+              value={selectedType}
               allowClear
-              options={typeOptions}
+              options={machineTypes}
             />
             <Button type="primary" icon={<SearchOutlined />} onClick={applyFilters}>
               Search
             </Button>
+            <Button type="link" icon={<ReloadOutlined />} onClick={resetMachines}>
+              Reset
+            </Button>
           </Space>
-        </div> */}
+        </div>
         <List
           itemLayout="vertical"
           size="large"
           bordered
-          pagination={{
-            pageSize: 10
-          }}
-          dataSource={machinesData}
+          loading={loading}
+          pagination={filteredData.length > 0 ? { pageSize: 10 } : false}
+          dataSource={filteredData}
           renderItem={(item, index) => (
             <>
               <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
