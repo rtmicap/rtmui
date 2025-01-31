@@ -28,7 +28,7 @@ const Carousel = ({ imagesMap }) => {
         <button onClick={prevSlide}>❮</button>
         <div style={{ transform: `translateX(-${currentIndex * 100}%)`, display: 'flex' }}>
           {imagesMap.map((imageName, index) => (
-            <><img src={imageName} alt={`Slide ${index}`} /> </>
+            <div key={index}><img  src={imageName} alt={`Slide ${index}`} /> </div>
               
             
           ))}
