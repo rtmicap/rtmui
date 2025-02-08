@@ -13,7 +13,11 @@
         "warranty": "2 years",
         "shipping": "Free shipping within 7 days",
         "returns": "30-day return policy"
-      }
+      },
+      "images": [
+        "image1.jpg",
+        "image2.jpg",
+        "image3.jpg"
+      ]
     }
   ]
-  

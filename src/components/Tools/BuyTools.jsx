@@ -1,20 +1,28 @@
 import { useState, useEffect } from 'react';
 import DetailCard from '../common/DetailCard'; 
-import CardSection from '../common/CardSection'; 
 import cardData from '../../api/tools_details.json';
 
 function BuyTools() {
   const [data, setData] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    // Simulating an API call by using the imported JSON data
-    setData(cardData);  // You could replace this with a real API call
+    setData(cardData);
   }, []);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setSelectedProduct(data[0]);
+    }
+  }, [data]);
 
   return (
     <div>
-      <DetailCard />
-      <CardSection data={data} />
+      {selectedProduct ? (
+        <DetailCard product={selectedProduct} />
+      ) : (
+        <p>Loading product details...</p>
+      )}
     </div>
   );
 }

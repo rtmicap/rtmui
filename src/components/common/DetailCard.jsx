@@ -1,82 +1,93 @@
 import React from 'react';
-import { Carousel } from 'antd';
-import './DetailCard.scss';
+import PropTypes from 'prop-types';
+import './DetailCard.scss'; // Import your SCSS file
 
-// Custom Left Arrow SVG
-const LeftArrow = (props) => (
-    <div {...props} className="custom-arrow left-arrow">
-      <svg
-        width="30"
-        height="30"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ transform: 'rotate(180deg)', cursor: 'pointer' }}
-      >
-        <path
-          d="M15 18l-6-6 6-6"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
-  
-  // Custom Right Arrow SVG
-  const RightArrow = (props) => (
-    <div {...props} className="custom-arrow right-arrow">
-      <svg
-        width="30"
-        height="30"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ cursor: 'pointer' }}
-      >
-        <path
-          d="M9 18l6-6-6-6"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
+import image1 from '../../assets/Hired_duration.jpg'; 
+import image2 from '../../assets/Rental_duration.jpg'; 
+import image3 from '../../assets/Hired_duration.jpg'; 
 
-const DetailCard = () => {
-  const onChange = (currentSlide) => {
-    console.log(currentSlide);
+// Map the image names from the JSON to the actual imported images
+const imagesMap = {
+    "image1.jpg": image1,
+    "image2.jpg": image2,
+    "image3.jpg": image3,
+  };
+  console.log("Image Map:", imagesMap);
+
+// Carousel Component
+const Carousel = ({ images }) => {
+    console.log("Images being passed to Carousel:", images);
+    const [currentIndex, setCurrentIndex] = React.useState(0);
+
+    const nextSlide = () => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    };
+
+    const prevSlide = () => {
+      setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+    };
+
+    return (
+      <div className="carousel-container">
+        <button onClick={prevSlide}>❮</button>
+        <div style={{ transform: `translateX(-${currentIndex * 100}%)`, display: 'flex' }}>
+          {images.map((imageName, index) => (
+            <div className="carousel-item" key={index}>
+              <img src={imagesMap[imageName]} alt={`Slide ${index}`} style={{ width: '100%', height: '400px', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+        <button onClick={nextSlide}>❯</button>
+      </div>
+    );
   };
 
-  return (
-    <div className="detail-card">
-      <div className="carousel-container">
-        <Carousel
-          afterChange={onChange}
-          dots={false}
-          autoplay
-          prevArrow={<LeftArrow />}  // Custom Left Arrow
-          nextArrow={<RightArrow />}  // Custom Right Arrow
-        >
-          <div>
-            <h3 className="detail-card-carousel-content">Tool Photo 1</h3>
-          </div>
-          <div>
-            <h3 className="detail-card-carousel-content">Tool Photo 2</h3>
-          </div>
-          <div>
-            <h3 className="detail-card-carousel-content">Tool Photo 3</h3>
-          </div>
-          <div>
-            <h3 className="detail-card-carousel-content">Tool Photo 4</h3>
-          </div>
-        </Carousel>
-      </div>
-    </div>
-  );
+Carousel.propTypes = {
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
-
-export default DetailCard;
+  
+  // DetailCard Component
+  const DetailCard = ({ product }) => {
+    const { toolname, description, priceDetails, additionalDetails, images } = product;
+  
+    return (
+      <div className="detail-card-container">
+        <Carousel images={images} />
+        <h2>{toolname}</h2>
+        <p>{description}</p>
+        <div className="pricing-info">
+          <h3>Pricing Information</h3>
+          <p>Original Price: ${priceDetails.price}</p>
+          <p>Discount: {priceDetails.discount}%</p>
+          <p>Final Price: ${priceDetails.finalPrice}</p>
+        </div>
+        <div className="additional-details">
+          <h3>Additional Details</h3>
+          <p>Warranty: {additionalDetails.warranty}</p>
+          <p>Shipping: {additionalDetails.shipping}</p>
+          <p>Returns: {additionalDetails.returns}</p>
+        </div>
+      </div>
+    );
+  };
+  
+  // PropTypes for DetailCard
+  DetailCard.propTypes = {
+    product: PropTypes.shape({
+      toolname: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      priceDetails: PropTypes.shape({
+        price: PropTypes.number.isRequired,
+        discount: PropTypes.number.isRequired,
+        finalPrice: PropTypes.number.isRequired,
+      }).isRequired,
+      additionalDetails: PropTypes.shape({
+        warranty: PropTypes.string.isRequired,
+        shipping: PropTypes.string.isRequired,
+        returns: PropTypes.string.isRequired,
+      }).isRequired,
+      images: PropTypes.arrayOf(PropTypes.string).isRequired,
+    }).isRequired,
+  };
+  
+  export default DetailCard;

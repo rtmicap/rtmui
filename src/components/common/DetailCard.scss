@@ -1,36 +1,59 @@
 // DetailCard.scss
-
-.carousel-container {
+.detail-card-container {
   max-width: 1200px;
-  margin: 0 auto;
-  position: relative; /* Needed to position arrows */
-}
+  margin: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-.custom-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-  z-index: 10; /* Ensure it's on top of the carousel */
-  background: rgba(0, 0, 0, 0.6); /* Semi-transparent background for arrows */
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-}
+  .carousel-container {
+    width: 100%;
+    height: 400px; // Ensure this height fits your images
+    display: flex;
+    overflow: hidden;
+    position: relative;
 
-.left-arrow {
-  left: 10px; /* Position for left arrow */
-}
+    .carousel-item {
+      min-width: 100%;
+      transition: transform 0.5s ease;
 
-.right-arrow {
-  right: 10px; /* Position for right arrow */
-}
+      img {
+        width: 100%; // Ensure images take full width of carousel item
+        height: 100%; // Ensure images fill the height of carousel item
+        object-fit: cover; // Maintain aspect ratio while covering the area
+      }
+    }
+  }
 
-.detail-card-carousel-content {
-  margin: 0;
-  height: 160px;
-  color: #fff;
-  line-height: 160px;
-  text-align: center;
-  background: #364d79;
+  .card-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      width: 45%; // Adjust as needed
+
+      &:last-child {
+        margin-left: 20px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .card-container {
+      flex-direction: column;
+      align-items: center;
+
+      .card {
+        width: 90%;
+        margin-bottom: 20px;
+      }
+    }
+  }
 }
