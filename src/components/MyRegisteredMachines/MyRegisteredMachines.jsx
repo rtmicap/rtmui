@@ -36,7 +36,7 @@ function MyRegisteredMachines() {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      // console.log("getMachinesByCompanyId err: ", error);
+      console.log("getMachinesByCompanyId err: ", error);
       message.error("Error while fetching your machines!");
     }
   }
