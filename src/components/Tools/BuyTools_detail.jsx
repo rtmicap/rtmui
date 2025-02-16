@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import DetailCard from '../common/DetailCard'; 
 import cardData from '../../api/tools_details.json';
-import SearchTools from './SearchTools';
 
 function BuyTools_detail() {
   const [data, setData] = useState([]);
@@ -19,9 +18,6 @@ function BuyTools_detail() {
 
   return (
     <div>
-    <div>
-      <SearchTools />
-    </div>
     <div>
       {selectedProduct ? (
         <DetailCard product={selectedProduct} />

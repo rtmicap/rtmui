@@ -2,6 +2,7 @@ import React from 'react'
 import "./buy.scss"
 import samimg from "../../assets/Total_Revenue.jpg"
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import SearchTools from './SearchTools';
 
 
 
@@ -50,7 +51,8 @@ function BuyTools() {
         <div>
             <h1>BuyTools</h1>
             <div className="container-layout">
-            <div className="sidebar-filter">Search/Filter</div>
+            <div className="sidebar-filter">Search/Filter <div>
+                <SearchTools /></div> </div>
             <div className="main-container">
                 {buyTools.map((item,index)=>{
                   return(
