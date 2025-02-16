@@ -13,6 +13,7 @@ import AppHeader from './components/AppHeader/AppHeader';
 import HomePage from './components/Homepage/HomePage';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
+import BuyTools_detail from './components/Tools/BuyTools_detail';
 import RentTools from './components/Tools/RentTools';
 import SellTools from './components/Tools/SellTools';
 // gauges
@@ -82,6 +83,7 @@ const App = () => {
             <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
             {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
+            <Route path='buytools-detail' element={<BuyTools_detail />} />
             <Route path="rent-tools" element={<RentTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 
