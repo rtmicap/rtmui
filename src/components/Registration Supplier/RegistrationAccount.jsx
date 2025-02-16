@@ -492,7 +492,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeMobile : formData.factoryMobile,
+            children: formData.officeMobile,
         },
     ];
 
