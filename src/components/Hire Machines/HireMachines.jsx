@@ -339,7 +339,7 @@ function HireMachines() {
                                                             <img
                                                                 alt="PDF file"
                                                                 src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" // A PDF icon
-                                                                style={{ width: '80px', height: 'auto', objectFit: 'contain' }}
+                                                                style={{ width: '40px', height: 'auto', objectFit: 'contain' }}
                                                             />
                                                             <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
                                                                 <span style={{color: 'blue'}}>View File</span> <FilePdfOutlined style={{ color: 'red' }} />

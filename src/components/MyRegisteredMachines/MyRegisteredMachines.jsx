@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined, FilePdfOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography } from 'antd';
+import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty } from 'antd';
 import axios from '../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import ViewMachineDetail from '../Hire Machines/ViewMachineDetail';
@@ -24,6 +24,7 @@ function MyRegisteredMachines() {
   const [selectedType, setSelectedType] = useState(null);
   const [categoryAndType, setCategoryAndType] = useState([]);
   const [machineTypes, setMachineTypes] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const getMachinesByCompanyId = async () => {
     try {
@@ -45,8 +46,14 @@ function MyRegisteredMachines() {
     const response = await axios.get(GET_MACHINES_BY_CAT_AND_TYPE_URL);
     const machineCategories = response.data;
     // console.log("categoryNames: ", machineCategories);
+    const machinesKey = Object.keys(machineCategories);
     setCategoryAndType(machineCategories);
     // console.log("machinesKey log: ", machinesKey);
+    const options = machinesKey.map(category => ({
+      value: category,
+      label: <span>{category}</span>
+    }));
+    setCategories(options);
   }
 
   useEffect(() => {
@@ -55,11 +62,11 @@ function MyRegisteredMachines() {
   }, []);
 
   // Map data to options for Select
-  const categories = [...new Set(machinesData.map(item => item.Category))];
-  const types = [...new Set(machinesData.map(item => item.Machine_Type))];
+  // const categories = [...new Set(machinesData.map(item => item.Category))];
+  // const types = [...new Set(machinesData.map(item => item.Machine_Type))];
 
-  const categoryOptions = categories.map(category => ({ value: category, label: category }));
-  const typeOptions = types.map(type => ({ value: type, label: type }));
+  // const categoryOptions = categories.map(category => ({ value: category, label: category }));
+  // const typeOptions = types.map(type => ({ value: type, label: type }));
 
 
   const handleCategoryChange = (value) => {
@@ -177,7 +184,7 @@ function MyRegisteredMachines() {
               style={{ width: 200 }}
               value={selectedCategory}
               allowClear
-              options={categoryOptions}
+              options={categories}
             />
             <Select
               placeholder="Filter by Machine Type"
@@ -202,6 +209,14 @@ function MyRegisteredMachines() {
           loading={loading}
           pagination={filteredData.length > 0 ? { pageSize: 10 } : false}
           dataSource={filteredData}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_DEFAULT}
+                description={<Text strong>You have not registered machines.</Text>}
+              />
+            ),
+          }}
           renderItem={(item, index) => (
             <>
               <Badge.Ribbon text={formatUpperCase(item.Category)} color='red'>
