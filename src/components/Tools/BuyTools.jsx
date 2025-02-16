@@ -2,10 +2,11 @@ import React from 'react'
 import "./buy.scss"
 import samimg from "../../assets/Total_Revenue.jpg"
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import SearchTools from './SearchTools';
 
 
 
-function BuyTools_main() {
+function BuyTools() {
     const navigate = useNavigate();
     const buyTools = 
         [
@@ -50,11 +51,12 @@ function BuyTools_main() {
         <div>
             <h1>BuyTools</h1>
             <div className="container-layout">
-            <div className="sidebar-filter">Search/Filter</div>
+            <div className="sidebar-filter">Search/Filter <div>
+                <SearchTools /></div> </div>
             <div className="main-container">
                 {buyTools.map((item,index)=>{
                   return(
-                <div className="inline-cardblock" id={item.id} onClick={()=>cardClick(item.id)}>
+                <div className="inline-cardblock" key={item.id} onClick={()=>cardClick(item.id)}>
                     <div className="main-card">
                         <div className="child-card-img">
                             <img className="card-img" src={samimg} alt={index} />
@@ -70,4 +72,4 @@ function BuyTools_main() {
     )
 }
 
-export default BuyTools_main;
+export default BuyTools;

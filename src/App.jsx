@@ -44,6 +44,7 @@ import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
+import BuyTools_detail from './components/Tools/BuyTools_detail';
 
 const App = () => {
   const location = useLocation();

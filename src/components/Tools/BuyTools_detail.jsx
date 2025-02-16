@@ -18,11 +18,13 @@ function BuyTools_detail() {
 
   return (
     <div>
+    <div>
       {selectedProduct ? (
         <DetailCard product={selectedProduct} />
       ) : (
         <p>Loading product details...</p>
       )}
+    </div>
     </div>
   );
 }

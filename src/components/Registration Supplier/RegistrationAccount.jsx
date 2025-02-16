@@ -452,7 +452,15 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: `${formData.officeTelephoneStd} ${formData.officeTelephone}`,
+            children: `${formData.officeTelephoneStd || '-'} ${formData.officeTelephone || ''}`,
+        },
+        {
+            label: (<h6>Factory Telephone</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: `${formData.factoryTelephoneStd || '-'} ${formData.factoryTelephone || ''}`,
         },
         {
             label: (<h6>Factory Email</h6>),
@@ -538,6 +546,10 @@ const RegistrationAccount = () => {
     const documentDescriptive = [
         {
             label: (<h6>Ownership</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.ownership
         },
         {
@@ -557,22 +569,6 @@ const RegistrationAccount = () => {
             children: formData.indLicNum
         },
         {
-            label: (<h6>GSTIN Number</h6>),
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
-            children: formData.GSTIN
-        },
-        {
-            label: (<h6>PAN Number</h6>),
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
-            children: formData.PAN
-        },
-        {
             label: (<h6>CIN Uploaded File</h6>),
             span: {
                 xs: 1,
@@ -587,6 +583,14 @@ const RegistrationAccount = () => {
             )
         },
         {
+            label: (<h6>GSTIN Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.GSTIN
+        },
+        {
             label: (<h6>GSTIN Uploaded File</h6>),
             span: {
                 xs: 1,
@@ -599,6 +603,14 @@ const RegistrationAccount = () => {
             children: (
                 <Button type='link' onClick={handleGstViewFile}>View GSTIN File</Button>
             )
+        },
+        {
+            label: (<h6>PAN Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.PAN
         },
         {
             label: (<h6>PAN Uploaded File</h6>),
@@ -1569,6 +1581,7 @@ const RegistrationAccount = () => {
     // const formData = new FormData();
 
     const handleNext = () => {
+        console.log("formData123: ", formData);
         form.validateFields().then(async(values) => {
             console.log("form: ", values);
             if(currentStep==0){
@@ -1611,6 +1624,7 @@ const RegistrationAccount = () => {
                 cin:cinid 
             }
         })
+        console.log("response: ", response);
         if (response.data.code==1){
             form.setFields([{ name: 'indLicNum',errors:['']},{ name: 'GSTIN',errors:['']},{ name: 'PAN',errors:['']}])
             //message.error('CIN or PAN or GST is already linked with an account');
@@ -1701,7 +1715,6 @@ const RegistrationAccount = () => {
             console.log("Form Error: ", error);
             message.error(`There is some error while submitting! ${error.message}`);
         })
-        console.log("handleSubmit values: ", values);
     };
 
     return (
