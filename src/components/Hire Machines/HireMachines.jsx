@@ -334,11 +334,6 @@ function HireMachines() {
                                             ]}
                                             extra={
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                                    {/* <img
-                                                        alt="machine image"
-                                                        src={item.Machine_Photo}
-                                                        style={{ width: '300px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
-                                                    /> */}
                                                     {item.Machine_Photo?.toLowerCase().endsWith('.pdf') ? (
                                                         <a href={item.Machine_Photo} target="_blank" rel="noopener noreferrer">
                                                             <img
