@@ -144,7 +144,7 @@ function RenterOrdersDetailPage() {
     };
 
     const handleSampleReportRedirect = (record, value) => {
-        let goods_status=["first_sample_repeat","first_sample_preparation"];
+        let goods_status=["first_sample_repeat","first_sample_preparation","production_in_progress","production_complete"];
         if (goods_status.indexOf(record.goods_status)>-1) {
         navigate(`/order-details/${record.order_id}/sample-report`, {
             state: {
