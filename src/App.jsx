@@ -13,6 +13,7 @@ import AppHeader from './components/AppHeader/AppHeader';
 import HomePage from './components/Homepage/HomePage';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
+import BuyTools_detail from './components/Tools/BuyTools_detail';
 import RentTools from './components/Tools/RentTools';
 import SellTools from './components/Tools/SellTools';
 // gauges
@@ -43,7 +44,6 @@ import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
-import BuyTools_detail from './components/Tools/BuyTools_detail';
 
 const App = () => {
   const location = useLocation();
