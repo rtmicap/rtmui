@@ -5,7 +5,7 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; }
 
   .carousel-container {
     width: 100%;
@@ -14,17 +14,19 @@
     overflow: hidden;
     position: relative;
 
-    .carousel-item {
-      min-width: 100%;
-      transition: transform 0.5s ease;
-
-      img {
-        width: 100%; // Ensure images take full width of carousel item
-        height: 100%; // Ensure images fill the height of carousel item
-        object-fit: cover; // Maintain aspect ratio while covering the area
-      }
-    }
+    
+    
   }
+  .carousel-item {
+    min-width: 100%;
+    transition: transform 0.5s ease;
+  }
+
+img {
+  width: 100%; // Ensure images take full width of carousel item
+  height: 100%; // Ensure images fill the height of carousel item
+  object-fit: cover; // Maintain aspect ratio while covering the area
+}
 
   .card-container {
     display: flex;
@@ -56,4 +58,3 @@
       }
     }
   }
-}

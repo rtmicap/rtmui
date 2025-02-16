@@ -7,34 +7,30 @@ import image2 from '../../assets/Rental_duration.jpg';
 import image3 from '../../assets/Hired_duration.jpg'; 
 
 // Map the image names from the JSON to the actual imported images
-const imagesMap = {
-    "image1.jpg": image1,
-    "image2.jpg": image2,
-    "image3.jpg": image3,
-  };
+const imagesMap = [image1, image2, image3];
   console.log("Image Map:", imagesMap);
 
 // Carousel Component
-const Carousel = ({ images }) => {
-    console.log("Images being passed to Carousel:", images);
+const Carousel = ({ imagesMap }) => {
+    console.log("Images being passed to Carousel:", imagesMap);
     const [currentIndex, setCurrentIndex] = React.useState(0);
 
     const nextSlide = () => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % imagesMap.length);
     };
 
     const prevSlide = () => {
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+      setCurrentIndex((prevIndex) => (prevIndex - 1 + imagesMap.length) % imagesMap.length);
     };
 
     return (
       <div className="carousel-container">
         <button onClick={prevSlide}>❮</button>
         <div style={{ transform: `translateX(-${currentIndex * 100}%)`, display: 'flex' }}>
-          {images.map((imageName, index) => (
-            <div className="carousel-item" key={index}>
-              <img src={imagesMap[imageName]} alt={`Slide ${index}`} style={{ width: '100%', height: '400px', objectFit: 'cover' }} />
-            </div>
+          {imagesMap.map((imageName, index) => (
+            <><img src={imageName} alt={`Slide ${index}`} /> </>
+              
+            
           ))}
         </div>
         <button onClick={nextSlide}>❯</button>
@@ -43,7 +39,7 @@ const Carousel = ({ images }) => {
   };
 
 Carousel.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  imagesMap: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
   
   // DetailCard Component
@@ -52,7 +48,7 @@ Carousel.propTypes = {
   
     return (
       <div className="detail-card-container">
-        <Carousel images={images} />
+        <Carousel imagesMap={imagesMap} />
         <h2>{toolname}</h2>
         <p>{description}</p>
         <div className="pricing-info">
