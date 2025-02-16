@@ -49,3 +49,6 @@ export const GET_COMPANY_DETAILS = '/user/getCompanyDetails';
 
 // admin password changes
 export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
+
+//tools configuration
+export const SEARCH_TOOLS = "/tools/searchtools";
