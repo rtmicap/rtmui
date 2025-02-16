@@ -8,7 +8,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 import config from "../../env.json";
-import { REGISTER_ACCOUNT_URL,CHECK_REGISTERED_USER } from '../../api/apiUrls';
+import { REGISTER_ACCOUNT_URL, CHECK_REGISTERED_USER } from '../../api/apiUrls';
 const { Text } = Typography;
 import axios from "../../api/axios";
 import "./registrationaccount.scss";
@@ -17,7 +17,7 @@ const RegistrationAccount = () => {
     const navigate = useNavigate();
 
     const [currentStep, setCurrentStep] = useState(0);
-    const [docErrorMsg,setDocErrorMsg] = useState("");
+    const [docErrorMsg, setDocErrorMsg] = useState("");
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -346,7 +346,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeCountry,
+            children: isChecked ? formData.officeCountry : formData.factoryCountry,
         },
         {
             label: (<h6>Factory Country</h6>),
@@ -367,7 +367,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeAddress,
+            children: isChecked ? formData.officeAddress : formData.factoryAddress,
         },
         {
             label: (<h6>Factory Address</h6>),
@@ -388,7 +388,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeState,
+            children: isChecked ? formData.officeState : formData.factoryState,
         },
         {
             label: (<h6>Factory State</h6>),
@@ -404,7 +404,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeCity,
+            children: isChecked ? formData.officeCity : formData.factoryCity,
         },
         {
             label: (<h6>Factory City</h6>),
@@ -420,7 +420,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeArea,
+            children: isChecked ? formData.officeArea : formData.factoryArea,
         },
         {
             label: (<h6>Factory Area</h6>),
@@ -436,7 +436,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.offPinCode,
+            children: isChecked ? formData.offPinCode : formData.facPinCode,
         },
         {
             label: (<h6>Factory PIN Code</h6>),
@@ -452,7 +452,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: `${formData.officeTelephoneStd || '-'} ${formData.officeTelephone || ''}`,
+            children: isChecked ? `${(formData.officeTelephoneStd && '+' + formData.officeTelephoneStd) || '-'} ${formData.officeTelephone || ''}` : `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || '-'} ${formData.factoryTelephone || ''}`,
         },
         {
             label: (<h6>Factory Telephone</h6>),
@@ -460,7 +460,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: `${formData.factoryTelephoneStd || '-'} ${formData.factoryTelephone || ''}`,
+            children: `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || '-'} ${formData.factoryTelephone || ''}`,
         },
         {
             label: (<h6>Factory Email</h6>),
@@ -476,7 +476,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeEmailAddress,
+            children: isChecked ?  formData.officeEmailAddress : formData.factoryEmailAddress,
         },
         {
             label: (<h6>Factory Cell Phone</h6>),
@@ -492,7 +492,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeMobile,
+            children: isChecked ? formData.officeMobile : formData.factoryMobile,
         },
     ];
 
@@ -1268,7 +1268,7 @@ const RegistrationAccount = () => {
             title: 'Documents Verification',
             content: (
                 <Form form={form} layout="vertical">
-                    
+
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1307,7 +1307,7 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                     </Row>
-                    
+
                     {/* CIN Input and file */}
                     <div className={docErrorMsg}>CIN or GST or PAN is already linked with an account</div>
                     <Row gutter={[16, 18]}>
@@ -1582,60 +1582,60 @@ const RegistrationAccount = () => {
 
     const handleNext = () => {
         console.log("formData123: ", formData);
-        form.validateFields().then(async(values) => {
+        form.validateFields().then(async (values) => {
             console.log("form: ", values);
-            if(currentStep==0){
+            if (currentStep == 0) {
                 setDocErrorMsg("docErrorHide");
                 await validateUserName(values.factoryEmailAddress);
             }
-            if(currentStep==1){
-                await validateDocDetails(values.GSTIN,values.PAN,values.indLicNum)
+            if (currentStep == 1) {
+                await validateDocDetails(values.GSTIN, values.PAN, values.indLicNum)
             }
-                setCurrentStep(currentStep + 1);
-                setFormData({ ...formData, ...values });
-        }).catch(error=>{
+            setCurrentStep(currentStep + 1);
+            setFormData({ ...formData, ...values });
+        }).catch(error => {
             return
         })
-       
+
     };
 
-    const validateUserName = async(value) => {
-        
-         let factoryEmail = value;
-            const response = await axios.get(CHECK_REGISTERED_USER, {
-                            params: { factoryEmail }
-            })
-            if (response.data.code==1){
-                form.setFields([{ name: 'factoryEmailAddress',errors:['Factory Email is already registered.']}])
-                return Promise.reject(new Error('Error'));
-            }
-            else{
-                return Promise.resolve();
-            }
-  
-     }
+    const validateUserName = async (value) => {
 
-     const validateDocDetails = async(gstid,panid,cinid)=>{
-        console.log(gstid,panid,cinid);
+        let factoryEmail = value;
         const response = await axios.get(CHECK_REGISTERED_USER, {
-            params: { 
-                gst:gstid,
-                pan:panid,
-                cin:cinid 
+            params: { factoryEmail }
+        })
+        if (response.data.code == 1) {
+            form.setFields([{ name: 'factoryEmailAddress', errors: ['Factory Email is already registered.'] }])
+            return Promise.reject(new Error('Error'));
+        }
+        else {
+            return Promise.resolve();
+        }
+
+    }
+
+    const validateDocDetails = async (gstid, panid, cinid) => {
+        console.log(gstid, panid, cinid);
+        const response = await axios.get(CHECK_REGISTERED_USER, {
+            params: {
+                gst: gstid,
+                pan: panid,
+                cin: cinid
             }
         })
         console.log("response: ", response);
-        if (response.data.code==1){
-            form.setFields([{ name: 'indLicNum',errors:['']},{ name: 'GSTIN',errors:['']},{ name: 'PAN',errors:['']}])
+        if (response.data.code == 1) {
+            form.setFields([{ name: 'indLicNum', errors: [''] }, { name: 'GSTIN', errors: [''] }, { name: 'PAN', errors: [''] }])
             //message.error('CIN or PAN or GST is already linked with an account');
             setDocErrorMsg("docError");
             return Promise.reject(new Error('Error'));
         }
-        else{
+        else {
             setDocErrorMsg("docErrorHide");
             return Promise.resolve();
         }
-     }
+    }
 
     const handlePrev = () => {
         setCurrentStep(currentStep - 1);

@@ -65,6 +65,7 @@ function RegistrationMachines() {
         setCategory('');
         setOpenIdenticalCheck(false);
         setMachineInputFields([]);
+        setFileList([]);
     }
 
     const machineFieldsFromApi = async () => {

@@ -8,7 +8,7 @@ const { Meta } = Card;
 const { Option } = Select;
 import Config from '../../env.json'
 import { useAuth } from '../../contexts/AuthContext';
-import { FileSearchOutlined, WechatOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, WechatOutlined, FilePdfOutlined } from '@ant-design/icons';
 import { LikeOutlined, MessageOutlined, DownOutlined } from '@ant-design/icons';
 import { Avatar, List } from 'antd';
 import "./style.scss";
@@ -333,16 +333,34 @@ function HireMachines() {
                                                 <Button type="primary" onClick={() => navigate(`book-machine/${item.id}`)}>Book Machine</Button>,
                                             ]}
                                             extra={
-                                                <>
-                                                    <img
-                                                        width={260}
-                                                        height={210}
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                    {/* <img
                                                         alt="machine image"
-                                                        // src={`https://picsum.photos/280/190?random=${item.id}`}
                                                         src={item.Machine_Photo}
-                                                    />,
-                                                    <Title level={5}>Distance(Kms): <a>{item.distance}</a></Title>
-                                                </>
+                                                        style={{ width: '300px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
+                                                    /> */}
+                                                    {item.Machine_Photo?.toLowerCase().endsWith('.pdf') ? (
+                                                        <a href={item.Machine_Photo} target="_blank" rel="noopener noreferrer">
+                                                            <img
+                                                                alt="PDF file"
+                                                                src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" // A PDF icon
+                                                                style={{ width: '80px', height: 'auto', objectFit: 'contain' }}
+                                                            />
+                                                            <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
+                                                                <span style={{color: 'blue'}}>View File</span> <FilePdfOutlined style={{ color: 'red' }} />
+                                                            </Title>
+                                                        </a>
+                                                    ) : (
+                                                        <img
+                                                            alt="machine image"
+                                                            src={item.Machine_Photo}
+                                                            style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
+                                                        />
+                                                    )}
+                                                    <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
+                                                        Distance(Kms): <a>{item.distance ? item.distance : '-'}</a>
+                                                    </Title>
+                                                </div>
                                             }
                                         >
                                             <List.Item.Meta
