@@ -43,6 +43,7 @@ import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
+import BuyTools_detail from './components/Tools/BuyTools_detail';
 
 const App = () => {
   const location = useLocation();
@@ -82,6 +83,7 @@ const App = () => {
             <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
             {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
+            <Route path='buytools-detail' element={<BuyTools_detail />} />
             <Route path="rent-tools" element={<RentTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 

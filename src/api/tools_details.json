@@ -1,0 +1,23 @@
+[
+    {
+      "toolname": "taper gauge",
+      "description": "Taper gauge tool for measuring spindle taper",
+      "condition": "used",
+      "yearofpurchase": 2021,
+      "priceDetails": {
+        "price": 500,
+        "discount": 10,
+        "finalPrice": 450
+      },
+      "additionalDetails": {
+        "warranty": "2 years",
+        "shipping": "Free shipping within 7 days",
+        "returns": "30-day return policy"
+      },
+      "images": [
+        "image1.jpg",
+        "image2.jpg",
+        "image3.jpg"
+      ]
+    }
+  ]
