@@ -346,7 +346,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeCountry : formData.factoryCountry,
+            children: formData.officeCountry || 'Not Provided',
         },
         {
             label: (<h6>Factory Country</h6>),
@@ -367,7 +367,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeAddress : formData.factoryAddress,
+            children: formData.officeAddress || 'Not Provided',
         },
         {
             label: (<h6>Factory Address</h6>),
@@ -380,7 +380,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryAddress,
+            children: formData.factoryAddress || 'Not Provided',
         },
         {
             label: (<h6>Office State</h6>),
@@ -388,7 +388,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeState : formData.factoryState,
+            children: formData.officeState || 'Not Provided',
         },
         {
             label: (<h6>Factory State</h6>),
@@ -396,7 +396,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryState,
+            children: formData.factoryState || 'Not Provided',
         },
         {
             label: (<h6>Office City</h6>),
@@ -404,7 +404,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeCity : formData.factoryCity,
+            children: formData.officeCity || 'Not Provided',
         },
         {
             label: (<h6>Factory City</h6>),
@@ -412,7 +412,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryCity,
+            children: formData.factoryCity || 'Not Provided',
         },
         {
             label: (<h6>Office Area</h6>),
@@ -420,7 +420,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeArea : formData.factoryArea,
+            children: formData.officeArea || 'Not Provided',
         },
         {
             label: (<h6>Factory Area</h6>),
@@ -428,7 +428,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryArea,
+            children: formData.factoryArea || 'Not Provided',
         },
         {
             label: (<h6>Office PIN Code</h6>),
@@ -436,7 +436,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.offPinCode : formData.facPinCode,
+            children: formData.offPinCode || 'Not Provided',
         },
         {
             label: (<h6>Factory PIN Code</h6>),
@@ -444,7 +444,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.facPinCode,
+            children: formData.facPinCode || 'Not Provided',
         },
         {
             label: (<h6>Office Telephone</h6>),
@@ -452,7 +452,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? `${(formData.officeTelephoneStd && '+' + formData.officeTelephoneStd) || '-'} ${formData.officeTelephone || ''}` : `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || '-'} ${formData.factoryTelephone || ''}`,
+            children: `${(formData.officeTelephoneStd && '+' + formData.officeTelephoneStd) || 'Not Provided'} ${formData.officeTelephone || ''}`,
         },
         {
             label: (<h6>Factory Telephone</h6>),
@@ -460,7 +460,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || '-'} ${formData.factoryTelephone || ''}`,
+            children: `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || 'Not Provided'} ${formData.factoryTelephone || ''}`,
         },
         {
             label: (<h6>Factory Email</h6>),
@@ -468,7 +468,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryEmailAddress,
+            children: formData.factoryEmailAddress || 'Not Provided',
         },
         {
             label: (<h6>Office Email</h6>),
@@ -476,10 +476,10 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ?  formData.officeEmailAddress : formData.factoryEmailAddress,
+            children: formData.officeEmailAddress || 'Not Provided',
         },
         {
-            label: (<h6>Factory Cell Phone</h6>),
+            label: (<h6>Factory Mobile Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -487,12 +487,12 @@ const RegistrationAccount = () => {
             children: formData.factoryMobile,
         },
         {
-            label: (<h6>Office Cell Phone</h6>),
+            label: (<h6>Office Mobile Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
             },
-            children: isChecked ? formData.officeMobile : formData.factoryMobile,
+            children: formData.officeMobile,
         },
     ];
 
