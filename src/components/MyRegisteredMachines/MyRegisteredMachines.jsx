@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined } from "@ant-design/icons";
+import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined, FilePdfOutlined } from "@ant-design/icons";
 import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography } from 'antd';
 import axios from '../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
@@ -214,16 +214,29 @@ function MyRegisteredMachines() {
                     <Button type="primary" danger>Block Machine</Button>,
                   ]}
                   extra={
-                    <>
-                      <img
-                        width={260}
-                        height={210}
-                        alt="machine image"
-                        // src={`https://picsum.photos/280/190?random=${item.id}`}
-                        src={item.Machine_Photo}
-                      />,
-                      <Title level={5}>Distance(Kms): <a>{item.distance}</a></Title>
-                    </>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      {item.Machine_Photo?.toLowerCase().endsWith('.pdf') ? (
+                        <a href={item.Machine_Photo} target="_blank" rel="noopener noreferrer">
+                          <img
+                            alt="PDF file"
+                            src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" // A PDF icon
+                            style={{ width: '80px', height: 'auto', objectFit: 'contain' }}
+                          />
+                          <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
+                            <span style={{ color: 'blue' }}>View File</span> <FilePdfOutlined style={{ color: 'red' }} />
+                          </Title>
+                        </a>
+                      ) : (
+                        <img
+                          alt="machine image"
+                          src={item.Machine_Photo}
+                          style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
+                        />
+                      )}
+                      <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
+                        Distance(Kms): <a>{item.distance ? item.distance : '-'}</a>
+                      </Title>
+                    </div>
                   }
                 >
                   <List.Item.Meta
