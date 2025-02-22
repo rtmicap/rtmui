@@ -41,6 +41,8 @@ export const GET_COMPANY_DETAILS_BY_ID = "/user/getcompanydetailsbyid";
 
 // Get Registered Machines
 export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
+// Get Machines By Machine ID
+export const GET_MACHINES_BY_MACHONE_ID = "/machines/getMachinesByMachineId";
 
 // ******************************///*****************///
 //Admin URLS

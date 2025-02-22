@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined, FilePdfOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty } from 'antd';
+import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty, Drawer } from 'antd';
 import axios from '../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import ViewMachineDetail from '../Hire Machines/ViewMachineDetail';
+import EditMachine from '../EditMachine/EditMachine';
 const { Title, Text } = Typography;
 
 function MyRegisteredMachines() {
@@ -25,6 +26,18 @@ function MyRegisteredMachines() {
   const [categoryAndType, setCategoryAndType] = useState([]);
   const [machineTypes, setMachineTypes] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [selectedMachineId, setSelectedMachineId] = useState(null);
+
+  const handleEdit = (id) => {
+    setSelectedMachineId(id);
+    setOpenDrawer(true);
+  };
+
+  const onCloseDrawer = () => {
+    setOpenDrawer(false);
+    setSelectedMachineId(null);
+  };
 
   const getMachinesByCompanyId = async () => {
     try {
@@ -226,6 +239,7 @@ function MyRegisteredMachines() {
                   actions={[
                     <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
                     <Button type="primary" danger>Block Machine</Button>,
+                    // <Button onClick={() => handleEdit(item.id)}>Edit Machine</Button>,
                   ]}
                   extra={
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -275,6 +289,11 @@ function MyRegisteredMachines() {
         />
         {/* // View Details */}
         {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
+
+        {/* Drawer for editing */}
+        {selectedMachineId && (
+          <EditMachine machineId={selectedMachineId} onClose={onCloseDrawer} />
+        )}
       </div>
     </>
   )
