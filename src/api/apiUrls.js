@@ -52,3 +52,4 @@ export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
 
 //tools configuration
 export const SEARCH_TOOLS = "/tools/searchtools";
+export const SEARCH_SUGGESTIONS = "/tools/searchsuggestions";

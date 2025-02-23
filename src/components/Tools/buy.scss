@@ -16,7 +16,7 @@
 .main-container {
     display: inline-block;
     min-width: 545px;
-    max-width: 100%;
+    width: 100%;
     border:1px solid rgb(165, 163, 163);
 }
 
@@ -34,6 +34,7 @@
     display: inline-block;
     position: relative;
     cursor: pointer;
+    
 }
 
 .child-card-img {
@@ -59,6 +60,7 @@
     font-weight: bold;
     width: 95%;
     padding-left: 5px;
+    font-size:18px;
 }
 
 .card-desc {
@@ -69,4 +71,57 @@
     width: 95%;
     padding-left: 5px;
     color: rgb(100, 99, 99);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
+
+.detailsCardSpan{
+    font-weight: bold;
+   }
+
+
+/*   Search component                */
+.search_main_container{
+    position:relative;
+}
+.searchbox_container{
+    //border:1px solid red;
+}
+.searchText_inlineblock{
+    width: 302px;
+    float: left;
+}
+.searchIcon_inlineblock{
+    width: 31px;
+    margin-left: -4px;
+    display: inline-block;
+    margin-bottom: -5px;
+    margin-top: -1px;
+    cursor:pointer;
+}
+.search-box{
+    width:300px ;
+}
+.search_results_container{
+    position: absolute;
+    width:fit-content;
+    border:1px solid grey;
+    background:white;
+    padding-left:10px;
+    z-index:1;
+}
+.search_suggestion_item{
+    min-width:298px;
+    background:white;  
+    display: block;
+    cursor: pointer;
+    color:grey;
+}
+.search_suggestion_item:hover{
+    color:blue;
+}
+
+
+
+
