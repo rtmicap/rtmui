@@ -1,89 +1,112 @@
-import React from 'react';
+import {React, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import './DetailCard.scss'; // Import your SCSS file
 
-import image1 from '../../assets/Hired_duration.jpg'; 
-import image2 from '../../assets/Rental_duration.jpg'; 
-import image3 from '../../assets/Hired_duration.jpg'; 
+
 
 // Map the image names from the JSON to the actual imported images
-const imagesMap = [image1, image2, image3];
-  console.log("Image Map:", imagesMap);
+//const imagesMap = [image1, image2, image3, image4];
 
 // Carousel Component
-const Carousel = ({ imagesMap }) => {
-    console.log("Images being passed to Carousel:", imagesMap);
-    const [currentIndex, setCurrentIndex] = React.useState(0);
-
+const Carousel = (imagesMap) => {
+    imagesMap=Object.values(imagesMap)[0];
+    const [leftPos, setLeftPos] = useState(0);    
     const nextSlide = () => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % imagesMap.length);
+      if(imagesMap.length>1){
+      if (leftPos/(imagesMap.length)==0 || -leftPos/(imagesMap.length-1)<100 ){
+      setLeftPos((leftPos) => (leftPos - 100));
+      }
+    }
     };
 
     const prevSlide = () => {
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + imagesMap.length) % imagesMap.length);
+      if(leftPos<0){
+      setLeftPos((leftPos) => (leftPos + 100));
+      }
     };
 
-    return (
-      <div className="carousel-container">
-        <button onClick={prevSlide}>❮</button>
-        <div style={{ transform: `translateX(-${currentIndex * 100}%)`, display: 'flex' }}>
-          {imagesMap.map((imageName, index) => (
-            <div key={index}><img  src={imageName} alt={`Slide ${index}`} /> </div>
-              
-            
-          ))}
+    return(imagesMap.length?
+    
+      <div className="img-main-container">
+          <div className="img-btn-left"><input type="button" className="img-btn" onClick={prevSlide} value="<" /> </div>
+          <div className="img-btn-right"><input type="button" className="img-btn" onClick={nextSlide} value=">" /> </div>
+        <div className="img-repo-container" style={{marginLeft:`${leftPos}%`,width:`${imagesMap.length*100}%`}}>
+        {imagesMap.map((imageName, index) => (
+        <div className="img-container" key={index}><img  src={imageName} alt={`Slide ${index}`} /> </div>
+        ))
+        }
         </div>
-        <button onClick={nextSlide}>❯</button>
-      </div>
-    );
+        </div>
+    :
+        <div className="img-main-container">
+         <div className="Noimg-container">
+          No Images Uploaded!!
+        </div>
+        </div>
+    )
   };
 
-Carousel.propTypes = {
-  imagesMap: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-  
   // DetailCard Component
-  const DetailCard = ({ product }) => {
-    const { toolname, description, priceDetails, additionalDetails, images } = product;
-  
+  const DetailCard = ({product}) => {
+      console.log(product,"   Details page");
     return (
       <div className="detail-card-container">
-        <Carousel imagesMap={imagesMap} />
-        <h2>{toolname}</h2>
-        <p>{description}</p>
+        <Carousel imagesMap={product.tool_image} />
+        <div className="titleCard">
+        <h3>{product.tool_name}</h3>
+
+        <p><span className="detailsCardSpan">Description : </span>{product.tool_description}</p>
+        </div>
         <div className="pricing-info">
+        <hr/>
           <h3>Pricing Information</h3>
-          <p>Original Price: ${priceDetails.price}</p>
-          <p>Discount: {priceDetails.discount}%</p>
-          <p>Final Price: ${priceDetails.finalPrice}</p>
+          <hr/>
+          <p><span className="detailsCardSpan">Sale Price:</span>{product.tool_selling_price}</p>
         </div>
         <div className="additional-details">
+        <hr/>
           <h3>Additional Details</h3>
-          <p>Warranty: {additionalDetails.warranty}</p>
-          <p>Shipping: {additionalDetails.shipping}</p>
-          <p>Returns: {additionalDetails.returns}</p>
+          <hr/>
+          <div className="additional-details-content">
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
+          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
+          </div>
         </div>
       </div>
     );
   };
   
-  // PropTypes for DetailCard
-  DetailCard.propTypes = {
-    product: PropTypes.shape({
-      toolname: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      priceDetails: PropTypes.shape({
-        price: PropTypes.number.isRequired,
-        discount: PropTypes.number.isRequired,
-        finalPrice: PropTypes.number.isRequired,
-      }).isRequired,
-      additionalDetails: PropTypes.shape({
-        warranty: PropTypes.string.isRequired,
-        shipping: PropTypes.string.isRequired,
-        returns: PropTypes.string.isRequired,
-      }).isRequired,
-      images: PropTypes.arrayOf(PropTypes.string).isRequired,
-    }).isRequired,
-  };
   
   export default DetailCard;

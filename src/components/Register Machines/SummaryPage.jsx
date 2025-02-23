@@ -171,13 +171,17 @@ function SummaryPage({ setOpenSummary, resetForm }) {
             // var fd = new FormData();
             // fd.append("data", JSON.stringify({ machines: outputArray }));
             const configHeaders = {
-                headers: { "content-type": "application/json" },
+                Authorization: token, // This should be null
+                headers: { "content-type": "application/json", },
             };
 
             var reqItem = {
                 machines: outputArray
             }
             setIsLoading(true);
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const response = await axios.post(REGISTER_MACHINE_URL, reqItem, configHeaders);
             console.log("response 200: ", response);
             if (response && (response.status == 200 || response.status == 201)) {
@@ -188,12 +192,19 @@ function SummaryPage({ setOpenSummary, resetForm }) {
                 setOpenSummary(false);
                 resetForm()
             } else {
+                console.log("response123: ", response);
                 message.error(`${response.data.message}`);
             }
 
         } catch (error) {
-            console.log('Error sending data:', error);
+            console.log('Error while submitting machine data:', error);
             // handleShowModal('error', error && error.message ? error.message : 'Something went wrong while registering the machines. Please create new machines!', 'Redirect to register machines page!');
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!")
+            } else {
+                message.error("There is some error while Submitting the machine!");
+            }
+            navigate("/login");
         } finally {
             setIsLoading(false);
         }
