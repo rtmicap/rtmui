@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
 import DetailCard from '../common/DetailCard'; 
 import cardData from '../../api/tools_details.json';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function BuyTools_detail() {
-  const [data, setData] = useState([]);
+  const location = useLocation();
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const { toolsDetails } = location.state || {};
 
   useEffect(() => {
-    setData(cardData);
-  }, []);
-
-  useEffect(() => {
-    if (data.length > 0) {
-      setSelectedProduct(data[0]);
-    }
-  }, [data]);
+    console.log(toolsDetails, "  test");
+      setSelectedProduct(cardData[0]);
+  });
 
   return (
     <div>
     <div>
       {selectedProduct ? (
-        <DetailCard product={selectedProduct} />
+        <DetailCard product={toolsDetails} tools={toolsDetails}/>
       ) : (
         <p>Loading product details...</p>
       )}
