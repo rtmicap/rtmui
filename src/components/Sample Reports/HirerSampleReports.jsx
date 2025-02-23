@@ -71,13 +71,21 @@ function HirerSampleReports() {
                 data.first_sample_id = form.getFieldValue("first_sample_id");
                 data.inspection_date_time = form.getFieldValue("inspection_date_time");
                 // console.log("datta: ", data);
+                const token = localStorage.getItem('authToken');
+                axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
                 const response = await axios.patch(UPDATE_FIRST_SAMPLE_REPORT_URL, data);
                 console.log("updated: ", response.data);
                 message.success(response.data.message);
                 navigate(-1);
             } catch (error) {
                 console.log("error update: ", error);
-                message.error("There is something error updating the sample report!");
+                if (error && error.response.status == 401) {
+                    message.warning("Unauthorized! Please log in again!");
+                    navigate("/login");
+                }else{
+                    message.error("There is something error updating the sample report!");
+                }
             }
         }
     }

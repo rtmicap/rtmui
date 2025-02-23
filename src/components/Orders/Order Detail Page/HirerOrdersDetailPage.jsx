@@ -25,7 +25,12 @@ function HirerOrdersDetailPage() {
             // console.log("company details: ", response.data.data);
             setter(response.data.data);
         } catch (error) {
-            message.error("Error fetching Company Details");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            }else{
+                message.error("Error fetching Company Details");
+            }
         }
     };
     var load = true;
