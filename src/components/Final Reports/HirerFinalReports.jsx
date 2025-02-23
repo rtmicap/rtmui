@@ -131,6 +131,8 @@ function HirerFinalReports() {
                 data.orderid = order.order_id;
                 data.final_report_id = form.getFieldValue("final_report_id");
                 // console.log("final report datta: ", data);
+                const token = localStorage.getItem('authToken');
+                axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
                 const response = await axios.patch(UPDATE_FINAL_REPORT_URL, data);
                 // console.log("updated submitFinalReportStatus: ", response.data);
                 message.success(response.data ? response.data.message : response.message);
@@ -138,7 +140,12 @@ function HirerFinalReports() {
             }
         } catch (error) {
             // console.log("error final report: ", error);
-            message.error("There is some error while updating final report!");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            }else{
+                message.error("There is some error while updating final report!");
+            }
         }
     }
 

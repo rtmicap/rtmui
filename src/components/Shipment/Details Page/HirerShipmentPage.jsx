@@ -178,7 +178,7 @@ function HirerShipmentPage() {
             setImageFileIsLoading((prev) => ({ ...prev, [key]: true })); // Set loading for the specific key
             setIsSubmitDisabled(true); // submit button disabled
             // const isImageFormat = info.fileList[0].type === 'application/jpg' || 'application/jpeg' || 'application/png';
-            const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png','application/pdf'].includes(info.fileList[0].type);
+            const isImageFormat = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'].includes(info.fileList[0].type);
             const isLt2M = info.fileList[0].size / 1024 / 1024 < 2;
 
             if (!isImageFormat) {
@@ -272,6 +272,10 @@ function HirerShipmentPage() {
                 })
             );
             const finalValues = { ...values, shipment_details: updatedShipmentDetails };
+
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const shipmentRes = await axios.post(CREATE_SHIPMENT_URL, finalValues);
             console.log("shipmentRes: ", shipmentRes);
             message.success(shipmentRes.data.message);
@@ -279,7 +283,12 @@ function HirerShipmentPage() {
 
         } catch (error) {
             console.error('Shipment error:', error);
-            message.error('Shipment failed. Please try again.');
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            } else {
+                message.error('Shipment failed. Please try again.');
+            }
             resetForm(); // clear the form data
         }
     };

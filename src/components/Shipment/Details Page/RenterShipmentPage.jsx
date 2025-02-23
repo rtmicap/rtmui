@@ -43,6 +43,9 @@ function RenterShipmentPage() {
     const getShipmentByOrderId = async () => {
         try {
             setLoading(true);
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const response = await axios.get(`${GET_SHIPMENT_BY_ORDERID_URL}/${order.order_id}`);
             console.log("Renter getShipmentByOrderId: ", response.data);
             if (response && response.data.result.length > 0) {
@@ -55,7 +58,12 @@ function RenterShipmentPage() {
                 setLoading(false);
             }
         } catch (error) {
-            message.error("Something error while fetching shipment data!");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            } else {
+                message.error("Something error while fetching shipment data!");
+            }
             console.log("shipment data err: ", error);
             setShipmentData([]);
             setLoading(false);
@@ -263,12 +271,20 @@ function RenterShipmentPage() {
                 message.info("Please update the Received Status!");
             }
             console.log('shipments2:', shipmentData);
+
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const resp = await axios.patch(UPDATE_SHIPMENT_URL, { shipment_details: shipmentData, orderid: order.order_id });
             message.success(resp.data.message ? resp.data.message : 'Shipment Updated!');
             navigate(-1); // redirect to previous page
         } catch (error) {
             console.error('Failed to update shipments:', error);
-            message.error("There is some error while updating the shipment!");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!")
+            } else {
+                message.error("There is some error while updating the shipment!");
+            }
         }
     };
 

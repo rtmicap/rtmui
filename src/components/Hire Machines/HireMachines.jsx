@@ -54,6 +54,9 @@ function HireMachines() {
                 page: pages
             };
 
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const response = await axios.get(SEARCH_MACHINES, {
                 params: queryParams,
             });
@@ -69,9 +72,13 @@ function HireMachines() {
         } catch (error) {
             // Handle errors
             setLoading(false);
-            message.error("There is some error while searching the machine!", error.message);
-            //console.error('Error fetching data:', error);
-            navigate("/login");
+            console.error('Error fetching data:', error);
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            } else {
+                message.error("There is some error while searching the machine!", error.message);
+            }
         }
     };
 
@@ -342,7 +349,7 @@ function HireMachines() {
                                                                 style={{ width: '40px', height: 'auto', objectFit: 'contain' }}
                                                             />
                                                             <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>
-                                                                <span style={{color: 'blue'}}>View File</span> <FilePdfOutlined style={{ color: 'red' }} />
+                                                                <span style={{ color: 'blue' }}>View File</span> <FilePdfOutlined style={{ color: 'red' }} />
                                                             </Title>
                                                         </a>
                                                     ) : (
