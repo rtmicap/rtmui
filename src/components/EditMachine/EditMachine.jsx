@@ -1,6 +1,6 @@
 import { Button, Col, Drawer, Form, Input, message, Row, Select, Space, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { GET_MACHINES_BY_MACHONE_ID } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { Cutting } from '../Machine Variable Fields/Cutting';
@@ -13,7 +13,7 @@ const { TextArea } = Input;
 
 function EditMachine({ machineId, onClose }) {
     const location = useLocation();
-
+    const navigate = useNavigate();
     const [form] = Form.useForm();
     const [fields, setFields] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -1310,10 +1310,12 @@ const RegistrationAccount = () => {
 
                     {/* CIN Input and file */}
                     <div className={docErrorMsg}>CIN or GST or PAN is already linked with an account</div>
+                    <div><span style={{ color: 'red', fontWeight: 'bold' }}>Note:</span> Type <b>UAM</b> without '-' (hyphen) symbol</div>
                     <Row gutter={[16, 18]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
                                 {
+                                    // pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
                                     pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
                                     message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
                                 },
@@ -1321,8 +1323,18 @@ const RegistrationAccount = () => {
                                     required: true,
                                     message: "Please enter your CIN or UAM"
                                 },
-                            ]} extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456">
-                                <Input placeholder="Enter your CIN number or UAM" maxLength={22} />
+                                {
+                                    min: 11,
+                                    message: "Minimum 11 characters required (for Udyam)",
+                                },
+                                {
+                                    max: 21,
+                                    message: "Maximum 21 characters allowed (for CIN)",
+                                },
+
+
+                            ]} extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456" normalize={(value) => value?.trim()}>
+                                <Input placeholder="Enter your CIN number or UAM" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
