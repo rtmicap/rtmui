@@ -44,6 +44,7 @@ import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
+import EditMachine from './components/EditMachine/EditMachine';
 
 const App = () => {
   const location = useLocation();
@@ -79,6 +80,7 @@ const App = () => {
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
+            <Route path="my-registered-machines/edit-machine/:machineId" element={<EditMachine />} />
             {/* <Route path="hire-machine/booking/:machineId" element={<Booking />} /> */}
             <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
             {/* Tools */}
