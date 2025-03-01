@@ -1,14 +1,14 @@
-import { Button, Col, Drawer, Form, Input, message, Row, Select, Space, Spin } from 'antd';
+import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { GET_MACHINES_BY_MACHONE_ID } from '../../api/apiUrls';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FILE_UPLOAD_URL, GET_MACHINES_BY_MACHONE_ID } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { Cutting } from '../Machine Variable Fields/Cutting';
 import { Drilling } from '../Machine Variable Fields/Drilling';
 import { Milling } from '../Machine Variable Fields/Milling';
 import { Grinding } from '../Machine Variable Fields/Grinding';
 import { Turning } from '../Machine Variable Fields/Turning';
-import { LoadingOutlined, LeftCircleOutlined } from '@ant-design/icons';
+import { LoadingOutlined, LeftCircleOutlined, UploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 
 function EditMachine({ machineId, onClose }) {
@@ -18,6 +18,11 @@ function EditMachine({ machineId, onClose }) {
     const [fields, setFields] = useState([]);
     const [loading, setLoading] = useState(true);
     const [singleMachineData, setSingleMachineData] = useState({});
+    const [fileLoading, setFileLoading] = useState(false);
+    const [machineImageList, setMachineImageList] = useState([]);
+    const [viewUploadedImage, setViewUploadedImage] = useState('');
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
     const machineCategories = { Cutting, Drilling, Milling, Grinding, Turning }; // Add all your machine categories
 
     const { machineData } = location.state || {};
@@ -35,6 +40,8 @@ function EditMachine({ machineId, onClose }) {
             const filteredFields = selectedFields.filter(field => field.name !== "noOfMachines");
             console.log("selectedFields: ", selectedFields);
             console.log("filteredFields: ", filteredFields);
+            // add comments field too 
+            form.setFieldsValue({ Comments: machineData.Comments });
             setFields(filteredFields);
             let variableFields = {};
             try {
@@ -59,6 +66,58 @@ function EditMachine({ machineId, onClose }) {
         getMachinesByMachineId();
     }, []);
 
+    const fileUpload = async (file) => {
+        try {
+            const configHeaders = {
+                headers: { "content-type": "multipart/form-data" },
+            };
+            const formData = new FormData();
+            formData.append("fileName", file.originFileObj);
+            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
+            // console.log("responseFileData: ", response);
+            return response.data;
+        } catch (error) {
+            return error;
+        }
+    }
+
+
+    const handleImageFileChange = async (info) => {
+        let fileList = [...info.fileList];
+        // Limit to only one file
+        fileList = fileList.slice(-1);
+        // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+        // Display an error message if more than one file is uploaded
+        if (fileList && fileList.length > 1) {
+            message.error('You can only upload one file/image');
+        } else {
+            setMachineImageList(fileList);
+            console.log("fileList: ", fileList);
+            if (fileList && fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+                setFileLoading(true);
+                setIsSubmitDisabled(true);
+                // update file upload api
+                const fileRes = await fileUpload(fileList[0]);
+                // console.log("fileRes: ", fileRes);
+                message.success("Machine Image Uploaded")
+                setViewUploadedImage(fileRes.fileUrl);
+                setFileLoading(false);
+                setIsSubmitDisabled(false);
+
+            } else {
+                message.error('File/Image size must less than 2 MB');
+            }
+        }
+    };
+
+    const handleImageRemove = () => {
+        setMachineImageList([]);
+        setViewUploadedImage('');
+        form.setFieldsValue({
+            Machine_Photo: '' // empty the file list
+        });
+    };
+
     const handleSubmit = (values) => {
         console.log("updated form Values:", values);
         // onClose();
@@ -73,7 +132,7 @@ function EditMachine({ machineId, onClose }) {
             Machine_Hour_Rate: values.machineHourRate,
             Machine_Name: singleMachineData.Machine_Name,
             Comments: values.Comments,
-            Machine_Photo: values.Machine_Photo,
+            Machine_Photo: viewUploadedImage,
             CompanyId: singleMachineData.CompanyId,
             type: values.type,
         };
@@ -98,6 +157,26 @@ function EditMachine({ machineId, onClose }) {
 
         console.log("Formatted Data:", formattedData);
     };
+
+    const showConfirm = async () => {
+        try {
+            // Validate form fields first
+            await form.validateFields();
+            // If validation passes, show confirmation modal
+            Modal.confirm({
+                title: "Are you sure you want to update?",
+                content: "This action will save the changes.",
+                okText: "Yes, Update",
+                cancelText: "Cancel",
+                onOk() {
+                    form.submit(); // Submit the form if confirmed
+                },
+            });
+        } catch (error) {
+            console.error("Validation failed:", error);
+        }
+    };
+
 
     const contentStyle = {
         padding: 50,
@@ -139,15 +218,42 @@ function EditMachine({ machineId, onClose }) {
                         ))}
                         <Row gutter={[16, 16]}>
                             <Col span={24}>
-                                <Form.Item label={'Comments (optional)'} name={'comments'} rules={[{ message: `Please input the comments` }]}>
+                                <Form.Item label={'Comments (optional)'} name={'Comments'} rules={[{ message: `Please input the comments` }]}>
                                     <TextArea rows={4} placeholder="Enter Comments (Max 100 words)" maxLength={100} showCount allowClear />
                                 </Form.Item>
                             </Col>
                         </Row>
 
-                        {/* <Row gutter={[16, 16]}>
+                        <Row gutter={[16, 16]}>
                             <Col span={24}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Form.Item label="Upload Machine Image" name={'Machine_Photo'} tooltip={{
+                                    title: 'Image size must be max 2MB',
+                                    icon: <InfoCircleOutlined />,
+                                }} rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please upload machine image!',
+                                    },
+                                ]}>
+                                    <Flex gap="small" wrap>
+                                        <Upload
+                                            fileList={machineImageList}
+                                            onChange={handleImageFileChange}
+                                            maxCount={1}
+                                            accept=".png,.jpeg,.jpg,.pdf"
+                                            beforeUpload={() => false}
+                                            onRemove={handleImageRemove}
+                                            data={(file) => file.fileName = "FOO"}
+                                        >
+                                            <Button loading={fileLoading} icon={<UploadOutlined />}>{fileLoading ? 'Uploading..' : 'Update Machine Image'}</Button>
+                                        </Upload>
+                                        {viewUploadedImage &&
+                                            <Link to={viewUploadedImage} target={'_blank'}>View Uploaded Image</Link>
+                                        }
+                                    </Flex>
+                                </Form.Item>
+
+                                {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     {machineData.Machine_Photo?.toLowerCase().endsWith('.pdf') ? (
                                         <a href={machineData.Machine_Photo} target="_blank" rel="noopener noreferrer">
                                             <img
@@ -163,11 +269,11 @@ function EditMachine({ machineId, onClose }) {
                                             style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
                                         />
                                     )}
-                                </div>
+                                </div> */}
                             </Col>
-                        </Row> */}
+                        </Row>
                         {!loading &&
-                            <Button type="primary" htmlType="submit">
+                            <Button type="primary" onClick={showConfirm} disabled={isSubmitDisabled ? true : false}>
                                 Update
                             </Button>
                         }

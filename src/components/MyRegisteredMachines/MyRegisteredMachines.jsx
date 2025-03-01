@@ -269,7 +269,7 @@ function MyRegisteredMachines() {
                   }
                 >
                   <List.Item.Meta
-                    bordered={true}
+                    bordered
                     avatar={<Title level={5}>Machine ID: <a>{item.id}</a></Title>}
                     title={<a>{item.CompanyName}</a>}
                     description={<><Text strong>{formatUpperCase("Type of Machine")}:</Text>&nbsp;<span style={{ fontWeight: 'bold', color: 'blue' }}>{item.Machine_Type}</span></>}
