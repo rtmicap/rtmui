@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined, FilePdfOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty, Drawer } from 'antd';
+import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty, Drawer, Tooltip } from 'antd';
 import axios from '../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import ViewMachineDetail from '../Hire Machines/ViewMachineDetail';
@@ -29,9 +29,14 @@ function MyRegisteredMachines() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedMachineId, setSelectedMachineId] = useState(null);
 
-  const handleEdit = (id) => {
+  const handleEdit = (id, machineData) => {
     setSelectedMachineId(id);
-    setOpenDrawer(true);
+    navigate(`edit-machine/${id}`, {
+      state: {
+        machineData,
+      },
+    });
+    // setOpenDrawer(true);
   };
 
   const onCloseDrawer = () => {
@@ -239,21 +244,23 @@ function MyRegisteredMachines() {
                   actions={[
                     <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
                     <Button type="primary" danger>Block Machine</Button>,
-                    // <Button onClick={() => handleEdit(item.id)}>Edit Machine</Button>,
+                    <Button onClick={() => handleEdit(item.id, item)}>Edit Machine</Button>,
                   ]}
                   extra={
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: "40px" }}>
                       {item.Machine_Photo?.toLowerCase().endsWith('.pdf') ? (
-                        <a href={item.Machine_Photo} target="_blank" rel="noopener noreferrer">
-                          <img
-                            alt="PDF file"
-                            src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" // A PDF icon
-                            style={{ width: '40px', height: 'auto', objectFit: 'contain' }}
-                          />
-                        </a>
+                        <Tooltip title="Click to View File" placement={'right'}>
+                          <a href={item.Machine_Photo} target="_blank" rel="noopener noreferrer">
+                            <img
+                              alt="PDF file"
+                              src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" // A PDF icon
+                              style={{ width: '40px', height: 'auto', objectFit: 'contain' }}
+                            />
+                          </a>
+                        </Tooltip>
                       ) : (
                         <img
-                          alt="machine image"
+                          alt="Machine Image Not Available"
                           src={item.Machine_Photo}
                           style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '5px' }}
                         />
@@ -262,7 +269,7 @@ function MyRegisteredMachines() {
                   }
                 >
                   <List.Item.Meta
-                    bordered={true}
+                    bordered
                     avatar={<Title level={5}>Machine ID: <a>{item.id}</a></Title>}
                     title={<a>{item.CompanyName}</a>}
                     description={<><Text strong>{formatUpperCase("Type of Machine")}:</Text>&nbsp;<span style={{ fontWeight: 'bold', color: 'blue' }}>{item.Machine_Type}</span></>}
@@ -291,9 +298,9 @@ function MyRegisteredMachines() {
         {showViewModal && <ViewMachineDetail open={open} setOpen={setOpen} machine={passData} />}
 
         {/* Drawer for editing */}
-        {selectedMachineId && (
+        {/* {selectedMachineId && (
           <EditMachine machineId={selectedMachineId} onClose={onCloseDrawer} />
-        )}
+        )} */}
       </div>
     </>
   )
