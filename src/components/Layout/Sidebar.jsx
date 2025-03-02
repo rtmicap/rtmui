@@ -39,7 +39,7 @@ const items = [
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
         getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),
-        getItem('Rent Tools', 'rent-tools', <CheckSquareOutlined />),
+        getItem('My Tools', 'my-tools', <CheckSquareOutlined />),
     ]),
     getItem('Gauges', 'gauges', <FieldTimeOutlined />, [
         getItem('Buy Gauges', 'buy-gauges', <PlusSquareOutlined />),
