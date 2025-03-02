@@ -93,6 +93,21 @@
     overflow: hidden;
 }
 
+.card-distance{
+    position: absolute;
+    margin-top: 264px;
+    margin-left: 69px;
+    border-bottom-right-radius: 10px;
+    width: 150px;
+    padding: 2px 10px 2px 10px;
+    font-weight: bold;
+    background-color:lightgray;
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+
 .detailsCardSpan{
     font-weight: bold;
    }

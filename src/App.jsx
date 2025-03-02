@@ -78,7 +78,7 @@ const [isIdle, setIsIdle] = useState(false);
         localStorage.clear("authToken");
         navigate("/login");
         // Perform logout or display timeout message here
-      }, 120000); // 20 minutes
+      }, 1200000); // 20 minutes
     };
   
     useEffect(() => {
