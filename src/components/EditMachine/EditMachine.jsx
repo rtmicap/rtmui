@@ -1,4 +1,4 @@
-import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload } from 'antd';
+import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FILE_UPLOAD_URL, GET_MACHINES_BY_MACHONE_ID } from '../../api/apiUrls';
@@ -22,10 +22,13 @@ function EditMachine({ machineId, onClose }) {
     const [machineImageList, setMachineImageList] = useState([]);
     const [viewUploadedImage, setViewUploadedImage] = useState('');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+    const [isFieldDisabled, setIsFieldDisabled] = useState(false);
 
     const machineCategories = { Cutting, Drilling, Milling, Grinding, Turning }; // Add all your machine categories
 
     const { machineData } = location.state || {};
+
+    const nonEditable = ["brand", "model", "yearOfPurchase", "type", "noOfMachines", "Category", "Machine_Type"];
 
     const getMachinesByMachineId = async () => {
         setSingleMachineData(machineData);
@@ -37,12 +40,18 @@ function EditMachine({ machineId, onClose }) {
             const selectedCategory = machineCategories[machineData.Category];
             // Extract the selected fields if the category exists
             const selectedFields = selectedCategory ? selectedCategory[machineTypeKey] || [] : [];
-            const filteredFields = selectedFields.filter(field => field.name !== "noOfMachines");
+            const filteredFields = selectedFields.filter(field => nonEditable.includes(field.name));
+            setIsFieldDisabled(filteredFields.length > 0);
             console.log("selectedFields: ", selectedFields);
-            console.log("filteredFields: ", filteredFields);
-            // add comments field too 
-            form.setFieldsValue({ Comments: machineData.Comments });
-            setFields(filteredFields);
+            // console.log("filteredFields: ", filteredFields);
+            // add other fields apart from json fields
+            form.setFieldsValue({
+                Category: machineData.Category,
+                Machine_Type: machineData.Machine_Type,
+                Comments: machineData.Comments,
+                noOfMachines: machineData.variable_fields?.noOfMachines, // Include only noOfMachines
+            });
+            setFields(selectedFields);
             let variableFields = {};
             try {
                 variableFields = machineData.Variable_fields || "{}";
@@ -196,17 +205,47 @@ function EditMachine({ machineId, onClose }) {
                         {content}
                     </Spin> :
                     <Form form={form} layout="vertical" onFinish={handleSubmit}>
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                <Form.Item
+                                    name={"Category"}
+                                    label={"Category"}
+                                    tooltip={{
+                                        title: `You can't update the field`,
+                                        icon: <InfoCircleOutlined />,
+                                    }}
+                                >
+                                    <Input readOnly={nonEditable.includes("Category")} />
+                                </Form.Item>
+                            </Col>
+                            <Col span={24}>
+                                <Form.Item
+                                    name={"Machine_Type"}
+                                    label={"Machine Type"}
+                                    tooltip={{
+                                        title: `You can't update the field`,
+                                        icon: <InfoCircleOutlined />,
+                                    }}
+                                >
+                                    <Input readOnly={nonEditable.includes("Machine_Type")} />
+                                </Form.Item>
+                            </Col>
+                        </Row>
                         {fields.map((field) => (
                             <Form.Item
                                 key={field.name}
                                 name={field.name}
                                 label={field.label}
                                 rules={[{ required: true, message: `Please enter ${field.label}` }]}
+                                tooltip={nonEditable.includes(field.name) ? {
+                                    title: `You can't update the field`,
+                                    icon: <InfoCircleOutlined />,
+                                } : ''}
                             >
                                 {field.type === "text" || field.type === "number" ? (
-                                    <Input placeholder={field.placeholder} maxLength={field.maxLength} />
+                                    <Input placeholder={field.placeholder} maxLength={field.maxLength} readOnly={nonEditable.includes(field.name)} />
                                 ) : field.type === "select" ? (
-                                    <Select placeholder={field.placeholder}>
+                                    <Select placeholder={field.placeholder} disabled={nonEditable.includes(field.name)}>
                                         {field.options.map((option) => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
