@@ -14,7 +14,7 @@ import HomePage from './components/Homepage/HomePage';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
 import BuyTools_detail from './components/Tools/BuyTools_detail';
-import RentTools from './components/Tools/RentTools';
+import MyTools from './components/Tools/MyTools';
 import SellTools from './components/Tools/SellTools';
 // gauges
 import BuyGauges from './components/Gauges/BuyGauges';
@@ -123,7 +123,7 @@ const [isIdle, setIsIdle] = useState(false);
             {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
             <Route path='buytools-detail' element={<BuyTools_detail />} />
-            <Route path="rent-tools" element={<RentTools />} />
+            <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 
             {/* Quotes */}

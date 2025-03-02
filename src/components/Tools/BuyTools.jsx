@@ -11,7 +11,7 @@ import {message} from 'antd';
 
 function BuyTools() {
     let previousSearch = sessionStorage.getItem('searchParam')||null;
-    previousSearch!=null?previousSearch=JSON.parse(previousSearch):"";
+    previousSearch!=null?previousSearch=JSON.parse(previousSearch)["searchText"]:"";
     const location = useLocation();
     const navigate = useNavigate();
     const [buyTools,setBuyTools]=useState([]);
