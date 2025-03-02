@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import {message} from 'antd';
 import DetailCard from '../common/DetailCard'; 
 import cardData from '../../api/tools_details.json';
 import { Link, useLocation, useNavigate } from 'react-router-dom';

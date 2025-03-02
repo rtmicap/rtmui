@@ -54,14 +54,14 @@ const Carousel = (imagesMap) => {
         <Carousel imagesMap={product.tool_image} />
         <div className="titleCard">
         <h3>{product.tool_name}</h3>
-
+        <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
         <p><span className="detailsCardSpan">Description : </span>{product.tool_description}</p>
         </div>
         <div className="pricing-info">
         <hr/>
           <h3>Pricing Information</h3>
           <hr/>
-          <p><span className="detailsCardSpan">Sale Price:</span>{product.tool_selling_price}</p>
+          <p><span className="detailsCardSpan">Sale Price: ₹ </span>{product.tool_selling_price}</p>
         </div>
         <div className="additional-details">
         <hr/>
@@ -69,39 +69,6 @@ const Carousel = (imagesMap) => {
           <hr/>
           <div className="additional-details-content">
           <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-          <p><span className="detailsCardSpan">Model : </span>{product.tool_model}</p>
-          <p><span className="detailsCardSpan">Year : </span>{product.tool_year_of_purchase}</p>
           </div>
         </div>
       </div>
