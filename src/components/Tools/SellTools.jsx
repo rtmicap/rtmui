@@ -68,9 +68,6 @@ function SellTools() {
             axios.defaults.headers.common["authorization"] = "Bearer " + token;
         
             const response = await axios.post(SAVE_TOOLS, payload);
-            console.log("Response:", response); // Log the response for debugging
-            console.log("Response Status:", response.status);
-        console.log("Response Data:", response.data);
             if (response.status === 200 && response.data.result) {
                 setMessage({ type: "success", text: "Tool listed successfully!" });
                 setTimeout(() => {

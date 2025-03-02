@@ -15,9 +15,7 @@ function MyTools() {
       const token = localStorage.getItem('authToken');
       axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
       const response = await axios.get(GET_TOOLS_BY_COMPANY_ID);
-      if (response && response.data.result) {
-        console.log("Tools data:", response.data.result); // Debugging line
-        setMyTools(response.data.result);
+      if (response && response.data.result) {setMyTools(response.data.result);
       }
     } catch (error) {
       console.log(error);
@@ -59,7 +57,6 @@ function MyTools() {
           <div className="grid-container">
             {myTools.length > 0 ? (
               myTools.map((item, index) => {
-                console.log("Rendering tool:", item); // Debugging line
                 return (
                   <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
                     <div className="main-card">
