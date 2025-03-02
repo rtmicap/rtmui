@@ -61,7 +61,16 @@ const Carousel = (imagesMap) => {
         <hr/>
           <h3>Pricing Information</h3>
           <hr/>
-          <p><span className="detailsCardSpan">Sale Price: ₹ </span>{product.tool_selling_price}</p>
+          {(product.tool_selling_price!=null)?
+          <p><span className="detailsCardSpan">Sell Price: ₹ </span>{product.tool_selling_price}</p>
+            :
+            <p><span className="detailsCardSpan">Sell Price: </span> Not Available</p>
+          }
+          {(product.tool_rent_price!=null)?
+          <p><span className="detailsCardSpan">Rent Price: ₹ </span>{product.tool_rent_price}</p>
+            :
+            <p><span className="detailsCardSpan">Rent Price: </span> Not Available</p>
+          }
         </div>
         <div className="additional-details">
         <hr/>
