@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import samimg from "../../assets/Total_Revenue.jpg"
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SearchTools from './SearchTools';
-import { SEARCH_TOOLS } from '../../api/apiUrls';
+import { SEARCH_TOOLS,SAVE_FAVORITE} from '../../api/apiUrls';
 import axios from '../../api/axios';
 import "./buy.scss"
 import {firstChrUpperCase} from "../../utils/utils.js";
@@ -10,6 +10,7 @@ import {message} from 'antd';
 
 
 function BuyTools() {
+    let favClick=false;
     let previousSearch = sessionStorage.getItem('searchParam')||null;
     previousSearch!=null?previousSearch=JSON.parse(previousSearch):"";
     const location = useLocation();
@@ -55,13 +56,37 @@ function BuyTools() {
     }, [searchParam]);
     
     const cardClick = (item) => {
+        if (!favClick){
         console.log("card clicked ", item);
+        favClick=false;
         navigate("/buytools-detail",{
             state: {
               toolsDetails: item,
             },
           });
 
+        }
+
+
+    }
+
+    const handleFavClick=async(event)=>{
+        favClick=true;
+        try{
+        const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
+            let params={tool_id:event.target.id}
+            
+            const response = await axios.post(SAVE_FAVORITE, params);
+            if (response && response.data.results) {
+                setBuyTools(response.data.results);
+                return response.data.results;
+            }
+        } catch (error) {
+            console.log(error);
+            message.error("Error on adding favorites..");
+        }
     }
 
     return (
@@ -80,13 +105,16 @@ function BuyTools() {
                                 
                                 <div className="main-card">
                                 <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
+
+                                <div className={`fav_tool`}>{item.favoriteInd?<input type="checkbox" id={item.tool_id} onClick={handleFavClick} defaultChecked title="Favorite"/>:<input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick}/>}</div>
+                                
                                 <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div>
                                     <div className="child-card-img">
                                         <img className="card-img" src={item.tool_image[0]} alt={index} />
                                     </div>
                                     <div className="card-price-tag">₹ {item.tool_selling_price}</div>
+                                    <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>
                                     <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_name)}</span></div>
-                                    <div className="card-desc">{firstChrUpperCase(item.tool_description)}</div>
                                     
                                 </div>
                             </div>)
