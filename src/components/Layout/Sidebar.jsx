@@ -38,8 +38,8 @@ const items = [
     // getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
-        getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />),
-        getItem('My Tools', 'my-tools', <CheckSquareOutlined />),
+        /* getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />), */
+        getItem('Sell Tools', 'my-tools', <CheckSquareOutlined />),
     ]),
     getItem('Gauges', 'gauges', <FieldTimeOutlined />, [
         getItem('Buy Gauges', 'buy-gauges', <PlusSquareOutlined />),

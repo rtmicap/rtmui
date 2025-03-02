@@ -56,4 +56,5 @@ export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
 export const SEARCH_TOOLS = "/tools/searchtools";
 export const SEARCH_SUGGESTIONS = "/tools/searchsuggestions";
 export const SAVE_TOOLS = "tools/savetools";
+export const SAVE_FAVORITE = "/tools/addtofavorite";
 export const GET_TOOLS_BY_COMPANY_ID = "/tools/gettoolsbycompanyid";

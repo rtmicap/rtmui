@@ -9,6 +9,11 @@ function SearchTools({searchParam, setSearchParam}) {
   const [loading, setLoading] = useState(false);
   const [displaySearch,setDisplaySearch]=useState("none");
   const textboxRef = useRef();
+  const condRef=useRef();
+  const typeRef=useRef();
+
+  const [condition,setCondition]=useState("new");
+  const [type,setType]=useState("both");
 
   const fetchResults = async(event) => {
     console.log('Fetching results', event.target.value);
@@ -37,9 +42,24 @@ function SearchTools({searchParam, setSearchParam}) {
     
   }
 
+
+  useEffect(()=>{
+    try{
+    let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"new","type":"both"}';
+    console.log(currentSessionStorage,"  cS");
+    setSearchParam(currentSessionStorage)
+    currentSessionStorage=JSON.parse(currentSessionStorage);
+    setCondition(currentSessionStorage.condition);
+    setType(currentSessionStorage.type);
+    }
+    catch(error){
+      console.log(error);
+    }
+  })
+
   const updateSessionStorage=(name,key,value)=>{
     try{
-      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"searchText":""}';
+      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":""}';
         currentSessionStorage=JSON.parse(currentSessionStorage);
         currentSessionStorage[key]=value;
         sessionStorage.setItem(name,JSON.stringify(currentSessionStorage));
@@ -52,28 +72,37 @@ function SearchTools({searchParam, setSearchParam}) {
   const handleClick=(event)=>{
     let searchItem=(event.target.innerText);
     setDisplaySearch("none");
-    setSearchParam(searchItem);
-    updateSessionStorage("searchParam","searchText", searchItem);
+    updateSessionStorage("searchParam","query", searchItem);
     textboxRef.current.value=searchItem;
   }
 
   const searchClick=()=>{
     let searchItem=textboxRef.current.value;
     setDisplaySearch("none");
-    setSearchParam(searchItem);
-    updateSessionStorage("searchParam","searchText", searchItem);
+    updateSessionStorage("searchParam","query", searchItem);
+    let searchQuery=JSON.parse(sessionStorage.getItem("searchParam"));
+    setSearchParam(searchQuery);
   }
+
+  const handleSelectclick=(event)=>{
+    let value = (event.target.value);
+    let key= (event.target.id);
+    updateSessionStorage("searchParam",key, value);
+    key=="condition"?setCondition(value):setType(value);
+  }
+
 
   return (
     <div className="search_main_container">
       <div className="search_cells_container">
       <label>New/Used</label>
-      <select name="tools_condition" id="tools_condition">
-        <option value="New">New</option>
-        <option value="Used">Used</option>
+      <select name="tools_condition" id="condition" ref={condRef} value={condition} onChange={handleSelectclick}>
+        <option value="new">New</option>
+        <option value="used">Used</option>
       </select></div>
+
       <div className="search_cells_container">
-        <label>Buy/Rent</label><select name="tools_sellType" id="tools_sellType">
+        <label>Buy/Rent</label><select name="tools_sellType" ref={typeRef} value={type} id="type" onChange={handleSelectclick}>
         <option value="both">Both</option>
         <option value="buy">Buy</option>
         <option value="rent">Rent</option>

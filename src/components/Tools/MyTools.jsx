@@ -44,7 +44,7 @@ function MyTools() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>My Tools</h1>
+        <h1>Sell Tools</h1>
         <button 
           style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
           onClick={handleAddToolClick}
