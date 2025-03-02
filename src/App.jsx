@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileAddOutlined, UserOutlined, BookOutlined, LogoutOutlined, RestOutlined, DashboardOutlined, ContainerOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { Menu, message, theme } from 'antd';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -65,6 +65,43 @@ const App = () => {
       return;
     }
   } */
+
+  // USer Idle timer
+const [isIdle, setIsIdle] = useState(false);
+    let timeoutId;
+  
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsIdle(true);
+                    
+        localStorage.clear("authToken");
+        navigate("/login");
+        // Perform logout or display timeout message here
+      }, 120000); // 20 minutes
+    };
+  
+    useEffect(() => {
+          const handleUserActivity = () => {
+            setIsIdle(false);
+            resetTimer();
+          };
+          // Initial timer setup
+          resetTimer();
+          // Event listeners for user activity
+          window.addEventListener('mousemove', handleUserActivity);
+          window.addEventListener('keydown', handleUserActivity);
+          window.addEventListener('click', handleUserActivity);
+          // Cleanup function to remove event listeners and clear timeout
+          return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('mousemove', handleUserActivity);
+            window.removeEventListener('keydown', handleUserActivity);
+            window.removeEventListener('click', handleUserActivity);
+          };
+        }, []);
+
+  //end idel timer code
 
   return (
     <>
