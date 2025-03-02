@@ -49,7 +49,7 @@ function SellTools() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         // Construct the request payload
         const payload = {
             toolname: formData.name,
@@ -62,55 +62,40 @@ function SellTools() {
             condition: formData.condition,
             image: formData.images.map((file) => file.name), // Assuming backend handles file upload separately
         };
-
+    
         try {
             const token = localStorage.getItem("authToken");
             axios.defaults.headers.common["authorization"] = "Bearer " + token;
-
+        
             const response = await axios.post(SAVE_TOOLS, payload);
-            console.log("Response:", response); // Log response
-
-            if (response && response.data.success) {
-                setMessage({ type: "success", text: "Tool listed successfully!" }); // ✅ Show success message
-                console.log("Message Set:", { type: "success", text: "Tool listed successfully!" }); // Log message set
+            if (response.status === 200 && response.data.result) {
+                setMessage({ type: "success", text: "Tool listed successfully!" });
+                setTimeout(() => {
+                    navigate("/my-tools"); // Navigate to MyTools page after showing the message
+                }, 2000);
+            } else {
+                setMessage({ type: "error", text: "Error submitting tool. Please try again." });
             }
         } catch (error) {
             console.error("Error submitting tool:", error);
-            navigate("/login"); // Redirect to login if unauthorized
+            setMessage({ type: "error", text: "Error submitting tool. Please try again." });
         }
     };
 
-    // Reset the form and message after 2 seconds
     useEffect(() => {
         if (message?.type === "success") {
             console.log("Success Message Shown"); // Log when success message is shown
-            setTimeout(() => {
-                console.log("Resetting Form and Message...");
-                setFormData({
-                    name: "",
-                    description: "",
-                    specifications: "",
-                    make: "",
-                    rentPrice: "",
-                    sellingPrice: "",
-                    quantity: "",
-                    condition: "new",
-                    images: [],
-                });
-                setImagePreviews([]);
-                setMessage(null); // Reset the message
-            }, 2000); // 2 seconds
         }
     }, [message]);
 
     return (
         <div className="sell-tools-form">
             <h1>Sell Your Tool</h1>
-            {message && message.type === "success" && (
-                <div className="message success">
-                    {message.text}
-                </div> // Display success message
-            )}
+            {message && (
+            <div className={`message ${message.type}`}>
+                {message.text}
+            </div>
+        )}
 
             <form onSubmit={handleSubmit}>
                 <label>
