@@ -33,3 +33,62 @@ button {
     margin: 5px;
     border-radius: 5px;
 }
+
+/* New styles for file upload container */
+.file-upload-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Style for file input */
+#file-upload-input {
+    flex-grow: 1;
+    padding: 5px;
+    margin-right: 10px;  /* Space between input and button */
+}
+
+/* Style for upload button */
+.upload-button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.upload-button:hover {
+    background-color: #0056b3;
+}
+
+.image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    width: 100px;
+    height: 100px;
+}
+
+.image-preview-image {
+    width: 100%; /* Ensure the image fits within the container */
+    height: 100%;
+    object-fit: cover; /* This ensures the image covers the container */
+}
+
+.remove-image-button {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background-color: transparent;
+    color: black;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 2px 5px;
+    z-index: 1;
+}
+
+
+
+
