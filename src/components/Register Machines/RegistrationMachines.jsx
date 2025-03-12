@@ -16,6 +16,7 @@ import HeaderTitle from '../../utils/HeaderTitle';
 import SummaryPage from './SummaryPage';
 import { FILE_UPLOAD_URL, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import { Link } from 'react-router-dom';
+import pdfImage from "../../assets/pdImage.png";
 const getBase64 = (img) => {
     const reader = new FileReader();
     reader.readAsDataURL(img);
@@ -56,6 +57,7 @@ function RegistrationMachines() {
     const [machineInputFields, setMachineInputFields] = useState([]);
     //others select
     const [selectedOption, setSelectedOption] = useState('');
+    const [fileLoading, setFileLoading] = useState(false);
 
     const resetForm = () => {
         form.resetFields();
@@ -63,6 +65,7 @@ function RegistrationMachines() {
         setCategory('');
         setOpenIdenticalCheck(false);
         setMachineInputFields([]);
+        setFileList([]);
     }
 
     const machineFieldsFromApi = async () => {
@@ -174,6 +177,7 @@ function RegistrationMachines() {
     const handleImageChange = async ({ fileList: newFileList }) => {
         console.log("newFileList: ", newFileList);
         // console.log("newFileList: ", newFileList[0].uid);
+        setFileLoading(true);
         try {
             if (newFileList && newFileList.length > 0) {
                 if (newFileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
@@ -189,7 +193,9 @@ function RegistrationMachines() {
                     var response = await axios.post(baseUrl, formData, configHeaders);
                     // console.log("responseData Image: ", response);
                     setImageBase64(response.data.fileUrl)
+                    setFileLoading(false);
                 } else {
+                    setFileLoading(false);
                     setFileList([]);
                     message.error('File size must less than 2 MB');
                 }
@@ -419,7 +425,7 @@ function RegistrationMachines() {
                                     >
                                         {fileList.length < 1 && uploadButton}
                                     </Upload>
-
+                                    {fileLoading && <span>Uploading... <LoadingOutlined /></span>}
                                     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                                         {fileList.map((file) => {
                                             if (file.type == "application/pdf") {
@@ -427,7 +433,10 @@ function RegistrationMachines() {
                                                     <div key={file.uid} style={{ position: 'relative' }}>
                                                         {imageBase64 &&
                                                             <>
-                                                                <Link to={imageBase64} target={'_blank'}><FilePdfOutlined />&nbsp;View File</Link>
+                                                                <Link to={imageBase64} target={'_blank'} style={{ textDecoration: "none" }}>
+                                                                    <span><img src={pdfImage} alt="Icon" width={30} height={40} />&nbsp;&nbsp;View File</span>
+                                                                    {/* <span style={{ color: 'red' }}><FilePdfOutlined /></span> &nbsp;View File */}
+                                                                </Link>
                                                                 <Tooltip title="Delete File">
                                                                     <Button
                                                                         type="text"
@@ -451,27 +460,33 @@ function RegistrationMachines() {
                                             } else {
                                                 return (
                                                     <div key={file.uid} style={{ position: 'relative' }}>
-                                                        <img
-                                                            src={URL.createObjectURL(file.originFileObj)}
-                                                            alt="uploaded"
-                                                            style={{ width: '100%', height: '100%', borderRadius: '4px' }}
-                                                        />
-                                                        <Tooltip title="Delete Image">
-                                                            <Button
-                                                                type="text"
-                                                                danger
-                                                                icon={<DeleteOutlined />}
-                                                                onClick={() => handleDelete(file)}
-                                                                style={{
-                                                                    position: 'absolute',
-                                                                    top: '-10px',
-                                                                    right: '-10px',
-                                                                    background: '#fff',
-                                                                    border: '1px solid #d9d9d9',
-                                                                    borderRadius: '50%',
-                                                                }}
-                                                            />
-                                                        </Tooltip>
+                                                        {!fileLoading &&
+                                                            <>
+                                                                <img
+                                                                    src={URL.createObjectURL(file.originFileObj)}
+                                                                    alt="uploaded"
+                                                                    style={{ width: '100%', height: '100%', borderRadius: '4px' }}
+                                                                />
+
+                                                                <Tooltip title="Delete Image">
+                                                                    <Button
+                                                                        type="text"
+                                                                        danger
+                                                                        icon={<DeleteOutlined />}
+                                                                        onClick={() => handleDelete(file)}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '-10px',
+                                                                            right: '-10px',
+                                                                            background: '#fff',
+                                                                            border: '1px solid #d9d9d9',
+                                                                            borderRadius: '50%',
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            </>
+                                                        }
+
                                                     </div>
                                                 )
                                             }

@@ -32,12 +32,21 @@ function RenterSampleReports() {
             values.first_sample_inspection_report = viewInspectionReportFile;
             values.first_sample_disposition = "pending_approval";
             console.log('onFinishReport:', values);
+
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
             const response = await axios.post(CREATE_FIRST_SAMPLE_REPORT_URL, values);
             message.success(`${response.data.message}`);
             navigate(-1);
         } catch (error) {
             console.log('onFinishReport err:', error);
-            message.error(`${error && error.response.data ? error.response.data.error : 'Something went wrong while creating the sample report!'}`);
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            }else{
+                message.error(`${error && error.response.data ? error.response.data.error : 'Something went wrong while creating the sample report!'}`);
+            }
         }
 
     }

@@ -1,0 +1,103 @@
+// DetailCard.scss
+.detail-card-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.img-main-container{
+  max-height:400px;
+  border:1px solid grey;
+  width:100%;
+  overflow: hidden;
+  position:relative;
+  min-width:250px;
+}
+.img-repo-container{
+  //border:1px solid red;
+  display: flex;
+  flex-direction:row;
+  max-height:375px;
+  //width:400%;
+  transition: margin-left 0.5s;
+  background:black;
+}
+.Noimg-container{
+  min-height:100px;
+  width:100%;
+  color:white;
+  background-color: black;
+  text-align: center;
+  font-size:20px;
+}
+.img-container{
+  width:100%;
+  align-content: center;
+  min-height:100px;
+  //border:1px solid blue;
+  //position:relative;
+}
+ img{
+ max-height: 90%;
+ max-width:90%;
+ align-content: center;
+ margin:0 auto;
+ display: block;
+ }
+
+ .img-btn-left,.img-btn-right{
+  position: absolute;
+  height:100%;
+  align-content: center;
+ }
+
+ .img-btn-right{
+  right:0%
+ }
+
+ .img-btn{
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    font-weight:bold;
+    color: grey;
+    background: transparent;
+    border: 2px solid gray;
+    border-radius: 25px;
+    padding-top:2px;
+ }
+
+ .titleCard{
+  margin-top:20px;
+  width:100%;
+ }
+ .detailsCardSpan{
+  font-weight: bold;
+ }
+
+ .additional-details-content{
+  overflow: scroll;
+  overflow-x: hidden;
+  max-height:400px;
+ }
+
+  /* .card-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      width: 45%; // Adjust as needed
+
+      &:last-child {
+        margin-left: 20px;
+      }
+    } 
+  } */

@@ -51,18 +51,30 @@ function RenterFinalReports() {
     }, []);
 
     const onFinishFinalReport = async (values) => {
-        const data = form.getFieldsValue();
-        // console.log("get Data: ", data);
-        values.orderid = order.order_id;
-        values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
-        values.completion_date_time = orderCompletionDateTime;
-        values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
-        values.final_product_disposition = "pending_approval";
-        values.first_sample_id = form.getFieldValue("first_sample_id");
-        // console.log('onFinishFinalReport:', values);
-        const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
-        message.success(`${response.data.message}`);
-        navigate(-1);
+        try {
+            const data = form.getFieldsValue();
+            // console.log("get Data: ", data);
+            values.orderid = order.order_id;
+            values.final_goods_planned_pickup_datetime = goodsPickUpDateTime;
+            values.completion_date_time = orderCompletionDateTime;
+            values.prod_lot_inspection_report = viewProdLotInspectionReportFile;
+            values.final_product_disposition = "pending_approval";
+            values.first_sample_id = form.getFieldValue("first_sample_id");
+            // console.log('onFinishFinalReport:', values);
+            const token = localStorage.getItem('authToken');
+            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
+            const response = await axios.post(CREATE_FINAL_REPORT_URL, values);
+            message.success(`${response.data.message}`);
+            navigate(-1);
+        } catch (error) {
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!");
+                navigate("/login");
+            } else {
+                message.error("There is some error while creating final report!");
+            }
+        }
     }
 
     const onFinishFailedFinalReport = (errorInfo) => {

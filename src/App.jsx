@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileAddOutlined, UserOutlined, BookOutlined, LogoutOutlined, RestOutlined, DashboardOutlined, ContainerOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { Menu, message, theme } from 'antd';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -13,7 +13,8 @@ import AppHeader from './components/AppHeader/AppHeader';
 import HomePage from './components/Homepage/HomePage';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
-import RentTools from './components/Tools/RentTools';
+import BuyTools_detail from './components/Tools/BuyTools_detail';
+import MyTools from './components/Tools/MyTools';
 import SellTools from './components/Tools/SellTools';
 // gauges
 import BuyGauges from './components/Gauges/BuyGauges';
@@ -43,6 +44,7 @@ import Shipment from './components/Shipment/Shipment';
 import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
+import EditMachine from './components/EditMachine/EditMachine';
 
 const App = () => {
   const location = useLocation();
@@ -64,6 +66,43 @@ const App = () => {
     }
   } */
 
+  // USer Idle timer
+const [isIdle, setIsIdle] = useState(false);
+    let timeoutId;
+  
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsIdle(true);
+                    
+        localStorage.clear("authToken");
+        navigate("/login");
+        // Perform logout or display timeout message here
+      }, 1200000); // 20 minutes
+    };
+  
+    useEffect(() => {
+          const handleUserActivity = () => {
+            setIsIdle(false);
+            resetTimer();
+          };
+          // Initial timer setup
+          resetTimer();
+          // Event listeners for user activity
+          window.addEventListener('mousemove', handleUserActivity);
+          window.addEventListener('keydown', handleUserActivity);
+          window.addEventListener('click', handleUserActivity);
+          // Cleanup function to remove event listeners and clear timeout
+          return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('mousemove', handleUserActivity);
+            window.removeEventListener('keydown', handleUserActivity);
+            window.removeEventListener('click', handleUserActivity);
+          };
+        }, []);
+
+  //end idel timer code
+
   return (
     <>
       {/* <AppHeader /> */}
@@ -78,11 +117,13 @@ const App = () => {
             <Route path="view-legal-agreement" element={<HireMachines />} />
             <Route path="view-code-conduct" element={<HireMachines />} />
             <Route path="change-password" element={<HireMachines />} />
+            <Route path="my-registered-machines/edit-machine/:machineId" element={<EditMachine />} />
             {/* <Route path="hire-machine/booking/:machineId" element={<Booking />} /> */}
             <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
             {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
-            <Route path="rent-tools" element={<RentTools />} />
+            <Route path='buytools-detail' element={<BuyTools_detail />} />
+            <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 
             {/* Quotes */}

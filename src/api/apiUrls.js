@@ -41,6 +41,8 @@ export const GET_COMPANY_DETAILS_BY_ID = "/user/getcompanydetailsbyid";
 
 // Get Registered Machines
 export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
+// Get Machines By Machine ID
+export const GET_MACHINES_BY_MACHONE_ID = "/machines/getMachinesByMachineId";
 
 // ******************************///*****************///
 //Admin URLS
@@ -49,3 +51,11 @@ export const GET_COMPANY_DETAILS = '/user/getCompanyDetails';
 
 // admin password changes
 export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
+
+//tools configuration
+export const SEARCH_TOOLS = "/tools/searchtools";
+export const SEARCH_SUGGESTIONS = "/tools/searchsuggestions";
+export const SAVE_TOOLS = "tools/savetools";
+export const SAVE_FAVORITE = "/tools/addtofavorite";
+export const DELETE_FAVORITE = "/tools/deletefavorite";
+export const GET_TOOLS_BY_COMPANY_ID = "/tools/gettoolsbycompanyid";

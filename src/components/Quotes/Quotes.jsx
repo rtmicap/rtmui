@@ -78,7 +78,11 @@ function Quotes() {
             setAllQuotes([]);
             setQuoteLoading(false);
             // console.log(error);
-            message.error("Error on loading quotes..");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!")
+            } else {
+                message.error("Error on loading quotes..");
+            }
             navigate("/login");
         }
     };
@@ -204,7 +208,12 @@ function Quotes() {
             // setIsLoading(false);
             return;
         } catch (error) {
-            message.error("Something error while accepting the quote!");
+            if (error && error.response.status == 401) {
+                message.warning("Unauthorized! Please log in again!")
+            } else {
+                message.error("Something error while accepting the quote!");
+            }
+            navigate("/login");
             // setIsLoading(false);
             return;
         }
@@ -253,6 +262,9 @@ function Quotes() {
                         changedenddate: values.changedenddate,
                         changedstartdate: values.changedstartdate
                     }
+                    const token = localStorage.getItem('authToken');
+                    axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+
                     const response = await axios.patch(UPDATE_QUOTE_URL, reqItem);
                     message.success("Your order change request has been sent to Hirer successfully. You will get their response shortly for their acceptance!");
                     setBookingLoading(false);

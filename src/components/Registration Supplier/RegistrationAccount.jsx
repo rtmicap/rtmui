@@ -8,7 +8,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import { Document, Page } from '@react-pdf/renderer';
 import { useNavigate } from "react-router-dom";
 import config from "../../env.json";
-import { REGISTER_ACCOUNT_URL,CHECK_REGISTERED_USER } from '../../api/apiUrls';
+import { REGISTER_ACCOUNT_URL, CHECK_REGISTERED_USER } from '../../api/apiUrls';
 const { Text } = Typography;
 import axios from "../../api/axios";
 import "./registrationaccount.scss";
@@ -17,7 +17,7 @@ const RegistrationAccount = () => {
     const navigate = useNavigate();
 
     const [currentStep, setCurrentStep] = useState(0);
-    const [docErrorMsg,setDocErrorMsg] = useState("");
+    const [docErrorMsg, setDocErrorMsg] = useState("");
     const [form] = Form.useForm();
 
     const [listsOfCountries, setListsOfCountries] = useState([]);
@@ -346,7 +346,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeCountry,
+            children: formData.officeCountry || 'Not Provided',
         },
         {
             label: (<h6>Factory Country</h6>),
@@ -367,7 +367,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeAddress,
+            children: formData.officeAddress || 'Not Provided',
         },
         {
             label: (<h6>Factory Address</h6>),
@@ -380,7 +380,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryAddress,
+            children: formData.factoryAddress || 'Not Provided',
         },
         {
             label: (<h6>Office State</h6>),
@@ -388,7 +388,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeState,
+            children: formData.officeState || 'Not Provided',
         },
         {
             label: (<h6>Factory State</h6>),
@@ -396,7 +396,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryState,
+            children: formData.factoryState || 'Not Provided',
         },
         {
             label: (<h6>Office City</h6>),
@@ -404,7 +404,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeCity,
+            children: formData.officeCity || 'Not Provided',
         },
         {
             label: (<h6>Factory City</h6>),
@@ -412,7 +412,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryCity,
+            children: formData.factoryCity || 'Not Provided',
         },
         {
             label: (<h6>Office Area</h6>),
@@ -420,7 +420,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeArea,
+            children: formData.officeArea || 'Not Provided',
         },
         {
             label: (<h6>Factory Area</h6>),
@@ -428,7 +428,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryArea,
+            children: formData.factoryArea || 'Not Provided',
         },
         {
             label: (<h6>Office PIN Code</h6>),
@@ -436,7 +436,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.offPinCode,
+            children: formData.offPinCode || 'Not Provided',
         },
         {
             label: (<h6>Factory PIN Code</h6>),
@@ -444,7 +444,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.facPinCode,
+            children: formData.facPinCode || 'Not Provided',
         },
         {
             label: (<h6>Office Telephone</h6>),
@@ -452,7 +452,15 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: `${formData.officeTelephoneStd} ${formData.officeTelephone}`,
+            children: `${(formData.officeTelephoneStd && '+' + formData.officeTelephoneStd) || 'Not Provided'} ${formData.officeTelephone || ''}`,
+        },
+        {
+            label: (<h6>Factory Telephone</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: `${(formData.factoryTelephoneStd && '+' + formData.factoryTelephoneStd) || 'Not Provided'} ${formData.factoryTelephone || ''}`,
         },
         {
             label: (<h6>Factory Email</h6>),
@@ -460,7 +468,7 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.factoryEmailAddress,
+            children: formData.factoryEmailAddress || 'Not Provided',
         },
         {
             label: (<h6>Office Email</h6>),
@@ -468,10 +476,10 @@ const RegistrationAccount = () => {
                 xl: 2,
                 xxl: 2,
             },
-            children: formData.officeEmailAddress,
+            children: formData.officeEmailAddress || 'Not Provided',
         },
         {
-            label: (<h6>Factory Cell Phone</h6>),
+            label: (<h6>Factory Mobile Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -479,7 +487,7 @@ const RegistrationAccount = () => {
             children: formData.factoryMobile,
         },
         {
-            label: (<h6>Office Cell Phone</h6>),
+            label: (<h6>Office Mobile Number</h6>),
             span: {
                 xl: 2,
                 xxl: 2,
@@ -538,6 +546,10 @@ const RegistrationAccount = () => {
     const documentDescriptive = [
         {
             label: (<h6>Ownership</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
             children: formData.ownership
         },
         {
@@ -557,22 +569,6 @@ const RegistrationAccount = () => {
             children: formData.indLicNum
         },
         {
-            label: (<h6>GSTIN Number</h6>),
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
-            children: formData.GSTIN
-        },
-        {
-            label: (<h6>PAN Number</h6>),
-            span: {
-                xl: 2,
-                xxl: 2,
-            },
-            children: formData.PAN
-        },
-        {
             label: (<h6>CIN Uploaded File</h6>),
             span: {
                 xs: 1,
@@ -587,6 +583,14 @@ const RegistrationAccount = () => {
             )
         },
         {
+            label: (<h6>GSTIN Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.GSTIN
+        },
+        {
             label: (<h6>GSTIN Uploaded File</h6>),
             span: {
                 xs: 1,
@@ -599,6 +603,14 @@ const RegistrationAccount = () => {
             children: (
                 <Button type='link' onClick={handleGstViewFile}>View GSTIN File</Button>
             )
+        },
+        {
+            label: (<h6>PAN Number</h6>),
+            span: {
+                xl: 2,
+                xxl: 2,
+            },
+            children: formData.PAN
         },
         {
             label: (<h6>PAN Uploaded File</h6>),
@@ -1256,7 +1268,7 @@ const RegistrationAccount = () => {
             title: 'Documents Verification',
             content: (
                 <Form form={form} layout="vertical">
-                    
+
                     {/* Add your document upload fields here */}
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
@@ -1295,23 +1307,39 @@ const RegistrationAccount = () => {
                             </Form.Item>
                         </Col>
                     </Row>
-                    
+
                     {/* CIN Input and file */}
                     <div className={docErrorMsg}>CIN or GST or PAN is already linked with an account</div>
+                    <div><span style={{ color: 'red', fontWeight: 'bold' }}>Note:</span> Type <b>UAM</b> without '-' (hyphen) symbol</div>
                     <Row gutter={[16, 18]}>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-                            <Form.Item name={'indLicNum'} label="CIN (Corporate Identification Number) or UAM" rules={[
-                                {
-                                    pattern: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$|^UDYAM([A-Z]{2})(\d{2})(\d{7})$/,
-                                    message: "Please provide your valid CIN number L17110MH1973PLC019786 (or) U12345AB6784CDE123456"
-                                },
-                                {
-                                    required: true,
-                                    message: "Please enter your CIN or UAM"
-                                },
-                            ]} extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456">
-                                <Input placeholder="Enter your CIN number or UAM" maxLength={22} />
+                            <Form.Item
+                                name={'indLicNum'}
+                                label="CIN (Corporate Identification Number) or UAM"
+                                rules={[
+                                    {
+                                        pattern: /^[A-Za-z]{1}[0-9]{5}[A-Za-z]{2}[0-9]{4}[A-Za-z]{3}[0-9]{6}$|^UDYAM[A-Z]{2}\d{2}\d{7}$/,
+                                        message: "Please provide a valid CIN (e.g., L17110MH1973PLC019786) or UDYAM (e.g., UDYAMMH021234567).",
+                                    },
+                                    {
+                                        required: true,
+                                        message: "Please enter your CIN or UAM",
+                                    },
+                                    {
+                                        min: 11,
+                                        message: "Minimum 11 characters required (for Udyam)",
+                                    },
+                                    {
+                                        max: 21,
+                                        message: "Maximum 21 characters allowed (for CIN)",
+                                    },
+                                ]}
+                                extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456. UDYAM format should not contain hyphens."
+                                normalize={(value) => value?.trim()}
+                            >
+                                <Input placeholder="Enter your CIN number or UAM" />
                             </Form.Item>
+
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                             <Form.Item name={'cinPdf'} label="Upload your CIN File" rules={[
@@ -1569,59 +1597,61 @@ const RegistrationAccount = () => {
     // const formData = new FormData();
 
     const handleNext = () => {
-        form.validateFields().then(async(values) => {
+        console.log("formData123: ", formData);
+        form.validateFields().then(async (values) => {
             console.log("form: ", values);
-            if(currentStep==0){
+            if (currentStep == 0) {
                 setDocErrorMsg("docErrorHide");
                 await validateUserName(values.factoryEmailAddress);
             }
-            if(currentStep==1){
-                await validateDocDetails(values.GSTIN,values.PAN,values.indLicNum)
+            if (currentStep == 1) {
+                await validateDocDetails(values.GSTIN, values.PAN, values.indLicNum)
             }
-                setCurrentStep(currentStep + 1);
-                setFormData({ ...formData, ...values });
-        }).catch(error=>{
+            setCurrentStep(currentStep + 1);
+            setFormData({ ...formData, ...values });
+        }).catch(error => {
             return
         })
-       
+
     };
 
-    const validateUserName = async(value) => {
-        
-         let factoryEmail = value;
-            const response = await axios.get(CHECK_REGISTERED_USER, {
-                            params: { factoryEmail }
-            })
-            if (response.data.code==1){
-                form.setFields([{ name: 'factoryEmailAddress',errors:['Factory Email is already registered.']}])
-                return Promise.reject(new Error('Error'));
-            }
-            else{
-                return Promise.resolve();
-            }
-  
-     }
+    const validateUserName = async (value) => {
 
-     const validateDocDetails = async(gstid,panid,cinid)=>{
-        console.log(gstid,panid,cinid);
+        let factoryEmail = value;
         const response = await axios.get(CHECK_REGISTERED_USER, {
-            params: { 
-                gst:gstid,
-                pan:panid,
-                cin:cinid 
+            params: { factoryEmail }
+        })
+        if (response.data.code == 1) {
+            form.setFields([{ name: 'factoryEmailAddress', errors: ['Factory Email is already registered.'] }])
+            return Promise.reject(new Error('Error'));
+        }
+        else {
+            return Promise.resolve();
+        }
+
+    }
+
+    const validateDocDetails = async (gstid, panid, cinid) => {
+        console.log(gstid, panid, cinid);
+        const response = await axios.get(CHECK_REGISTERED_USER, {
+            params: {
+                gst: gstid,
+                pan: panid,
+                cin: cinid
             }
         })
-        if (response.data.code==1){
-            form.setFields([{ name: 'indLicNum',errors:['']},{ name: 'GSTIN',errors:['']},{ name: 'PAN',errors:['']}])
+        console.log("response: ", response);
+        if (response.data.code == 1) {
+            form.setFields([{ name: 'indLicNum', errors: [''] }, { name: 'GSTIN', errors: [''] }, { name: 'PAN', errors: [''] }])
             //message.error('CIN or PAN or GST is already linked with an account');
             setDocErrorMsg("docError");
             return Promise.reject(new Error('Error'));
         }
-        else{
+        else {
             setDocErrorMsg("docErrorHide");
             return Promise.resolve();
         }
-     }
+    }
 
     const handlePrev = () => {
         setCurrentStep(currentStep - 1);
@@ -1701,7 +1731,6 @@ const RegistrationAccount = () => {
             console.log("Form Error: ", error);
             message.error(`There is some error while submitting! ${error.message}`);
         })
-        console.log("handleSubmit values: ", values);
     };
 
     return (
