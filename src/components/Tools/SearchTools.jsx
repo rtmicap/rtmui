@@ -43,29 +43,30 @@ function SearchTools({searchParam, setSearchParam}) {
   }
 
 
-  useEffect(()=>{
-    try{
-    let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"new","type":"both"}';
-    console.log(currentSessionStorage,"  cS");
-    setSearchParam(currentSessionStorage)
-    currentSessionStorage=JSON.parse(currentSessionStorage);
-    setCondition(currentSessionStorage.condition);
-    setType(currentSessionStorage.type);
+  useEffect(() => {
+    try {
+      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"both","type":"both"}';
+      console.log(currentSessionStorage, "  cS");
+      setSearchParam(currentSessionStorage)
+      currentSessionStorage = JSON.parse(currentSessionStorage);
+      setCondition(currentSessionStorage.condition);
+      setType(currentSessionStorage.type);
+      sessionStorage.setItem('searchParam', JSON.stringify(currentSessionStorage));
     }
-    catch(error){
+    catch (error) {
       console.log(error);
     }
   })
 
-  const updateSessionStorage=(name,key,value)=>{
-    try{
-      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":""}';
-        currentSessionStorage=JSON.parse(currentSessionStorage);
-        currentSessionStorage[key]=value;
-        sessionStorage.setItem(name,JSON.stringify(currentSessionStorage));
+  const updateSessionStorage = (name, key, value) => {
+    try {
+      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"both",type:"both"}';
+      currentSessionStorage = JSON.parse(currentSessionStorage);
+      currentSessionStorage[key] = value;
+      sessionStorage.setItem(name, JSON.stringify(currentSessionStorage));
     }
-    catch(error){
-      console.log("Error session",error);
+    catch (error) {
+      console.log("Error session", error);
     }
 
   }
@@ -97,6 +98,7 @@ function SearchTools({searchParam, setSearchParam}) {
       <div className="search_cells_container">
       <label>New/Used</label>
       <select name="tools_condition" id="condition" ref={condRef} value={condition} onChange={handleSelectclick}>
+        <option value="both">Both</option>
         <option value="new">New</option>
         <option value="used">Used</option>
       </select></div>
