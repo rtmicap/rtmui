@@ -78,7 +78,7 @@ const Carousel = (imagesMap) => {
           <h3>Additional Details</h3>
           <hr/>
           <div className="additional-details-content">
-          <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
+          <p>{product.tool_specifications}</p>
           </div>
         </div>
       </div>
