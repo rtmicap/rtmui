@@ -1318,7 +1318,7 @@ const RegistrationAccount = () => {
                                 label="CIN (Corporate Identification Number) or UAM"
                                 rules={[
                                     {
-                                        pattern: /^[A-Za-z]{1}[0-9]{5}[A-Za-z]{2}[0-9]{4}[A-Za-z]{3}[0-9]{6}$|^UDYAM[A-Z]{2}\d{2}\d{7}$/,
+                                        pattern: /^[A-Za-z][A-Za-z0-9]{10,20}$/,
                                         message: "Please provide a valid CIN (e.g., L17110MH1973PLC019786) or UDYAM (e.g., UDYAMMH021234567).",
                                     },
                                     {
@@ -1327,12 +1327,12 @@ const RegistrationAccount = () => {
                                     },
                                     {
                                         min: 11,
-                                        message: "Minimum 11 characters required (for Udyam)",
+                                        message: "Minimum 11 characters required",
                                     },
                                     {
                                         max: 21,
-                                        message: "Maximum 21 characters allowed (for CIN)",
-                                    },
+                                        message: "Maximum 21 characters allowed",
+                                    }
                                 ]}
                                 extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456. UDYAM format should not contain hyphens."
                                 normalize={(value) => value?.trim()}
