@@ -7,6 +7,8 @@ import AppHeader from '../AppHeader/AppHeader';
 const { Content } = Layout;
 
 function Login() {
+ 
+
     const navigate = useNavigate();
     const { isLoading, error, userLogin } = useAuth();
 
@@ -16,8 +18,15 @@ function Login() {
             // console.log("test u: ", res);
             if (res && res.status && !res.admin) {
                 navigate('/');
+
             } else if (res && res.status && res.admin) {
-                navigate('/admin/dashboard');
+                
+                if (typeof window.gtag === 'function') {
+                    window.gtag('Login_Success', 'Dashboard_Page', { /* ... */ });
+                  } else {
+                    console.warn('gtag not loaded yet');
+                  }
+                  navigate('/admin/dashboard');
             } if (res && !res.status && !res.admin) {
                 message.error(res && res.response && res.response.message ? res.response.message : "Unable to login! Please contact support");
             } 

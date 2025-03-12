@@ -54,8 +54,9 @@ const Carousel = (imagesMap) => {
         <Carousel imagesMap={product.tool_image} />
         <div className="titleCard">
         <h3>{product.tool_name}</h3>
-        <p><span className="detailsCardSpan">Make : </span>{product.tool_make} </p>
-        <p><span className="detailsCardSpan">Description : </span>{product.tool_description}</p>
+        <p><span className="detailsCardSpan">Make         : </span>{product.tool_make} </p>
+        <p><span className="detailsCardSpan">Description  : </span>{product.tool_description}</p>
+        <p><span className="detailsCardSpan">Availble QTY : </span>{product.tool_quantity}</p>
         </div>
         <div className="pricing-info">
         <hr/>
