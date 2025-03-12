@@ -55,7 +55,7 @@
 .main-card {
     border: 1px solid rgb(165, 163, 163);
     width:230px;
-    height:300px;
+    height:310px;
     border-radius: 10px;
     padding: 10px 10px 10px 10px;
     display: inline-block;
@@ -87,13 +87,20 @@
     font-weight: bold;
     width: 95%;
     padding-left: 5px;
-    font-size:18px;
+    font-size:16px;
 }
-
+.prim_price_tag{
+    width:fit-content;
+}
+.sec_price_tag{
+    width:fit-content;
+    font-size:14px;
+    color:blue;
+}
 .card-desc {
     display: inline-block;
     border: none;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     max-height: 55px;
     width: 95%;
     padding-left: 5px;
@@ -105,7 +112,7 @@
 
 .card-distance{
     position: absolute;
-    margin-top: 264px;
+    margin-top: 274px;
     margin-left: 69px;
     border-bottom-right-radius: 10px;
     width: 150px;

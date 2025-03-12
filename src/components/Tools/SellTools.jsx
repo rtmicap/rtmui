@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { SAVE_TOOLS } from "../../api/apiUrls";
+import { SAVE_TOOLS, FILE_UPLOAD_URL } from "../../api/apiUrls";
 import { useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import "./sell.scss";
@@ -20,6 +20,8 @@ function SellTools() {
 
     const [imagePreviews, setImagePreviews] = useState([]);
     const [message, setMessage] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,15 +44,61 @@ function SellTools() {
             return;
         }
 
+        // Create preview URLs for the selected files
         const imageUrls = files.map((file) => URL.createObjectURL(file));
         setImagePreviews([...imagePreviews, ...imageUrls]);
-        setFormData({ ...formData, images: [...formData.images, ...files] });
+        setSelectedFiles([...selectedFiles, ...files]); // Append to previously selected files
+    };
+
+    const handleRemoveImage = (indexToRemove) => {
+        // Remove image and file at the given index
+        setImagePreviews(imagePreviews.filter((_, index) => index !== indexToRemove));
+        setSelectedFiles(selectedFiles.filter((_, index) => index !== indexToRemove));
+    };
+
+    const handleUploadImages = async () => {
+        if (selectedFiles.length === 0) return;
+
+        setIsUploading(true); // Set uploading state to true
+
+        try {
+            const formDataForUpload = new FormData();
+            selectedFiles.forEach((file) => {
+                formDataForUpload.append('fileName', file); // Add files to the formData
+            });
+
+            // Make the API call to upload images
+            const token = localStorage.getItem("authToken");
+            axios.defaults.headers.common["authorization"] = "Bearer " + token;
+
+            const response = await axios.post(FILE_UPLOAD_URL, formDataForUpload);
+
+            if (response.status === 200 && response.data.files) {
+                // Extract the URLs from the response
+                const uploadedUrls = response.data.files.map((file) => file.fileUrl);
+
+                // Update the formData with uploaded image URLs
+                setFormData(prevState => ({
+                    ...prevState,
+                    images: [...prevState.images, ...uploadedUrls], // Store URLs in images
+                }));
+
+                alert('Images uploaded successfully');
+            } else {
+                alert('Failed to upload images');
+            }
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            alert('Error uploading images');
+        } finally {
+            setIsUploading(false); // Reset uploading state
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        // Construct the request payload
+
+        // Construct the request payload with image URLs
         const payload = {
             toolname: formData.name,
             description: formData.description,
@@ -60,13 +108,13 @@ function SellTools() {
             sellingprice: parseFloat(formData.sellingPrice) || 0,
             quantity: parseInt(formData.quantity, 10) || 0,
             condition: formData.condition,
-            image: formData.images.map((file) => file.name), // Assuming backend handles file upload separately
+            image: formData.images, // Use the URLs stored in images
         };
-    
+
         try {
             const token = localStorage.getItem("authToken");
             axios.defaults.headers.common["authorization"] = "Bearer " + token;
-        
+
             const response = await axios.post(SAVE_TOOLS, payload);
             if (response.status === 200 && response.data.result) {
                 setMessage({ type: "success", text: "Tool listed successfully!" });
@@ -92,14 +140,14 @@ function SellTools() {
         <div className="sell-tools-form">
             <h1>Sell Your Tool</h1>
             {message && (
-            <div className={`message ${message.type}`}>
-                {message.text}
-            </div>
-        )}
+                <div className={`message ${message.type}`}>
+                    {message.text}
+                </div>
+            )}
 
             <form onSubmit={handleSubmit}>
                 <label>
-                    Name: 
+                    Name:
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                 </label>
 
@@ -143,14 +191,40 @@ function SellTools() {
 
                 <label>
                     Upload Images (Max 4):
-                    <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
+                    <div className="file-upload-container">
+                        <input
+                            id="file-upload-input"
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                        />
+                        <button
+                            type="button"
+                            className="upload-button"
+                            onClick={handleUploadImages}
+                            disabled={isUploading}
+                        >
+                            {isUploading ? 'Uploading...' : 'Upload'}
+                        </button>
+                    </div>
                 </label>
 
                 <div className="image-preview">
                     {imagePreviews.map((src, index) => (
-                        <img key={index} src={src} alt="Uploaded preview" width="100" />
+                        <div key={index} className="image-preview-container">
+                            <img src={src} alt="Uploaded preview" width="100" className="image-preview-image" />
+                            <button
+                                type="button"
+                                className="remove-image-button"
+                                onClick={() => handleRemoveImage(index)}
+                            >
+                                X
+                            </button>
+                        </div>
                     ))}
                 </div>
+
 
                 <button type="submit">Sell Tool</button>
             </form>
