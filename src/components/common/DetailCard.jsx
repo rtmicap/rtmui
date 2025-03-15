@@ -35,7 +35,9 @@ const Carousel = (imagesMap) => {
         <div className="img-container" key={index}><img  src={imageName} alt={`Slide ${index}`} /> </div>
         ))
         }
+        
         </div>
+        <div className="img-counter">{1+(-leftPos/100)}/{imagesMap.length}</div>
         </div>
     :
         <div className="img-main-container">
@@ -48,7 +50,7 @@ const Carousel = (imagesMap) => {
 
   // DetailCard Component
   const DetailCard = ({product}) => {
-      console.log(product,"   Details page");
+
     return (
       <div className="detail-card-container">
         <Carousel imagesMap={product.tool_image} />
