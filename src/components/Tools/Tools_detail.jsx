@@ -3,8 +3,9 @@ import {message} from 'antd';
 import DetailCard from '../common/DetailCard'; 
 import cardData from '../../api/tools_details.json';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {firstChrUpperCase} from "../../utils/utils.js";
 
-function BuyTools_detail() {
+function Tools_detail() {
   const location = useLocation();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { toolsDetails } = location.state || {};
@@ -27,4 +28,4 @@ function BuyTools_detail() {
   );
 }
 
-export default BuyTools_detail;
+export default Tools_detail;
