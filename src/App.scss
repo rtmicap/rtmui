@@ -55,7 +55,17 @@
     margin-top:20px;
   }
   //*************** Login page **********************
-
+  /* page not found */
+  .pageNotFound{
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    margin-top:100px;
+    div{
+      color:red;
+    }
+  }
+  /*  */
   //*************** Content Layout page **********************
   #root{
     max-width:1400px;

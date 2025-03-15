@@ -37,7 +37,7 @@ function MyTools() {
   const cardClick = (item) => {
     if (!favClick) {
       console.log("card clicked ", item);
-      navigate("/tools-detail", {
+      navigate(`/tools-detail/?toolid=${item.tool_id}`, {
         state: {
           toolsDetails: item,
         },
