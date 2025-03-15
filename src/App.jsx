@@ -109,7 +109,7 @@ const [isIdle, setIsIdle] = useState(false);
       <Routes>
         {/* With Auth */}
         <Route element={<PrivateRoutes />}>
-          <Route path="/*" element={<Layout />}>
+          <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="hire-machine" element={<HireMachines />} />
             <Route path="register-machine" element={<RegistrationMachines />} />
@@ -166,10 +166,9 @@ const [isIdle, setIsIdle] = useState(false);
           </Route>
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>
-            <Route index path="dashboard" element={<AdminDashboard />} />
-            <Route path="list-users" element={<ListOfUsers />} />
+          <Route index path="dashboard" element={<AdminDashboard />} />
+          <Route path="list-users" element={<ListOfUsers />} />
           </Route>
-          <Route path="*" element={<Missing />} />
         </Route>
 
         {/* Without Auth */}

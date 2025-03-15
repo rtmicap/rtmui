@@ -1,8 +1,10 @@
 import React from 'react'
+import '../app.scss'
 
 function Missing() {
     return (
-        <div>Missing</div>
+        <div className="pageNotFound">Page Not Found
+        <div>404</div></div>
     )
 }
 

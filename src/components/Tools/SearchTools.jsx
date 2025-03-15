@@ -16,7 +16,6 @@ function SearchTools({searchParam, setSearchParam}) {
   const [type,setType]=useState("both");
 
   const fetchResults = async(event) => {
-    console.log('Fetching results', event.target.value);
         //setLoading(false);
       const delayDebounce = setTimeout(async() => {
 
@@ -46,7 +45,6 @@ function SearchTools({searchParam, setSearchParam}) {
   useEffect(() => {
     try {
       let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"both","type":"both"}';
-      console.log(currentSessionStorage, "  cS");
       setSearchParam(currentSessionStorage)
       currentSessionStorage = JSON.parse(currentSessionStorage);
       setCondition(currentSessionStorage.condition);
