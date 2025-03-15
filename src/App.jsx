@@ -13,7 +13,7 @@ import AppHeader from './components/AppHeader/AppHeader';
 import HomePage from './components/Homepage/HomePage';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
-import BuyTools_detail from './components/Tools/BuyTools_detail';
+import Tools_detail from './components/Tools/Tools_detail';
 import MyTools from './components/Tools/MyTools';
 import SellTools from './components/Tools/SellTools';
 // gauges
@@ -122,7 +122,7 @@ const [isIdle, setIsIdle] = useState(false);
             <Route path="hire-machine/book-machine/:machineId" element={<BookingMachines />} />
             {/* Tools */}
             <Route path='buy-tools' element={<BuyTools />} />
-            <Route path='buytools-detail' element={<BuyTools_detail />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 

@@ -47,15 +47,21 @@
     margin-top: -11px;
     margin-left: 187px;
     border-radius: 12px 12px 12px 12px;
-    width: fit-content;
+    width: 33px;
+    height:27px;
     padding: 2px 10px 2px 10px;
     font-weight: bold;
     background-color:lightgray;
+    text-align: center;
+        font-weight: 600;
+        color:red;
+    
+    
 }
 .main-card {
     border: 1px solid rgb(165, 163, 163);
     width:230px;
-    height:310px;
+    height:330px;
     border-radius: 10px;
     padding: 10px 10px 10px 10px;
     display: inline-block;
@@ -91,11 +97,12 @@
 }
 .prim_price_tag{
     width:fit-content;
+    color:#5d5f5a;
 }
 .sec_price_tag{
     width:fit-content;
     font-size:14px;
-    color:blue;
+    color:#4096ff;
 }
 .card-desc {
     display: inline-block;
@@ -112,9 +119,9 @@
 
 .card-distance{
     position: absolute;
-    margin-top: 274px;
-    margin-left: 69px;
-    border-bottom-right-radius: 10px;
+    bottom:-1px;
+    right:-1px;
+    border-bottom-right-radius: 9px;
     width: 150px;
     padding: 2px 10px 2px 10px;
     font-weight: bold;
@@ -129,6 +136,39 @@
     font-weight: bold;
    }
 
+   /*  MyTools  */
+
+   .addTool{
+    background-color: #1677ff;
+    color: white;
+    padding: 10px; 
+    border: none;
+    border-radius: 5px;
+    width:105px;
+    margin:10px;
+   }
+   .addTool:hover{
+    background-color: #7ec1ff;
+    }
+
+   .delTool{
+    background-color: #ee2222;
+    color: white;
+    padding: 10px; 
+    border: none;
+    border-radius: 5px;
+    width:105px;
+    margin:10px;
+   }
+   .delTool:hover{
+    background-color: #c91212;
+    }
+
+    .delTool:active{
+        color: grey;
+    }
+
+   /* end MyTools*/
 
 /*   Search component                */
 .search_main_container{
