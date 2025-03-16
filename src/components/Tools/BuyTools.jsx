@@ -60,6 +60,7 @@ function BuyTools() {
                 },
             });
         }
+        favClick=false;
 
     }
 
