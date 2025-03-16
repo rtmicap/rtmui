@@ -3,25 +3,26 @@ import {message} from 'antd';
 import DetailCard from '../common/DetailCard'; 
 import { Link, useLocation, useNavigate, useSearchParams  } from 'react-router-dom';
 import {firstChrUpperCase} from "../../utils/utils.js";
-import { GET_TOOLS_BY_COMPANY_ID } from '../../api/apiUrls.js';
+import { GET_TOOL_BY_ID } from '../../api/apiUrls.js';
 import axios from '../../api/axios.js';
 
 function Tools_detail() {
   const location = useLocation();
   const [toolsDetails,setToolsDetails]= useState(null);
   const [searchParams] = useSearchParams();
-  const paramValue = searchParams.get('toolid');
-
+  const tools_id = searchParams.get('toolid');
 
    const getTools_Details=async()=>{
     try{
       if (location.state==null){
         const token = localStorage.getItem('authToken');
               axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
-              const response = await axios.get(GET_TOOLS_BY_COMPANY_ID);
+              const response = await axios.get(GET_TOOL_BY_ID+`/${tools_id}`);
               console.log(response.data.result);
-              if (response && response.data.result) {
+              if (response && response.data.result.length>0) {
                 setToolsDetails(response.data.result[0]);
+              }else{
+                setToolsDetails(null);
               }
             }
             else{
@@ -46,7 +47,7 @@ function Tools_detail() {
       {toolsDetails ? (
         <DetailCard product={toolsDetails}/>
       ) : (
-        <p>Loading product details...</p>
+        <p>Product details not found</p>
       )}
     </div>
     </div>
