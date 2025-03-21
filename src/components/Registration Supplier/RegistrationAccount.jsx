@@ -1318,7 +1318,7 @@ const RegistrationAccount = () => {
                                 label="CIN (Corporate Identification Number) or UAM"
                                 rules={[
                                     {
-                                        pattern: /^[A-Za-z][A-Za-z0-9]{10,20}$/,
+                                        pattern: /^[A-Za-z0-9]{10,20}$/,
                                         message: "Please provide a valid CIN (e.g., L17110MH1973PLC019786) or UDYAM (e.g., UDYAMMH021234567).",
                                     },
                                     {
