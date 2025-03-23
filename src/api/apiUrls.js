@@ -43,7 +43,8 @@ export const GET_COMPANY_DETAILS_BY_ID = "/user/getcompanydetailsbyid";
 export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
 // Get Machines By Machine ID
 export const GET_MACHINES_BY_MACHONE_ID = "/machines/getMachinesByMachineId";
-
+// Update Machines
+export const UPDATE_MACHINES_BY_ID = "/machines/updatemachine";
 // ******************************///*****************///
 //Admin URLS
 
