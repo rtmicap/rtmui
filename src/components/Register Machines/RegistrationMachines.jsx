@@ -192,7 +192,7 @@ function RegistrationMachines() {
                     formData.append("fileName", newFileList[0].originFileObj);
                     var response = await axios.post(baseUrl, formData, configHeaders);
                     // console.log("responseData Image: ", response);
-                    setImageBase64(response.data.fileUrl)
+                    setImageBase64(response.data.files[0].fileUrl)
                     setFileLoading(false);
                 } else {
                     setFileLoading(false);
