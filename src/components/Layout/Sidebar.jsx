@@ -54,7 +54,9 @@ const items = [
     //     getItem('View Company Guidelines', 'view-company-guidelines', null),
     // ]),
     // getItem('Settings', 'settings', <SettingOutlined />),
-    getItem('Logout', 'logout', <LogoutOutlined />),
+    getItem('Profile', 'profile', <SettingOutlined />),
+    getItem('Logout', 'logout', <LogoutOutlined />)
+    
 ]
 
 function Sidebar() {
