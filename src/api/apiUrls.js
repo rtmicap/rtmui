@@ -39,6 +39,9 @@ export const GET_FINAL_SAMPLE_REPORT_ORDERID_URL = "/order/getallfinalreportsbyo
 // Company users data
 export const GET_COMPANY_DETAILS_BY_ID = "/user/getcompanydetailsbyid";
 
+// Company Information
+export const UPDATE_COMPANY_DETAILS_BY_ID = "/company/updateCompanyInfo";
+
 // Get Registered Machines
 export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
 // Get Machines By Machine ID

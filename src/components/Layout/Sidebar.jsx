@@ -2,7 +2,10 @@ import { Layout, Menu, message, theme, Spin } from 'antd';
 import { Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const { Header, Content, Footer, Sider } = Layout;
-import { FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined, ContactsOutlined, UnorderedListOutlined, CreditCardOutlined } from '@ant-design/icons';
+import {
+    FileAddOutlined, SettingOutlined, BookOutlined, LogoutOutlined, CalendarOutlined, DashboardOutlined, ToolOutlined, FieldTimeOutlined, FormatPainterOutlined, PlusSquareOutlined, MinusSquareOutlined, CheckSquareOutlined, ScissorOutlined,
+    ContactsOutlined, UnorderedListOutlined, CreditCardOutlined, FileProtectOutlined
+} from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useEffect, useState } from "react";
 import Navbar from '../Navbar/Navbar'
@@ -27,7 +30,7 @@ const items = [
     // getItem('Hire a Machine', 'hire-machine', <CalendarOutlined />),
     getItem('Machines', 'machines', <ToolOutlined />, [
         getItem('Register Machines', 'register-machine', <FileAddOutlined />),
-        
+
         getItem('My Registered Machines', 'my-registered-machines', <CalendarOutlined />),
     ]),
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
@@ -53,7 +56,10 @@ const items = [
     //     getItem('View Code of Conduct', 'view-code-conduct'),
     //     getItem('View Company Guidelines', 'view-company-guidelines', null),
     // ]),
-    // getItem('Settings', 'settings', <SettingOutlined />),
+    getItem('Settings', 'settings', <SettingOutlined />,
+        [
+            getItem('Profile', 'profile', <FileProtectOutlined />),
+        ]),
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
@@ -110,9 +116,9 @@ function Sidebar() {
 
                 {/* Content Goes here */}
                 <Layout>
-                
+
                     <Content className="contentPage">
-                        
+
                         <div
                             style={{
                                 padding: 24,
@@ -125,9 +131,9 @@ function Sidebar() {
                             <Outlet />
                         </div>
                     </Content>
-                    
+
                 </Layout>
-                
+
             </Layout>
         </>
     )
