@@ -1318,7 +1318,7 @@ const RegistrationAccount = () => {
                                 label="CIN (Corporate Identification Number) or UAM"
                                 rules={[
                                     {
-                                        pattern: /^[A-Za-z0-9]{10,20}$/,
+                                        pattern: /^[A-Za-z0-9]{11,21}$/,
                                         message: "Please provide a valid CIN (e.g., L17110MH1973PLC019786) or UDYAM (e.g., UDYAMMH021234567).",
                                     },
                                     {
@@ -1337,7 +1337,7 @@ const RegistrationAccount = () => {
                                 extra="CIN Format: L17110MH1973PLC019786 (or) U12345AB6784CDE123456. UDYAM format should not contain hyphens."
                                 normalize={(value) => value?.trim()}
                             >
-                                <Input placeholder="Enter your CIN number or UAM" />
+                                <Input placeholder="Enter your CIN number or UAM" minLength={11} maxLength={21} />
                             </Form.Item>
 
                         </Col>
