@@ -192,7 +192,6 @@ function EditMachine({ machineId, onClose }) {
             comments: values.comments,
             Machine_Photo: viewUploadedImage ? viewUploadedImage : singleMachineData.Machine_Photo,
             CompanyId: singleMachineData.CompanyId,
-            type: values.type,
         };
 
         // Extract `variable_fields` by removing `commonFields` from `values`
@@ -226,7 +225,7 @@ function EditMachine({ machineId, onClose }) {
         console.log("Final sendFinalData Data:", sendFinalData);
         const response = await axios.patch(UPDATE_MACHINES_BY_ID, (sendFinalData));
         if (response.status == 200) {
-            message.success("Successfully Updated!");
+            message.success(`Successfully Updated for Machine ID: ${response.data.result.id}!`);
             getMachinesByMachineId();
             navigate(-1);
         }
