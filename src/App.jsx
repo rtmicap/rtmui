@@ -45,7 +45,7 @@ import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
 import EditMachine from './components/EditMachine/EditMachine';
-import Profile from './components/Settings/Profile/Profile';
+import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
 
 const App = () => {
   const location = useLocation();
@@ -156,7 +156,7 @@ const App = () => {
             <Route path='sell-scrap' element={<SellScrap />} />
             {/* Settings */}
             {/* <Route path='settings' element={<Settings />} /> */}
-            <Route path='profile' element={<Profile />} />
+            <Route path='coordinators' element={<ManageCoordinator />} />
             {/* Documents */}
             <Route path="view-legal-docs" element={<RentGauges />} />
             <Route path="view-code-conduct" element={<SellGauges />} />
@@ -164,7 +164,6 @@ const App = () => {
 
             {/* Shipments Details */}
             <Route path="shipment-details" element={<Shipment />} />
-
           </Route>
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>

@@ -111,7 +111,7 @@ function SearchTools({searchParam, setSearchParam}) {
       <div className="searchbox_container">
         <div>Name</div>
         <div className="searchText_inlineblock"><input
-        type="text"
+        type="search"
         placeholder="Search tools..."
         className="search-box"
         id="searchText"

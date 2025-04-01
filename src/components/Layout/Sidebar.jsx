@@ -22,8 +22,6 @@ function getItem(label, key, icon, children) {
 }
 
 
-
-
 const items = [
     getItem('Dashboard', '/', <DashboardOutlined />),
     // getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
@@ -60,6 +58,7 @@ const items = [
         [
             getItem('Profile', 'profile', <FileProtectOutlined />),
         ]),
+    getItem('Co-Ordinators', 'coordinators', <FileAddOutlined />),
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 

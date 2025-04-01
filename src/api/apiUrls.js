@@ -2,6 +2,9 @@
 export const REGISTER_ACCOUNT_URL = "/registration/saveuser";
 export const CHECK_REGISTERED_USER = "/registration/userexists";
 
+//add employee
+export const ADD_EMPLOYEE = "/registration/addemployee";
+
 // login url
 export const LOGIN_URL = "/users/login";
 export const CURRENT_USER_URL = "/users/currentUser";
