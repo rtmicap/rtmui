@@ -19,8 +19,6 @@ function getItem(label, key, icon, children) {
 }
 
 
-
-
 const items = [
     getItem('Dashboard', '/', <DashboardOutlined />),
     // getItem('Register a Machine', 'register-machine', <FileAddOutlined />),

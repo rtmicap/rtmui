@@ -1,5 +1,6 @@
-import { Button, Card, Form, Input, Layout, message, Spin } from 'antd';
-import React, { useState } from 'react'
+import { Card, Form, Input, Layout, message, Spin,Radio } from 'antd';
+import Button from '../common/elements/ButtonElement';
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import AppNotificationContainer from '../../utils/Notifications/AppNotificationContainer';
@@ -11,9 +12,13 @@ function Login() {
 
     const navigate = useNavigate();
     const { isLoading, error, userLogin } = useAuth();
-
+    const [userType,setUserType]=useState("Employer");
+    const handleUserType=(e)=>{
+        setUserType(e.target.value);
+    }
     const onFinish = async (values) => {
-        // console.log('Success:', values);
+        //values["group"]=userType=="Employee"?"Employee":"";
+        console.log(values);
         userLogin(values, (res) => {
             // console.log("test u: ", res);
             if (res && res.status && !res.admin) {
@@ -32,6 +37,9 @@ function Login() {
             } 
         });
     };
+    useEffect(()=>{
+        localStorage.clear();
+    })
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
         errorInfo.errorFields.forEach(fieldError => {
@@ -95,7 +103,23 @@ function Login() {
                             >
                                 <Input.Password className="credTextbox"/>
                             </Form.Item>
-                            
+                            <Form.Item
+                                wrapperCol={{
+                                    offset: 8,
+                                    span: 16,
+                                }}
+                                name="userType"    
+                            >
+                            <Radio.Group  value={userType} defaultValue="employer" buttonStyle="solid" onChange={handleUserType}>
+                                <Radio.Button value="employer">Power User</Radio.Button>
+                                <Radio.Button value="employee">Co-ordinator</Radio.Button>
+                            </Radio.Group>
+
+                          </Form.Item>
+                            {/* <div className="radion-mainContainer">
+                            <div className="radio-Container"><input type="radio"  id="userEmployer" className="UserTypeRadio" name="userType" value="Employer" defaultChecked readOnly/><label className="UserTypeLabel" htmlFor="userEmployer">Employer</label></div>
+                            <div className="radio-Container"><input type="radio" className="UserTypeRadio" id="userEmployee" name="userType" value="Employee" onChange={(handleUserType)}readOnly/><label className="UserTypeLabel" htmlFor="userEmployee">Employee</label></div>
+                            </div> */}
                             <Form.Item
                                 wrapperCol={{
                                     offset: 8,
@@ -103,10 +127,9 @@ function Login() {
                                 }}
                             >
                                 <div className="btnContainer">
-                                <Button className="loginBtn" type="primary" htmlType="submit">
-                                    {isLoading ? 'Logging...' : 'Login'}
-                                </Button>
-                                <Button className="registerBtn" type='secondary' onClick={() => navigate('/register-account')}>Register</Button>
+                                <Button className="loginBtn" type="primary" htmlType="submit" value={isLoading ? 'Logging...' : 'Login'}/>
+                                
+                                <Button className="registerBtn" type='secondary' onClick={() => navigate('/register-account')} value="Register"/>
                                 </div>
                             </Form.Item>
                             

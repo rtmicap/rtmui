@@ -45,7 +45,7 @@ import SampleReports from './components/Sample Reports/SampleReports';
 import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
 import EditMachine from './components/EditMachine/EditMachine';
-import Profile from './components/Profile/Profile';
+import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
 
 const App = () => {
   const location = useLocation();
@@ -163,7 +163,7 @@ const [isIdle, setIsIdle] = useState(false);
 
             {/* Shipments Details */}
             <Route path="shipment-details" element={<Shipment />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/manage-coordinators" element={<ManageCoordinator />} />
           </Route>
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>

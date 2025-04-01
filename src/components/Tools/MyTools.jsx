@@ -93,16 +93,18 @@ function MyTools() {
 
   return (
     <div>
+      <h1>Sell Tools</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Sell Tools</h1>
+        
         <div className="addDelTool">
-          <input type="button" className="addTool" onClick={handleAddToolClick} value="Add Tool" />
+        <div className="floatButtonsRight">  
+          <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add Tool" />
 
-          <input type="button" className="delTool" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete Tool"} />
-
+          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete Tool"} />
+          </div>
           <input
-                type="text"
-                placeholder="Filter tools"
+                type="search"
+                placeholder="Search tools"
                 value={filterText}
                 onChange={handleFilterChange}
             />

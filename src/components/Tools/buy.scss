@@ -136,37 +136,9 @@
    }
 
    /*  MyTools  */
-
-   .addTool{
-    background-color: #1677ff;
-    color: white;
-    padding: 10px; 
-    border: none;
-    border-radius: 5px;
-    width:105px;
-    margin:10px;
+   .addDelTool{
+    width:100%;
    }
-   .addTool:hover{
-    background-color: #7ec1ff;
-    }
-
-   .delTool{
-    background-color: #ee2222;
-    color: white;
-    padding: 10px; 
-    border: none;
-    border-radius: 5px;
-    width:105px;
-    margin:10px;
-   }
-   .delTool:hover{
-    background-color: #c91212;
-    }
-
-    .delTool:active{
-        color: grey;
-    }
-
    /* end MyTools*/
 
 /*   Search component                */
