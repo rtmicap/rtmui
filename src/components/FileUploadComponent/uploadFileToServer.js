@@ -10,7 +10,7 @@ const uploadFileToServer = async (file, name) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        return response.data.fileUrl; // Returning the file URL from the server response
+        return response.data.files[0].fileUrl; // Returning the file URL from the server response
     } catch (error) {
         // console.error('Error uploading file: ', error);
         throw error;

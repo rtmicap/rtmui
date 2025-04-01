@@ -1,7 +1,7 @@
-import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload, Tooltip, Image,Typography } from 'antd';
+import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload, Tooltip, Image, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FILE_UPLOAD_URL, GET_MACHINES_BY_MACHONE_ID } from '../../api/apiUrls';
+import { FILE_UPLOAD_URL, GET_MACHINES_BY_MACHONE_ID, UPDATE_MACHINES_BY_ID } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { Cutting } from '../Machine Variable Fields/Cutting';
 import { Drilling } from '../Machine Variable Fields/Drilling';
@@ -142,7 +142,8 @@ function EditMachine({ machineId, onClose }) {
             formData.append("fileName", previewFile);
 
             const response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            setUploadedFileUrl(response.data.fileUrl);
+            setViewUploadedImage(response.data.files[0].fileUrl);
+            console.log("response.data", response.data);
             message.success("File uploaded successfully!");
         } catch (error) {
             message.error("File upload failed");
@@ -158,8 +159,24 @@ function EditMachine({ machineId, onClose }) {
         message.info("File removed. Select a new file.");
     };
 
+    const cleanVariableFields = (fields) => {
+        return Object.keys(fields).reduce((acc, key) => {
+            // Check if the value is an object (to remove unwanted keys)
+            if (typeof fields[key] === "object" && !Array.isArray(fields[key])) {
+                acc[key] = Object.fromEntries(
+                    Object.entries(fields[key]).filter(([k]) =>
+                        !["placeholder", "pattern", "maxLength", "options"].includes(k)
+                    )
+                );
+            } else {
+                acc[key] = fields[key]; // Keep primitive values (like strings and numbers)
+            }
+            return acc;
+        }, {});
+    };
 
-    const handleSubmit = (values) => {
+
+    const handleSubmit = async (values) => {
         console.log("updated form Values:", values);
         // onClose();
         console.log("singleMachineData:", singleMachineData);
@@ -167,36 +184,52 @@ function EditMachine({ machineId, onClose }) {
             id: singleMachineData.id,
             Category: singleMachineData.Category,
             Machine_Type: singleMachineData.Machine_Type,
-            Brand: values.brand,
-            Model: values.model,
-            Year_of_Purchase: values.yearOfPurchase,
-            Machine_Hour_Rate: values.machineHourRate,
+            brand: values.brand,
+            model: values.model,
+            yearOfPurchase: values.yearOfPurchase,
+            machineHourRate: values.machineHourRate,
             Machine_Name: singleMachineData.Machine_Name,
-            Comments: values.Comments,
-            Machine_Photo: viewUploadedImage,
+            comments: values.comments,
+            Machine_Photo: viewUploadedImage ? viewUploadedImage : singleMachineData.Machine_Photo,
             CompanyId: singleMachineData.CompanyId,
-            type: values.type,
         };
 
-        // Get the category
-        const selectedCategory = machineCategories[singleMachineData.Category];
-
-        // Normalize Machine Type key
-        const machineTypeKey = singleMachineData.Machine_Type.replace(/\s/g, "");
-
-        // Extract category-specific fields
-        const categorySpecificFields = selectedCategory ? selectedCategory[machineTypeKey] || {} : {};
-
-        // Merge user-entered values and predefined fields
-        const variableFields = { ...categorySpecificFields, ...values.Variable_fields };
-
+        // Extract `variable_fields` by removing `commonFields` from `values`
+        const variable_fields = Object.keys(values)
+            .filter(key => !(key in commonFields))
+            .reduce((obj, key) => {
+                obj[key] = values[key];
+                return obj;
+            }, {});
+        console.log("before format: ", variable_fields);
         // Convert variable fields to JSON string
-        const formattedData = {
-            ...commonFields,
-            Variable_fields: JSON.stringify(variableFields),
-        };
+        // const formattedData = {
+        //     ...commonFields,
+        //     Variable_fields: JSON.stringify(variable_fields),
+        // };
 
-        console.log("Formatted Data:", formattedData);
+        // console.log("Final Formatted Data:", formattedData);
+
+        var finalCommon = {
+            id: singleMachineData.id,
+            Machine_Photo: viewUploadedImage ? viewUploadedImage : singleMachineData.Machine_Photo,
+            comments: values.Comments,
+            machineHourRate: values.machineHourRate,
+        }
+
+        const sendFinalData = {
+            ...finalCommon,
+            variable_fields
+        }
+
+        console.log("Final sendFinalData Data:", sendFinalData);
+        const response = await axios.patch(UPDATE_MACHINES_BY_ID, (sendFinalData));
+        if (response.status == 200) {
+            message.success(`Successfully Updated for Machine ID: ${response.data.result.id}!`);
+            getMachinesByMachineId();
+            navigate(-1);
+        }
+        console.log("Formatted response:", response);
     };
 
     const showConfirm = async () => {
@@ -264,6 +297,7 @@ function EditMachine({ machineId, onClose }) {
                             </Col>
                         </Row>
                         {fields.map((field) => (
+                            field.name != "noOfMachines" &&
                             <Form.Item
                                 key={field.name}
                                 name={field.name}
@@ -305,64 +339,6 @@ function EditMachine({ machineId, onClose }) {
                                         message: 'Please upload machine image!',
                                     },
                                 ]}>
-                                    {/* <Flex gap="small" wrap>
-                                        <Upload
-                                            fileList={machineImageList}
-                                            onChange={handleImageFileChange}
-                                            maxCount={1}
-                                            accept=".png,.jpeg,.jpg,.pdf"
-                                            beforeUpload={() => false}
-                                            onRemove={handleImageRemove}
-                                            data={(file) => file.fileName = "FOO"}
-                                        >
-                                            <Button loading={fileLoading} icon={<UploadOutlined />}>{fileLoading ? 'Uploading..' : 'Update Machine Image'}</Button>
-                                        </Upload>
-                                        {viewUploadedImage &&
-                                            <Link to={viewUploadedImage} target={'_blank'}>View Uploaded Image</Link>
-                                        }
-                                    </Flex><br /> */}
-                                    {/* <Flex gap="small" wrap>
-                                        <Upload
-                                            fileList={previewFile ? [{ uid: '-1', name: previewFile.name }] : []}
-                                            onChange={handlePreviewFileChange}
-                                            maxCount={1}
-                                            accept=".png,.jpeg,.jpg,.pdf"
-                                            beforeUpload={() => false}  // Prevent auto-upload
-                                            onRemove={handleRemoveFile}
-                                        >
-                                            <Button icon={<UploadOutlined />}>Update Image/File</Button>
-                                        </Upload>
-
-                                       
-                                        {previewFile && (
-                                            <div style={{ marginTop: 15 }}>
-                                                {previewUrl ? (
-                                                    <Image width={100} src={previewUrl} alt="Preview" />
-                                                ) : (
-                                                    <p>{previewFile.name}</p>
-                                                )}
-
-                                                <Button icon={<DeleteOutlined />} onClick={handleRemoveFile} danger>
-                                                    Remove
-                                                </Button>
-
-                                                <Button
-                                                    type="primary"
-                                                    onClick={handleUploadFile}
-                                                    loading={fileLoading}
-                                                    disabled={isSubmitDisabled}
-                                                    style={{ marginLeft: 10 }}
-                                                >
-                                                    {fileLoading ? 'Uploading...' : 'Upload'}
-                                                </Button>
-                                            </div>
-                                        )}
-
-
-                                        {uploadedFileUrl && (
-                                            <Link to={uploadedFileUrl} target={'_blank'}>View Existing File</Link>
-                                        )}
-                                    </Flex> */}
                                     <Flex gap="small" wrap align="center">
                                         {/* File Upload Button */}
                                         <Upload
@@ -402,13 +378,20 @@ function EditMachine({ machineId, onClose }) {
                                             </Flex>
                                         )}
 
-                                        {/* Show Uploaded File Link */}
+                                        {/* Show Exisitng File Link */}
                                         {uploadedFileUrl && (
                                             <Text>
                                                 <Link to={uploadedFileUrl} target="_blank">View Existing File</Link>
                                             </Text>
                                         )}
-                                    </Flex>
+
+                                    </Flex><br />
+                                    {/* Show Uploaded File Link */}
+                                    {viewUploadedImage && (
+                                        <Text>
+                                            <Link to={viewUploadedImage} target="_blank"><span style={{ color: 'green' }}>View Uploaded File</span></Link>
+                                        </Text>
+                                    )}
                                     {/* {machineData.Machine_Photo && <Link to={machineData.Machine_Photo} target={'_blank'}>View Existing File</Link>} */}
                                 </Form.Item>
 

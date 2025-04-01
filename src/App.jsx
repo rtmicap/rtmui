@@ -68,39 +68,39 @@ const App = () => {
   } */
 
   // USer Idle timer
-const [isIdle, setIsIdle] = useState(false);
-    let timeoutId;
-  
-    const resetTimer = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setIsIdle(true);
-                    
-        localStorage.clear("authToken");
-        navigate("/login");
-        // Perform logout or display timeout message here
-      }, 1200000); // 20 minutes
+  const [isIdle, setIsIdle] = useState(false);
+  let timeoutId;
+
+  const resetTimer = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      setIsIdle(true);
+
+      localStorage.clear("authToken");
+      navigate("/login");
+      // Perform logout or display timeout message here
+    }, 1200000); // 20 minutes
+  };
+
+  useEffect(() => {
+    const handleUserActivity = () => {
+      setIsIdle(false);
+      resetTimer();
     };
-  
-    useEffect(() => {
-          const handleUserActivity = () => {
-            setIsIdle(false);
-            resetTimer();
-          };
-          // Initial timer setup
-          resetTimer();
-          // Event listeners for user activity
-          window.addEventListener('mousemove', handleUserActivity);
-          window.addEventListener('keydown', handleUserActivity);
-          window.addEventListener('click', handleUserActivity);
-          // Cleanup function to remove event listeners and clear timeout
-          return () => {
-            clearTimeout(timeoutId);
-            window.removeEventListener('mousemove', handleUserActivity);
-            window.removeEventListener('keydown', handleUserActivity);
-            window.removeEventListener('click', handleUserActivity);
-          };
-        }, []);
+    // Initial timer setup
+    resetTimer();
+    // Event listeners for user activity
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('keydown', handleUserActivity);
+    window.addEventListener('click', handleUserActivity);
+    // Cleanup function to remove event listeners and clear timeout
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      window.removeEventListener('click', handleUserActivity);
+    };
+  }, []);
 
   //end idel timer code
 
@@ -155,7 +155,8 @@ const [isIdle, setIsIdle] = useState(false);
             {/* Scrap */}
             <Route path='sell-scrap' element={<SellScrap />} />
             {/* Settings */}
-            <Route path='settings' element={<Settings />} />
+            {/* <Route path='settings' element={<Settings />} /> */}
+            <Route path='coordinators' element={<ManageCoordinator />} />
             {/* Documents */}
             <Route path="view-legal-docs" element={<RentGauges />} />
             <Route path="view-code-conduct" element={<SellGauges />} />
@@ -163,12 +164,11 @@ const [isIdle, setIsIdle] = useState(false);
 
             {/* Shipments Details */}
             <Route path="shipment-details" element={<Shipment />} />
-            <Route path="/profile/manage-coordinators" element={<ManageCoordinator />} />
           </Route>
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>
-          <Route index path="dashboard" element={<AdminDashboard />} />
-          <Route path="list-users" element={<ListOfUsers />} />
+            <Route index path="dashboard" element={<AdminDashboard />} />
+            <Route path="list-users" element={<ListOfUsers />} />
           </Route>
         </Route>
 

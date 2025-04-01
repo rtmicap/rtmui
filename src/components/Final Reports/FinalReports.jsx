@@ -143,7 +143,7 @@ function FinalReports() {
             const formData = new FormData();
             formData.append("fileName", file.originFileObj);
             var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            return response.data;
+            return response.data.files[0];
         } catch (error) {
             return error;
         }

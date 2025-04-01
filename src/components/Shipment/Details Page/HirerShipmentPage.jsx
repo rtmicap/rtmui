@@ -161,9 +161,9 @@ function HirerShipmentPage() {
             // console.log("response. file backblazedata: ", response.data);
             setFileUrls((prev) => ({
                 ...prev,
-                [name]: response.data.fileUrl,
+                [name]: response.data.files[0].fileUrl,
             }));
-            return response.data.fileUrl;
+            return response.data.files[0].fileUrl;
         } catch (error) {
             console.error("Error uploading file: ", error);
             message.error('File upload failed');
