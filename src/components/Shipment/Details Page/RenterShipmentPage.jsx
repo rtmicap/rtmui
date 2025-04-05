@@ -154,7 +154,7 @@ function RenterShipmentPage() {
                             message.error("Please enter a valid quantity.");
                         }
                     } else {
-                        message.error(`Update Received quantity!`);
+                        message.success(`Update Received quantity!`);
                     }
                 },
             });

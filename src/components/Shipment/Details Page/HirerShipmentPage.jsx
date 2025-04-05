@@ -415,7 +415,7 @@ function HirerShipmentPage() {
                                 <Flex gap="small" wrap>
                                     <FileUploadComponent
                                         accept=".pdf,.csv"
-                                        buttonText="Attach Invoice"
+                                        buttonText="Attach Invoice/Delivery Challan"
                                         loading={invoiceFileLoading}
                                         onFileUpload={handleFileUpload}
                                         handleRemoveFile={handleInvoiceRemove}
@@ -423,7 +423,7 @@ function HirerShipmentPage() {
                                     {invoiceFile && (
                                         <div className='col-auto'>
                                             <div>
-                                                <Link to={invoiceFile} target={'_blank'}>View Invoice File</Link>
+                                                <Link to={invoiceFile} target={'_blank'}>Preview Invoice File</Link>
                                             </div>
                                         </div>
                                     )}
@@ -560,7 +560,7 @@ function HirerShipmentPage() {
                                                             {fileUrls[name] && (
                                                                 <div className='col-auto mt-4'>
                                                                     <div>
-                                                                        <Link to={fileUrls[name]} target={'_blank'}>View File</Link>
+                                                                        <Link to={fileUrls[name]} target={'_blank'}>Preview File</Link>
                                                                         <Button type="link" onClick={() => handleFileRemove(name)}>Remove</Button>
                                                                     </div>
                                                                 </div>

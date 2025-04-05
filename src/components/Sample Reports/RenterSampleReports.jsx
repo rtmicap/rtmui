@@ -160,7 +160,6 @@ function RenterSampleReports() {
                                 }}
                                     rules={[
                                         {
-                                            required: true,
                                             message: 'Please update the part number!',
                                         },
                                     ]}

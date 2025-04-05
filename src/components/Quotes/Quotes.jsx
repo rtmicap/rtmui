@@ -534,7 +534,7 @@ function Quotes() {
                             Cancel
                         </Button>,
                         <Button key="update" type="primary" onClick={() => updateBookingDate(selectedQuote)}>
-                            {bookingLoading ? 'Updating...' : 'Update Date Change'}
+                            {bookingLoading ? 'Updating...' : 'Update Change Request'}
                         </Button>,
                     ]}
                 >
