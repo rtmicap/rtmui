@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
-import { CREATE_FINAL_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
+import { CREATE_FINAL_REPORT_URL } from '../../api/apiUrls';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/axios';
 import { uomChoices } from '../../utils/selectOptionUtils';

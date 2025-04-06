@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Drawer, Form, Input, message, Space, Table, Tag } from 'antd';
+import { Drawer, Form, Input, message, Space, Table, Tag } from 'antd';
 import HeaderTitle from '../../utils/HeaderTitle';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
+import Button from '../common/elements/ButtonElement';
 
 function SummaryPage({ setOpenSummary, resetForm }) {
     const [open, setOpen] = useState(false);
@@ -79,8 +80,8 @@ function SummaryPage({ setOpenSummary, resetForm }) {
             key: 'action',
             render: (_, record) => (
                 <Space Space size="middle" >
-                    <Button block onClick={() => onEditMachine(record)} disabled>Edit</Button>
-                    <Button type='primary' onClick={() => onRemoveMachine(record)} danger>Remove</Button>
+                    <Button block onClick={() => onEditMachine(record)} disabled value={'Edit'} />
+                    <Button type='primary' onClick={() => onRemoveMachine(record)} danger value={'Remove'} />
                     <a>Delete</a>
                 </Space >
             ),
@@ -182,7 +183,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
                 machines: outputArray
             }
             setIsLoading(true);
-        
+
             const response = await axios.post(REGISTER_MACHINE_URL, reqItem, configHeaders);
             console.log("response 200: ", response);
             if (response && (response.status == 200 || response.status == 201)) {
@@ -220,9 +221,12 @@ function SummaryPage({ setOpenSummary, resetForm }) {
     return (
         <>
             <div style={{ textAlign: 'right' }}>
-                <Button type='primary' onClick={addMoreMachines}>Add More Machines</Button>
+                <Button type='primary' onClick={addMoreMachines} value={'Add More Machines'} />
             </div>
-            <Table title={title} bordered columns={columns} dataSource={data} footer={() => data.length > 0 && <Button type='primary' onClick={submitMachine}>{isLoading ? 'Submitting' : 'Confirm & Submit'}</Button>} />
+            <Table title={title} bordered columns={columns} dataSource={data} footer={() => data.length > 0 &&
+                <Button type='primary' onClick={submitMachine} value={isLoading ? 'Submitting' : 'Confirm & Submit'} />
+            }
+            />
             <Drawer title="Basic Drawer" onClose={onClose} open={open}>
                 {editedData && editedData.length > 0 ?
                     editedData.map((item) => {
@@ -244,9 +248,7 @@ function SummaryPage({ setOpenSummary, resetForm }) {
                                     {/* Add more Form.Item for other fields */}
 
                                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                                        <Button type="primary" htmlType="submit">
-                                            Save
-                                        </Button>
+                                        <Button type="primary" htmlType="submit" value={'Save'} />
                                     </Form.Item>
                                 </Form>
                             </>

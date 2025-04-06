@@ -1,4 +1,4 @@
-import { Button, Collapse, message, Table, Tabs, Tag } from 'antd';
+import { Collapse, message, Table, Tabs, Tag } from 'antd';
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -8,6 +8,7 @@ import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReloadOutlined } from "@ant-design/icons";
 import { formattedDateTime, formatUpperCase } from '../../utils/utils';
+import Button from '../common/elements/ButtonElement';
 
 function Orders() {
 
@@ -115,9 +116,9 @@ function Orders() {
       key: 'actions',
       render: (_, record) => (
         <div>
-          <Button type="primary" onClick={() => handleView(record)}>View</Button>
-          {/* <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
-          <Button type="link" danger onClick={() => handleDelete(record)}>Delete</Button> */}
+          <Button type="primary" onClick={() => handleView(record)} value={'View'} />
+          {/* <Button type="link" onClick={() => handleEdit(record)} value={'Edit'} />
+          <Button type="link" danger onClick={() => handleDelete(record)} value={'Delete'} /> */}
         </div>
       ),
     },
@@ -206,7 +207,7 @@ function Orders() {
         <h3 className="card-title text-center">Orders</h3>
         <div className='row'>
           <div className="col text-end">
-            <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Orders</Button>
+            <Button type='link' onClick={refreshData} icon={<ReloadOutlined />} value={'Refresh Orders'} />
           </div>
         </div>
         {/* <Tabs

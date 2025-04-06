@@ -1,7 +1,7 @@
 import { Button, Collapse, DatePicker, Flex, Form, Input, message, Select, Tooltip, Upload } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CREATE_FIRST_SAMPLE_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
+import { CREATE_FIRST_SAMPLE_REPORT_URL } from '../../api/apiUrls';
 import { useAuth } from '../../contexts/AuthContext';
 import dayjs from 'dayjs';
 import axios from '../../api/axios';

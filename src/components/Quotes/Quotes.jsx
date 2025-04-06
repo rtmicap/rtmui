@@ -1,4 +1,4 @@
-import { Button, Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Table, Tabs, Tag } from 'antd'
+import { Collapse, DatePicker, Form, Input, message, Modal, Pagination, Select, Table, Tabs, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { ReloadOutlined } from "@ant-design/icons";
 import { GET_ALL_QUOTES_URL, UPDATE_QUOTE_URL, GET_ALL_ORDERS_URL } from '../../api/apiUrls';
@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { useAuth } from '../../contexts/AuthContext';
 import { GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls';
 import './quote.scss';
+import Button from '../common/elements/ButtonElement';
 
 const PAGE_SIZE = 10; // Number of items per page
 const { confirm } = Modal;
@@ -61,31 +62,7 @@ function Quotes() {
             message.error("Error fetching Company Details");
         }
     };
-    const getAllQuotes = async () => {
-        try {
-            setQuoteLoading(true);
-            const token = localStorage.getItem('authToken');
-            axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
-            const response = await axios.get(GET_ALL_QUOTES_URL);
-            await response.data.result.sort((d1, d2) => {
-                return new Date(d1.planned_start_date_time) - new Date(d2.planned_start_date_time);
-            })
-            // console.log("Quote response", response.status);
-            setAllQuotes(response.data.result);
-            setQuoteLoading(false);
-            return response.data.result;
-        } catch (error) {
-            setAllQuotes([]);
-            setQuoteLoading(false);
-            // console.log(error);
-            if (error && error.response.status == 401) {
-                message.warning("Unauthorized! Please log in again!")
-            } else {
-                message.error("Error on loading quotes..");
-            }
-            navigate("/login");
-        }
-    };
+
 
     const getAllOrders = async (quote_id) => {
         try {
@@ -136,6 +113,31 @@ function Quotes() {
     const customerGroupedQuotes = groupedQuotes(customerQuotes);
 
     useEffect(() => {
+        const getAllQuotes = async () => {
+            try {
+                setQuoteLoading(true);
+                const token = localStorage.getItem('authToken');
+                axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+                const response = await axios.get(GET_ALL_QUOTES_URL);
+                await response.data.result.sort((d1, d2) => {
+                    return new Date(d1.planned_start_date_time) - new Date(d2.planned_start_date_time);
+                })
+                // console.log("Quote response", response.status);
+                setAllQuotes(response.data.result);
+                setQuoteLoading(false);
+                return response.data.result;
+            } catch (error) {
+                setAllQuotes([]);
+                setQuoteLoading(false);
+                // console.log(error);
+                if (error && error.response.status == 401) {
+                    message.warning("Unauthorized! Please log in again!")
+                } else {
+                    message.error("Error on loading quotes..");
+                }
+                navigate("/login");
+            }
+        };
         getAllQuotes();
     }, [])
 
@@ -316,7 +318,7 @@ function Quotes() {
             title: 'More Info', key: 'files',
             render: (_, record) => (
                 <>
-                    <Button type='link' onClick={() => showModal(record)}>Click here</Button>
+                    <Button type='link' onClick={() => showModal(record)} value={'Click here'} />
                 </>
             )
         },
@@ -326,7 +328,9 @@ function Quotes() {
             render: (_, record) => (
                 <>
                     {(record.quote_status == "accepted") ?
-                        <div><Button className="orderDetailLink" type='link' onClick={() => handleAcceptedOrder(record.quote_id)}>Order Details</Button></div> :
+                        <div>
+                            <Button className="orderDetailLink" type='link' onClick={() => handleAcceptedOrder(record.quote_id)} value={'Order Details'} />
+                        </div> :
                         (record.hirer_company_id == authUser.CompanyId && record.quote_status == "pending") ?
                             <div>Under Review</div>
                             :
@@ -382,26 +386,10 @@ function Quotes() {
                 <h3 className="card-title text-center">Quotes</h3>
                 <div className='row'>
                     <div className="col text-end">
-                        <Button type='link' onClick={refreshData} icon={<ReloadOutlined />}>Refresh Quotes</Button>
+                        <Button type='link' onClick={refreshData} icon={<ReloadOutlined />} value={'Refresh Quotes'} />
                     </div>
                 </div>
 
-                {/*                 <div className='row'>
-                    <div className="col-auto">
-                        <h6>Filter By:</h6>
-                    </div>
-                    <div className='col-auto'>
-                        <Select placeholder='Select the machine category' options={uniqueCategories.map(category => ({ value: category, label: category }))}
-                            onChange={value => setSelectedCategory(value)} />
-                    </div>
-                    <div className='col-auto'>
-                        <Select placeholder='Select the machine type' options={uniqueTypes.map(type => ({ value: type, label: type }))}
-                            onChange={value => setSelectedType(value)} />
-                    </div>
-                    <div className='col-auto'>
-                        <Button type='primary' onClick={handleSearch}>Search</Button>
-                    </div>
-                </div> */}
                 {quoteLoading ? "Loading your Quotes..." :
                     <>
 
@@ -468,9 +456,7 @@ function Quotes() {
                         className="quoteViewModal"
                         onCancel={handleCancel}
                         footer={[
-                            <Button key="ok" type="primary" onClick={handleOk}>
-                                Okay
-                            </Button>,
+                            <Button key="ok" type="primary" onClick={handleOk} value={'Okay'} />,
                         ]}
                         width={800}
                     >
@@ -530,12 +516,8 @@ function Quotes() {
                     open={bookingDateModalOpen}
                     onCancel={handleBookingDateCancel}
                     footer={[
-                        <Button key="cancel" onClick={handleBookingDateCancel}>
-                            Cancel
-                        </Button>,
-                        <Button key="update" type="primary" onClick={() => updateBookingDate(selectedQuote)}>
-                            {bookingLoading ? 'Updating...' : 'Update Change Request'}
-                        </Button>,
+                        <Button key="cancel" onClick={handleBookingDateCancel} value={'Cancel'} />,
+                        <Button key="update" type="primary" onClick={() => updateBookingDate(selectedQuote)} value={bookingLoading ? 'Updating...' : 'Update Change Request'} />,
                     ]}
                 >
                     <Form form={form} layout="vertical">

@@ -1,4 +1,4 @@
-import { Button, Descriptions, message, Space, Tag, Timeline } from 'antd';
+import { Descriptions, message, Space, Tag, Timeline } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -6,7 +6,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import { GET_COMPANY_DETAILS_BY_ID } from '../../../api/apiUrls';
 import axios from '../../../api/axios';
 import ShipmentDetails from '../../Shipment/ShipmentDetails/ShipmentDetails';
-
+import Button from '../../common/elements/ButtonElement';
 
 function RenterOrdersDetailPage() {
     const location = useLocation();
@@ -183,7 +183,7 @@ function RenterOrdersDetailPage() {
     return (
         <>
             <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)} value={'Back'} />
                 <h3 className='text-center'>Order Details</h3>
                 <hr />
                 <Descriptions
@@ -202,19 +202,16 @@ function RenterOrdersDetailPage() {
 
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <Space>
-                        <button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'reviewMaterials')}>
-                            Review Ship Materials
-                        </button>
+                        <Button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'reviewMaterials')}
+                            value={'Review Ship Materials'} />
 
                         {/* Sample Reports */}
-                        <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}>
-                            First Sample Report
-                        </button>
+                        <Button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'sampleReports')}
+                            value={'First Sample Report'} />
 
                         {/* Final Reports */}
-                        <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'finalReports')}>
-                            Final Report
-                        </button>
+                        <Button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'finalReports')}
+                            value={'Final Report'} />
                     </Space>
                 </div>
                 {/* Lists of shipment details */}

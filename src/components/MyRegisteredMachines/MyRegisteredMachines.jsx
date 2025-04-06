@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeftCircleOutlined, WechatOutlined, SearchOutlined, ReloadOutlined, FilePdfOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty, Drawer, Tooltip } from 'antd';
+import { Badge, Col, List, message, Row, Select, Space, Statistic, Table, Typography, Empty, Drawer, Tooltip } from 'antd';
 import axios from '../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID, GET_MACHINES_BY_ID, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import ViewMachineDetail from '../Hire Machines/ViewMachineDetail';
 import EditMachine from '../EditMachine/EditMachine';
+import Button from '../common/elements/ButtonElement';
 const { Title, Text } = Typography;
 
 function MyRegisteredMachines() {
@@ -168,7 +169,7 @@ function MyRegisteredMachines() {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type='primary'>View</Button>
+          <Button type='primary' value={'View'} />
         </Space>
       ),
     },
@@ -212,12 +213,8 @@ function MyRegisteredMachines() {
               allowClear
               options={machineTypes}
             />
-            <Button type="primary" icon={<SearchOutlined />} onClick={applyFilters}>
-              Search
-            </Button>
-            <Button type="link" icon={<ReloadOutlined />} onClick={resetMachines}>
-              Reset
-            </Button>
+            <Button type="primary" icon={<SearchOutlined />} onClick={applyFilters} value={'Search'} />
+            <Button type="link" icon={<ReloadOutlined />} onClick={resetMachines} value={'Clear Search'} />
           </Space>
         </div>
         <List
@@ -242,9 +239,9 @@ function MyRegisteredMachines() {
                   style={{ background: index % 2 === 0 ? '#ffffff' : '#EEE2DE' }}
                   key={item.CompanyName}
                   actions={[
-                    <Button onClick={() => handleViewDetail(item)}>View Machine Details</Button>,
-                    <Button type="primary" danger>Block Machine</Button>,
-                    <Button onClick={() => handleEdit(item.id, item)}>Edit Machine</Button>,
+                    <Button onClick={() => handleViewDetail(item)} value={'View Machine Details'} />,
+                    <Button type="primary" danger value={'Block Machine'} />,
+                    <Button onClick={() => handleEdit(item.id, item)} value={'Edit Machine'} />,
                   ]}
                   extra={
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: "40px" }}>

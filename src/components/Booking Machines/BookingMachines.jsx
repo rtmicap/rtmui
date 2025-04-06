@@ -5,9 +5,10 @@ import { LeftCircleOutlined, InfoCircleOutlined, UploadOutlined } from '@ant-des
 const { RangePicker } = DatePicker;
 import axios from "../../api/axios";
 import HeaderTitle from '../../utils/HeaderTitle';
-import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
+import { QUOTE_SAVE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
 dayjs.extend(utc);
 const { TextArea } = Input;
 
@@ -44,21 +45,6 @@ function BookingMachines() {
     // steps 
     const [step, setStep] = useState(1);
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
-
-    const fileUpload = async (file) => {
-        try {
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            };
-            const formData = new FormData();
-            formData.append("fileName", file.originFileObj);
-            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            // console.log("responseFileData: ", response);
-            return response.data.files[0];
-        } catch (error) {
-            return error;
-        }
-    }
 
     const onOk = (value) => {
         // console.log('onOk: ', value);
@@ -118,10 +104,10 @@ function BookingMachines() {
                 setFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Part Drawing File Uploaded")
-                setViewPartDrawingFile(fileRes.fileUrl);
+                setViewPartDrawingFile(fileUrl);
                 setFileLoading(false);
                 setIsSubmitDisabled(false);
 
@@ -145,10 +131,10 @@ function BookingMachines() {
                 setProcessFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Process Sheet File Uploaded!")
-                setViewProcessSheetFile(fileRes.fileUrl);
+                setViewProcessSheetFile(fileUrl);
                 setProcessFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -171,10 +157,10 @@ function BookingMachines() {
                 setProgramFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Program Sheet File Uploaded!")
-                setViewProgramSheetFile(fileRes.fileUrl);
+                setViewProgramSheetFile(fileUrl);
                 setProgramFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -197,10 +183,10 @@ function BookingMachines() {
                 setSpecsFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Specs/Standards File Uploaded!")
-                setViewSpecsFile(fileRes.fileUrl);
+                setViewSpecsFile(fileUrl);
                 setSpecsFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -224,10 +210,10 @@ function BookingMachines() {
                 setOthersFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Others File Uploaded!")
-                setViewOthersFile(fileRes.fileUrl);
+                setViewOthersFile(fileUrl);
                 setOthersFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Row, Select, Form, Input, Upload, Button, Space, message, Image, Modal, Checkbox, Tooltip } from 'antd'
+import { Col, Row, Select, Form, Input, Upload, Space, message, Image, Modal, Checkbox, Tooltip } from 'antd'
 import { machineFields } from '../Machine Variable Fields/MachineFiellds';
 import { LoadingOutlined, PlusOutlined, UploadOutlined, DeleteOutlined, FilePdfOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
@@ -14,9 +14,12 @@ import axios from '../../api/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import HeaderTitle from '../../utils/HeaderTitle';
 import SummaryPage from './SummaryPage';
-import { FILE_UPLOAD_URL, GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
+import { GET_MACHINES_BY_CAT_AND_TYPE_URL } from '../../api/apiUrls';
 import { Link } from 'react-router-dom';
 import pdfImage from "../../assets/pdImage.png";
+import Button from '../common/elements/ButtonElement';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+
 const getBase64 = (img) => {
     const reader = new FileReader();
     reader.readAsDataURL(img);
@@ -82,6 +85,13 @@ function RegistrationMachines() {
     }
     useEffect(() => {
         machineFieldsFromApi();
+        // check if already machines are added or not
+        // if added then show summary page or else show register machines fields
+        var isMachinesExists = JSON.parse(localStorage.getItem('machines')) || [];
+        console.log("from useEff isMachinesExists: ", isMachinesExists);
+        if (isMachinesExists && isMachinesExists.length > 0) {
+            setOpenSummary(true);
+        }
     }, [])
 
     const handleMachineCategory = async (e) => {
@@ -182,17 +192,9 @@ function RegistrationMachines() {
             if (newFileList && newFileList.length > 0) {
                 if (newFileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
                     setFileList(newFileList);
-
-                    const configHeaders = {
-                        headers: { "content-type": "multipart/form-data" },
-                    };
-                    // const baseUrl = `${config.rtmWsEndpoint}/api/machines/uploadMachineImage`;
-                    const baseUrl = FILE_UPLOAD_URL;
-                    const formData = new FormData();
-                    formData.append("fileName", newFileList[0].originFileObj);
-                    var response = await axios.post(baseUrl, formData, configHeaders);
+                    var imgUrl = await uploadFileToServer(newFileList[0].originFileObj, null);
                     // console.log("responseData Image: ", response);
-                    setImageBase64(response.data.files[0].fileUrl)
+                    setImageBase64(imgUrl)
                     setFileLoading(false);
                 } else {
                     setFileLoading(false);
@@ -407,7 +409,7 @@ function RegistrationMachines() {
                         <div className="col-sm-6 col-lg-4">
                             {category && type && machineInputFields && machineInputFields.length > 0 &&
                                 <Form.Item
-                                    label="Upload Machine Image. (Size Max: 2MB )"
+                                    label="Upload Machine Image. (Max: 2MB )"
                                     name="Machine_Photo"
                                     valuePropName="fileList"
                                     getValueFromEvent={(e) => e && e.fileList}
@@ -438,8 +440,7 @@ function RegistrationMachines() {
                                                                     {/* <span style={{ color: 'red' }}><FilePdfOutlined /></span> &nbsp;View File */}
                                                                 </Link>
                                                                 <Tooltip title="Delete File">
-                                                                    <Button
-                                                                        type="text"
+                                                                    <Button type="text"
                                                                         danger
                                                                         icon={<DeleteOutlined />}
                                                                         onClick={() => handleDelete(file)}
@@ -450,8 +451,7 @@ function RegistrationMachines() {
                                                                             background: '#fff',
                                                                             border: '1px solid #d9d9d9',
                                                                             borderRadius: '50%',
-                                                                        }}
-                                                                    />
+                                                                        }} />
                                                                 </Tooltip>
                                                             </>
                                                         }
@@ -511,7 +511,7 @@ function RegistrationMachines() {
                     <div className="row">
                         <div className="col">
                             {category && type && machineInputFields && machineInputFields.length > 0 &&
-                                <Button type="primary" htmlType='submit'>Proceed to Submit</Button>
+                                <Button type="primary" htmlType='submit' value={'Proceed to Submit'} />
                             }
                         </div>
                     </div>
