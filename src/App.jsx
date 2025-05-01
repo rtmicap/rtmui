@@ -11,6 +11,7 @@ import Layout from './components/Layout/Layout';
 import HireMachines from './components/Hire Machines/HireMachines';
 import AppHeader from './components/AppHeader/AppHeader';
 import HomePage from './components/Homepage/HomePage';
+import HomePage1 from './components/Homepage/HomePage1';
 // Tools
 import BuyTools from './components/Tools/BuyTools';
 import Tools_detail from './components/Tools/Tools_detail';
@@ -46,6 +47,7 @@ import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
 import EditMachine from './components/EditMachine/EditMachine';
 import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
+
 
 const App = () => {
   const location = useLocation();
@@ -173,7 +175,8 @@ const App = () => {
         </Route>
 
         {/* Without Auth */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/textbox" element={<HomePage />} />
+        <Route path="/uploadimage" element={<HomePage1 />} />
         <Route path="/register-account" element={<RegistrationAccount />} />
         <Route path="/login" element={<Login />} />
         <Route path="/success" element={<SuccessMessage />} />
