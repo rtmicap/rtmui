@@ -11,6 +11,7 @@ import { uomChoices } from '../../utils/selectOptionUtils';
 import FinalReportsDetails from '../Detail Pages/FinalReportsDetails';
 import FileUploadComponent from '../FileUploadComponent/FileUploadComponent';
 import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+import FileUploader from '../FileUploadComponent/FileUploader';
 const { TextArea } = Input;
 
 function RenterFinalReports() {
@@ -26,7 +27,8 @@ function RenterFinalReports() {
     const [viewProdLotInspectionReportFile, setViewProdLotInspectionReportFile] = useState('');
     const [fileFinalReportLoading, setFileFinalReportLoading] = useState(false);
     const [orderCompletionDateTime, setOrderCompletionDateTime] = useState('');
-
+    const [fileList, setFileList] = useState([]);
+    
     const currentUserCompanyId = authUser && authUser.CompanyId;
     const navigate = useNavigate();
 
@@ -118,6 +120,14 @@ function RenterFinalReports() {
             prod_lot_inspection_report: '' // empty the file list
         });
     };
+
+    const handleProductionReportChange = (files) => {
+        console.log("upload prod inspection files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setViewProdLotInspectionReportFile(files[0].url);
+        }
+    }
 
     return (
         <>
@@ -243,29 +253,12 @@ function RenterFinalReports() {
                                         },
                                     ]}
                                 >
-                                    <Flex gap="large" wrap>
-                                        {/* <Upload
-                                            fileList={prodInspectionReportFileList}
-                                            onChange={handleProdLotInspectionReportFileChange}
-                                            maxCount={1}
-                                            beforeUpload={() => false}
-                                            onRemove={handleProdLotInspectionReportRemove}
-                                            accept=".pdf,.csv"
-                                        >
-                                            <Button loading={fileFinalReportLoading} icon={<UploadOutlined />}>{fileFinalReportLoading ? 'Uploading..' : 'Attach Final Report'}</Button>
-                                        </Upload> */}
-
-                                        <FileUploadComponent
-                                            accept=".pdf,.csv"
-                                            buttonText="Attach Final Report"
-                                            loading={fileFinalReportLoading}
-                                            onFileUpload={handleFileUpload}
-                                            handleRemoveFile={handleRemoveFile}
-                                        />
-                                        {viewProdLotInspectionReportFile &&
-                                            <Link to={viewProdLotInspectionReportFile} target={'_blank'}>View File</Link>
-                                        }
-                                    </Flex>
+                                    <FileUploader
+                                        value={fileList}
+                                        onChange={handleProductionReportChange}
+                                        maxCount={1}
+                                        acceptFile=".pdf,.xlsx,.xls"
+                                    />
                                 </Form.Item>
                             </div>
                         </div>

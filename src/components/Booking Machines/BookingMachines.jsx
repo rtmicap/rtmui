@@ -9,6 +9,7 @@ import { QUOTE_SAVE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+import FileUploader from "../FileUploadComponent/FileUploader";
 dayjs.extend(utc);
 const { TextArea } = Input;
 
@@ -45,6 +46,7 @@ function BookingMachines() {
     // steps 
     const [step, setStep] = useState(1);
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+    const [files, setFiles] = useState([]);
 
     const onOk = (value) => {
         // console.log('onOk: ', value);
@@ -90,32 +92,32 @@ function BookingMachines() {
         setLoading(false);
     };
 
-    const handlePartDrawingFileChange = async (info) => {
-        let fileList = [...info.fileList];
-        // Limit to only one file
-        fileList = fileList.slice(-1);
-        // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
-        // Display an error message if more than one file is uploaded
-        if (fileList.length > 1) {
-            message.error('You can only upload one file');
-        } else {
-            setPartDrawingFileList(fileList);
-            if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
-                setFileLoading(true);
-                setIsSubmitDisabled(true);
-                // update file upload api
-                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
-                // console.log("fileRes: ", fileRes);
-                message.success("Part Drawing File Uploaded")
-                setViewPartDrawingFile(fileUrl);
-                setFileLoading(false);
-                setIsSubmitDisabled(false);
+    // const handlePartDrawingFileChange = async (info) => {
+    //     let fileList = [...info.fileList];
+    //     // Limit to only one file
+    //     fileList = fileList.slice(-1);
+    //     // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+    //     // Display an error message if more than one file is uploaded
+    //     if (fileList.length > 1) {
+    //         message.error('You can only upload one file');
+    //     } else {
+    //         setPartDrawingFileList(fileList);
+    //         if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+    //             setFileLoading(true);
+    //             setIsSubmitDisabled(true);
+    //             // update file upload api
+    //             const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
+    //             // console.log("fileRes: ", fileRes);
+    //             message.success("Part Drawing File Uploaded")
+    //             setViewPartDrawingFile(fileUrl);
+    //             setFileLoading(false);
+    //             setIsSubmitDisabled(false);
 
-            } else {
-                message.error('File size must less than 2 MB');
-            }
-        }
-    };
+    //         } else {
+    //             message.error('File size must less than 2 MB');
+    //         }
+    //     }
+    // };
 
     const handleProcessSheetFileChange = async (info) => {
         let fileList = [...info.fileList];
@@ -251,6 +253,15 @@ function BookingMachines() {
         return current && current < dayjs().startOf('day');
     };
 
+    const handlePartDrawingFileChange = (files) => {
+        console.log("part draw files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setViewPartDrawingFile(files[0].url);
+        }
+    };
+
+
     return (
         <>
             <div className='container-fluid'>
@@ -369,22 +380,12 @@ function BookingMachines() {
                                             message: 'Please upload part drawing!',
                                         },
                                     ]}>
-                                        <Flex gap="small" wrap>
-                                            <Upload
-                                                fileList={partDrawingFileList}
-                                                onChange={handlePartDrawingFileChange}
-                                                maxCount={1}
-                                                beforeUpload={() => false}
-                                                onRemove={handlePartDrawingRemove}
-                                                data={(file) => file.fileName = "FOO"}
-                                            >
-                                                <Button loading={fileLoading} icon={<UploadOutlined />}>{fileLoading ? 'Uploading..' : 'Upload Part Drawing'}</Button>
-                                            </Upload>
-                                            {viewPartDrawingFile &&
-                                                <Link to={viewPartDrawingFile} target={'_blank'}>View Part Drawing File</Link>
-                                            }
-                                        </Flex>
 
+                                        <FileUploader
+                                            value={files}
+                                            onChange={handlePartDrawingFileChange}
+                                            maxCount={1}
+                                        />
                                     </Form.Item>
 
                                 </div>

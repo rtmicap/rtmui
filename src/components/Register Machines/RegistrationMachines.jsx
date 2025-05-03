@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import pdfImage from "../../assets/pdImage.png";
 import Button from '../common/elements/ButtonElement';
 import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+import FileUploader from '../FileUploadComponent/FileUploader';
 
 const getBase64 = (img) => {
     const reader = new FileReader();
@@ -296,6 +297,14 @@ function RegistrationMachines() {
         return Promise.resolve();
     };
 
+    const handleUploadMachineImageChange = (files) => {
+        console.log("upload machine files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setImageBase64(files[0].url);
+        }
+    };
+
     return (
         <>
             <Form form={form} layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
@@ -411,89 +420,14 @@ function RegistrationMachines() {
                                 <Form.Item
                                     label="Upload Machine Image. (Max: 2MB )"
                                     name="Machine_Photo"
-                                    valuePropName="fileList"
-                                    getValueFromEvent={(e) => e && e.fileList}
-                                    rules={[{ required: true, validator: validateFileList }]}
+                                    rules={[{ required: true }]}
                                 >
-                                    <Upload
-                                        listType="picture-card"
-                                        fileList={fileList}
-                                        onPreview={handlePreview}
-                                        onChange={handleImageChange}
-                                        beforeUpload={() => false}
-                                        accept=".png,.jpeg,.jpg,.pdf"
+                                    <FileUploader
+                                        value={fileList}
+                                        onChange={handleUploadMachineImageChange}
                                         maxCount={1}
-                                        showUploadList={false}
-                                    >
-                                        {fileList.length < 1 && uploadButton}
-                                    </Upload>
-                                    {fileLoading && <span>Uploading... <LoadingOutlined /></span>}
-                                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                        {fileList.map((file) => {
-                                            if (file.type == "application/pdf") {
-                                                return (
-                                                    <div key={file.uid} style={{ position: 'relative' }}>
-                                                        {imageBase64 &&
-                                                            <>
-                                                                <Link to={imageBase64} target={'_blank'} style={{ textDecoration: "none" }}>
-                                                                    <span><img src={pdfImage} alt="Icon" width={30} height={40} />&nbsp;&nbsp;View File</span>
-                                                                    {/* <span style={{ color: 'red' }}><FilePdfOutlined /></span> &nbsp;View File */}
-                                                                </Link>
-                                                                <Tooltip title="Delete File">
-                                                                    <Button type="text"
-                                                                        danger
-                                                                        icon={<DeleteOutlined />}
-                                                                        onClick={() => handleDelete(file)}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            top: '-4px',
-                                                                            right: '-45px',
-                                                                            background: '#fff',
-                                                                            border: '1px solid #d9d9d9',
-                                                                            borderRadius: '50%',
-                                                                        }} />
-                                                                </Tooltip>
-                                                            </>
-                                                        }
-                                                    </div>
-                                                )
-                                            } else {
-                                                return (
-                                                    <div key={file.uid} style={{ position: 'relative' }}>
-                                                        {!fileLoading &&
-                                                            <>
-                                                                <img
-                                                                    src={URL.createObjectURL(file.originFileObj)}
-                                                                    alt="uploaded"
-                                                                    style={{ width: '100%', height: '100%', borderRadius: '4px' }}
-                                                                />
-
-                                                                <Tooltip title="Delete Image">
-                                                                    <Button
-                                                                        type="text"
-                                                                        danger
-                                                                        icon={<DeleteOutlined />}
-                                                                        onClick={() => handleDelete(file)}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            top: '-10px',
-                                                                            right: '-10px',
-                                                                            background: '#fff',
-                                                                            border: '1px solid #d9d9d9',
-                                                                            borderRadius: '50%',
-                                                                        }}
-                                                                    />
-                                                                </Tooltip>
-                                                            </>
-                                                        }
-
-                                                    </div>
-                                                )
-                                            }
-                                        })}
-
-                                    </div>
-
+                                        acceptFile=".png,.jpeg,.jpg"
+                                    />
                                 </Form.Item>
                             }
                         </div>
