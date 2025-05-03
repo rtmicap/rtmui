@@ -1,7 +1,7 @@
-import { Button, Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload, Tooltip, Image, Typography } from 'antd';
+import { Col, Drawer, Modal, Flex, Form, Input, message, Row, Select, Space, Spin, Upload, Tooltip, Image, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FILE_UPLOAD_URL, GET_MACHINES_BY_MACHONE_ID, UPDATE_MACHINES_BY_ID } from '../../api/apiUrls';
+import { GET_MACHINES_BY_MACHONE_ID, UPDATE_MACHINES_BY_ID } from '../../api/apiUrls';
 import axios from '../../api/axios';
 import { Cutting } from '../Machine Variable Fields/Cutting';
 import { Drilling } from '../Machine Variable Fields/Drilling';
@@ -9,6 +9,8 @@ import { Milling } from '../Machine Variable Fields/Milling';
 import { Grinding } from '../Machine Variable Fields/Grinding';
 import { Turning } from '../Machine Variable Fields/Turning';
 import { LoadingOutlined, LeftCircleOutlined, UploadOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import Button from '../common/elements/ButtonElement';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
 const { TextArea } = Input;
 const { Text } = Typography;
 
@@ -81,21 +83,6 @@ function EditMachine({ machineId, onClose }) {
         getMachinesByMachineId();
     }, []);
 
-    // const fileUpload = async (file) => {
-    //     try {
-    //         const configHeaders = {
-    //             headers: { "content-type": "multipart/form-data" },
-    //         };
-    //         const formData = new FormData();
-    //         formData.append("fileName", file.originFileObj);
-    //         var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-    //         // console.log("responseFileData: ", response);
-    //         return response.data;
-    //     } catch (error) {
-    //         return error;
-    //     }
-    // }
-
     const handlePreviewFileChange = (info) => {
         const file = info.fileList[0]?.originFileObj; // Get selected file
 
@@ -126,7 +113,6 @@ function EditMachine({ machineId, onClose }) {
         message.success("File ready to upload. Click 'Upload' to confirm.");
     };
 
-
     const handleUploadFile = async () => {
         if (!previewFile) {
             message.error("No file selected for upload");
@@ -137,12 +123,8 @@ function EditMachine({ machineId, onClose }) {
         setIsSubmitDisabled(true);
 
         try {
-            const configHeaders = { headers: { "content-type": "multipart/form-data" } };
-            const formData = new FormData();
-            formData.append("fileName", previewFile);
-
-            const response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            setViewUploadedImage(response.data.files[0].fileUrl);
+            const fileUrl = await uploadFileToServer(previewFile);
+            setViewUploadedImage(fileUrl);
             console.log("response.data", response.data);
             message.success("File uploaded successfully!");
         } catch (error) {
@@ -262,7 +244,7 @@ function EditMachine({ machineId, onClose }) {
     return (
         <>
             <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)} value={'Back'} />
                 <h3 className='text-center'>Edit Machine ID: {machineData.id}</h3>
                 <hr />
                 {loading ?
@@ -349,7 +331,7 @@ function EditMachine({ machineId, onClose }) {
                                             beforeUpload={() => false}  // Prevent auto-upload
                                             onRemove={handleRemoveFile}
                                         >
-                                            <Button icon={<UploadOutlined />}>Update Image/File</Button>
+                                            <Button icon={<UploadOutlined />} value={'Update Image/File'} />
                                         </Upload>
 
                                         {/* Preview Section */}
@@ -362,18 +344,11 @@ function EditMachine({ machineId, onClose }) {
                                                 )}
 
                                                 <Flex gap="small">
-                                                    <Button icon={<DeleteOutlined />} onClick={handleRemoveFile} danger>
-                                                        Remove
-                                                    </Button>
-
-                                                    <Button
-                                                        type="primary"
+                                                    <Button icon={<DeleteOutlined />} onClick={handleRemoveFile} danger />
+                                                    <Button type="primary"
                                                         onClick={handleUploadFile}
                                                         loading={fileLoading}
-                                                        disabled={isSubmitDisabled}
-                                                    >
-                                                        {fileLoading ? 'Uploading...' : 'Upload'}
-                                                    </Button>
+                                                        disabled={isSubmitDisabled} value={fileLoading ? 'Uploading...' : 'Upload'} />
                                                 </Flex>
                                             </Flex>
                                         )}
@@ -415,9 +390,7 @@ function EditMachine({ machineId, onClose }) {
                             </Col>
                         </Row>
                         {!loading &&
-                            <Button type="primary" onClick={showConfirm} disabled={isSubmitDisabled ? true : false}>
-                                Update
-                            </Button>
+                            <Button type="primary" onClick={showConfirm} disabled={isSubmitDisabled ? true : false} value={'Update'} />
                         }
                     </Form>
                 }

@@ -23,7 +23,7 @@ import moment from 'moment/moment';
 import { useAuth } from '../../../contexts/AuthContext';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
-import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
+import { CREATE_SHIPMENT_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
 import { typesOfGoods, uomChoices } from '../../../utils/selectOptionUtils';
 import ShipmentDetails from '../ShipmentDetails/ShipmentDetails';
 import uploadFileToServer from '../../FileUploadComponent/uploadFileToServer';
@@ -150,20 +150,14 @@ function HirerShipmentPage() {
 
     // Image File Upload API
     const uploadImageFileToServer = async (file, name) => {
-        const formData = new FormData();
-        formData.append('fileName', file);
         try {
-            const response = await axios.post(FILE_UPLOAD_URL, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const fileUrl = await uploadFileToServer(file);
             // console.log("response. file backblazedata: ", response.data);
             setFileUrls((prev) => ({
                 ...prev,
-                [name]: response.data.files[0].fileUrl,
+                [name]: fileUrl,
             }));
-            return response.data.files[0].fileUrl;
+            return fileUrl;
         } catch (error) {
             console.error("Error uploading file: ", error);
             message.error('File upload failed');

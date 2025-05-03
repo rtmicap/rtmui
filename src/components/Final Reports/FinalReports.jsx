@@ -5,12 +5,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LeftCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect } from 'react';
 import axios from '../../api/axios';
-import { CREATE_FINAL_REPORT_URL, FILE_UPLOAD_URL, GET_FINAL_SAMPLE_REPORT_ORDERID_URL, UPDATE_FINAL_REPORT_URL } from '../../api/apiUrls';
+import { CREATE_FINAL_REPORT_URL, GET_FINAL_SAMPLE_REPORT_ORDERID_URL, UPDATE_FINAL_REPORT_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
 import { formattedDateTime } from '../../utils/utils';
 import HirerFinalReports from './HirerFinalReports';
 import RenterFinalReports from './RenterFinalReports';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
 
 const { TextArea } = Input;
 
@@ -135,20 +136,6 @@ function FinalReports() {
         // console.log('onOk: ', value);
     };
 
-    const fileUpload = async (file) => {
-        try {
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            };
-            const formData = new FormData();
-            formData.append("fileName", file.originFileObj);
-            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            return response.data.files[0];
-        } catch (error) {
-            return error;
-        }
-    }
-
     const handleProdLotInspectionReportFileChange = async (info) => {
         let fileList = [...info.fileList];
         // Limit to only one file
@@ -162,10 +149,10 @@ function FinalReports() {
             if (fileList[0].size / 1024 / 1024 < 3) { // upto 3 MB upload size
                 setFileFinalReportLoading(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Final Inspection Report File Uploaded!")
-                setViewProdLotInspectionReportFile(fileRes.fileUrl);
+                setViewProdLotInspectionReportFile(fileUrl);
                 setFileFinalReportLoading(false);
             } else {
                 message.error('File size must less than 3 MB');

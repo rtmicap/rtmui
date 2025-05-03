@@ -1,7 +1,7 @@
 import { Button, Collapse, DatePicker, Flex, Form, Input, message, Select, Tooltip, Upload } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CREATE_FIRST_SAMPLE_REPORT_URL, FILE_UPLOAD_URL } from '../../api/apiUrls';
+import { CREATE_FIRST_SAMPLE_REPORT_URL } from '../../api/apiUrls';
 import { useAuth } from '../../contexts/AuthContext';
 import dayjs from 'dayjs';
 import axios from '../../api/axios';
@@ -10,6 +10,7 @@ import { uomChoices } from '../../utils/selectOptionUtils';
 import SampleReportsDetails from '../Detail Pages/SampleReportsDetails';
 import FileUploadComponent from '../FileUploadComponent/FileUploadComponent';
 import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+import FileUploader from '../FileUploadComponent/FileUploader';
 
 function RenterSampleReports() {
     const location = useLocation();
@@ -22,7 +23,7 @@ function RenterSampleReports() {
     const [inspectionReportFileList, setInspectionReportFileList] = useState([]);
     const [fileReportLoading, setFileReportLoading] = useState(false);
     const [viewInspectionReportFile, setViewInspectionReportFile] = useState('');
-
+    const [fileList, setFileList] = useState([]);
     const currentUserCompanyId = authUser && authUser.CompanyId;
 
     const onFinishReport = async (values) => {
@@ -44,7 +45,7 @@ function RenterSampleReports() {
             if (error && error.response.status == 401) {
                 message.warning("Unauthorized! Please log in again!");
                 navigate("/login");
-            }else{
+            } else {
                 message.error(`${error && error.response.data ? error.response.data.error : 'Something went wrong while creating the sample report!'}`);
             }
         }
@@ -85,6 +86,14 @@ function RenterSampleReports() {
     const onOk = (value) => {
         console.log('onOk: ', value);
     };
+
+    const handleInspectionReportChange = (files) => {
+        console.log("upload inspection files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setViewInspectionReportFile(files[0].url);
+        }
+    }
 
 
     return (
@@ -217,21 +226,7 @@ function RenterSampleReports() {
                                         },
                                     ]}
                                 >
-                                    <Flex gap="large" wrap>
-                                        {/* <Upload
-                                            fileList={inspectionReportFileList}
-                                            onChange={handleInspectionReportFileChange}
-                                            maxCount={1}
-                                            beforeUpload={() => false}
-                                            onRemove={handleInspectionReportRemove}
-                                            accept=".pdf,.csv"
-                                        >
-                                            <Button type='link' loading={fileReportLoading} icon={<UploadOutlined />}>{fileReportLoading ? 'Uploading..' : 'Attach Report'}</Button>
-                                        </Upload>
-                                        {viewInspectionReportFile &&
-                                            <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
-                                        } */}
-
+                                    {/* <Flex gap="large" wrap>
                                         <FileUploadComponent
                                             name="first_sample_inspection_report"
                                             accept=".pdf,.csv"
@@ -244,7 +239,13 @@ function RenterSampleReports() {
                                         {viewInspectionReportFile &&
                                             <Link to={viewInspectionReportFile} target={'_blank'}>View File</Link>
                                         }
-                                    </Flex>
+                                    </Flex> */}
+                                    <FileUploader
+                                        value={fileList}
+                                        onChange={handleInspectionReportChange}
+                                        maxCount={1}
+                                        acceptFile=".pdf,.xlsx,.xls"
+                                    />
                                 </Form.Item>
                             </div>
 
