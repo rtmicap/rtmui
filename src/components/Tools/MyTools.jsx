@@ -5,6 +5,7 @@ import axios from '../../api/axios.js';
 import "./buy.scss"
 import { firstChrUpperCase } from "../../utils/utils.js";
 import { message } from 'antd';
+import BUTTON from '../common/elements/ButtonElement';
 
 function MyTools() {
   const [myTools, setMyTools] = useState([]);
@@ -99,7 +100,6 @@ function MyTools() {
         <div className="addDelTool">
         <div className="floatButtonsRight">  
           <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add Tool" />
-
           <input type="button" className="secondarybutton" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete Tool"} />
           </div>
           <input
