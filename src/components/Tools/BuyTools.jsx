@@ -16,14 +16,16 @@ function BuyTools() {
     const location = useLocation();
     const navigate = useNavigate();
     const [buyTools, setBuyTools] = useState([]);
-    const [searchParam, setSearchParam] = useState(() => {
+    
+    /* const [searchParam, setSearchParam] = useState(() => {
         if (previousSearch != "" && previousSearch != null) {
             return previousSearch
         } else {
             return null
         }
     }
-    );
+    ); */
+    const [searchParam, setSearchParam] = useState(previousSearch);
 
     const getAllTools = async () => {
         try {
@@ -49,6 +51,7 @@ function BuyTools() {
 
     useEffect(() => {
         //searchParam?previousSearch=searchParam:setSearchParam(previousSearch);
+        console.log("buy tools");
         getAllTools();
     }, [searchParam]);
 
@@ -96,7 +99,7 @@ function BuyTools() {
 
     return (
         <div>
-            <h1>Buy / Rent Tools</h1>
+            <h1>Buy / Rent {!!previousSearch?previousSearch.category:""}</h1>
             <div className="container-layout">
                 <div className="sidebar-filter"><div>
                     <SearchTools searchParam={searchParam} setSearchParam={setSearchParam} /></div> </div>

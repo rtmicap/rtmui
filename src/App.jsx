@@ -127,6 +127,14 @@ const App = () => {
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 
+
+             {/* Gauges */}
+            <Route path='buy-gauges' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-gauges" element={<MyTools />} />
+            {/* <Route path="sell-gauges" element={<SellTools />} /> */}
+
+
             {/* Quotes */}
             <Route path='quotes' element={<Quotes />} />
 
@@ -145,10 +153,7 @@ const App = () => {
             {/* payment */}
             <Route path='payment' element={<Payment />} />
 
-            {/* Gauges */}
-            <Route path='buy-gauges' element={<BuyGauges />} />
-            <Route path="rent-gauges" element={<RentGauges />} />
-            <Route path="sell-gauges" element={<SellGauges />} />
+           
             {/* Raw Material */}
             <Route path='sell-raw-materials' element={<RawMaterial />} />
 
