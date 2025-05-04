@@ -9,6 +9,8 @@ import BUTTON from '../common/elements/ButtonElement';
 
 function MyTools() {
   const [myTools, setMyTools] = useState([]);
+  let previousSearch = sessionStorage.getItem('searchParam') || null;
+  const [pageName, setPageName] = useState(JSON.parse(previousSearch).category);
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   let favClick = false;
@@ -43,8 +45,9 @@ function MyTools() {
   }
 
   useEffect(() => {
+    
     getAllTools();
-  }, []);
+  },[]);
 
   const handleAddToolClick = () => {
     navigate('/sell-tools');
@@ -94,13 +97,13 @@ function MyTools() {
 
   return (
     <div>
-      <h1>Sell Tools</h1>
+      <h1>Sell {pageName}</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         
         <div className="addDelTool">
-        <div className="floatButtonsRight">  
-          <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add Tool" />
-          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete Tool"} />
+        <div className="floatButtonsRight"> 
+          <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add" />
+          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete"} />
           </div>
           <input
                 type="search"

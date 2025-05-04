@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from '../../api/axios';
 import { SEARCH_SUGGESTIONS } from '../../api/apiUrls';
+import { useNavigate } from 'react-router-dom';
 import "./buy.scss"
 
 function SearchTools({searchParam, setSearchParam}) {
@@ -11,22 +12,21 @@ function SearchTools({searchParam, setSearchParam}) {
   const textboxRef = useRef();
   const condRef=useRef();
   const typeRef=useRef();
-
+  const navigate = useNavigate();
   const [condition,setCondition]=useState("new");
   const [type,setType]=useState("both");
 
   const fetchResults = async(event) => {
         //setLoading(false);
       const delayDebounce = setTimeout(async() => {
-
-        const query = event.target.value.trim()
-        if (query.length==0){
+        const query = {"query":event.target.value.trim(),"category":JSON.parse(searchParam).category};
+        if ((query.query).length==0){
           setDisplaySearch("none");
         }
-        if (query.length > 2) { // Start searching only after 3 characters
+        if ((query.query).length > 2) { // Start searching only after 3 characters
           //setLoading(true);
           try {
-            const response = await axios.get(SEARCH_SUGGESTIONS, {params: { query: query } });
+            const response = await axios.get(SEARCH_SUGGESTIONS, {params: query });
             let result = response.data.result;
             result.length?setDisplaySearch("block"):setDisplaySearch("none");
             let Unique_Result=new Set(result.map((item)=>{return item.tool_name;}));
@@ -44,7 +44,7 @@ function SearchTools({searchParam, setSearchParam}) {
 
   useEffect(() => {
     try {
-      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"both","type":"both"}';
+      let currentSessionStorage = sessionStorage.getItem('searchParam');
       setSearchParam(currentSessionStorage)
       currentSessionStorage = JSON.parse(currentSessionStorage);
       setCondition(currentSessionStorage.condition);
@@ -58,7 +58,7 @@ function SearchTools({searchParam, setSearchParam}) {
 
   const updateSessionStorage = (name, key, value) => {
     try {
-      let currentSessionStorage = sessionStorage.getItem('searchParam') || '{"query":"","condition":"both",type:"both"}';
+      let currentSessionStorage = sessionStorage.getItem('searchParam');
       currentSessionStorage = JSON.parse(currentSessionStorage);
       currentSessionStorage[key] = value;
       sessionStorage.setItem(name, JSON.stringify(currentSessionStorage));
@@ -112,7 +112,7 @@ function SearchTools({searchParam, setSearchParam}) {
         <div>Name</div>
         <div className="searchText_inlineblock"><input
         type="search"
-        placeholder="Search tools..."
+        placeholder="Search..."
         className="search-box"
         id="searchText"
         ref={textboxRef}
