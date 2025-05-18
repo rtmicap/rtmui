@@ -93,6 +93,16 @@ const App = () => {
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keydown', handleUserActivity);
     window.addEventListener('click', handleUserActivity);
+    /* window.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
+
+    // Disables common shortcut keys for viewing source code (Ctrl+U, F12)
+    window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey && event.key === 'u') || event.key === 'F12') {
+            event.preventDefault();
+        }
+    }); */
     // Cleanup function to remove event listeners and clear timeout
     return () => {
       clearTimeout(timeoutId);
