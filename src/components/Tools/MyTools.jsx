@@ -12,7 +12,8 @@ function MyTools() {
   let previousSearch = sessionStorage.getItem('searchParam') || null;
   const [pageName, setPageName] = useState(JSON.parse(previousSearch).category);
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [isEdit, setIsEdit] = useState(true);
   let favClick = false;
   const [filterText, setFilterText] = useState('');
 
@@ -59,13 +60,14 @@ function MyTools() {
       navigate(`/tools-detail/?toolid=${item.tool_id}`, {
         state: {
           toolsDetails: item,
+          transType: 'sell'
         },
       });
     }
   }
 
   const toggleDelete = (event) => {
-    setIsVisible(!isVisible);
+    setIsDelete(!isDelete);
   };
   const handleDeleteClick = async (event) => {
     try {
@@ -103,7 +105,7 @@ function MyTools() {
         <div className="addDelTool">
         <div className="floatButtonsRight"> 
           <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add" />
-          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isVisible ? "Cancel Delete" : "Delete"} />
+          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isDelete ? "Cancel Delete" : "Delete"} />
           </div>
           <input
                 type="search"
@@ -121,8 +123,11 @@ function MyTools() {
               <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
                 <div className="main-card">
                   <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
-                  {isVisible && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                  {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
                     X
+                  </div>}
+                  {isEdit && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                    E
                   </div>}
                   <div className="child-card-img">
                     <img className="card-img" src={item.tool_image[0]} alt={index} />
@@ -154,7 +159,7 @@ function MyTools() {
                         <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
                           <div className="main-card">
                             <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
-                            {isVisible && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                            {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
                               X
                             </div>}
                             <div className="child-card-img">
