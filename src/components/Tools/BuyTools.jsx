@@ -54,7 +54,6 @@ function BuyTools() {
 
     useEffect(() => {
         //searchParam?previousSearch=searchParam:setSearchParam(previousSearch);
-        console.log("buy tools");
         getAllTools();
     }, [searchParam]);
 
@@ -78,8 +77,6 @@ function BuyTools() {
 
 
         favClick = true;
-        console.log(buyTools)
-
         try {
             const token = localStorage.getItem('authToken');
             axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
@@ -149,7 +146,7 @@ function BuyTools() {
                                             </>
                                             /* <input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick} /> */
                                         }
-                                        {<img src={item.favoriteInd ? heartTrue : heartFalse} alt={item.favoriteInd ? "T" : "F"} index={index} id={item.tool_id} onClick={handleFavClick} ></img>}
+                                        {<img src={item.favoriteInd ? heartTrue : heartFalse} alt={item.favoriteInd ? "T" : "F"} index={index} id={item.tool_id} onClick={handleFavClick} title={item.favoriteInd ? "Delete favorite":"Add favorite"}></img>}
                                     </div>
                                     <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div>
                                     <div className="child-card-img">
