@@ -6,6 +6,8 @@ import { SEARCH_TOOLS, SAVE_FAVORITE, DELETE_FAVORITE } from '../../api/apiUrls'
 import axios from '../../api/axios';
 import "./buy.scss"
 import { firstChrUpperCase } from "../../utils/utils.js";
+import heartTrue from "../../assets/heart-true.svg"
+import heartFalse from "../../assets/heart-false.svg"
 import { message } from 'antd';
 
 
@@ -16,7 +18,8 @@ function BuyTools() {
     const location = useLocation();
     const navigate = useNavigate();
     const [buyTools, setBuyTools] = useState([]);
-    
+    const [isFav, setIsFav] = useState();
+
     /* const [searchParam, setSearchParam] = useState(() => {
         if (previousSearch != "" && previousSearch != null) {
             return previousSearch
@@ -60,26 +63,35 @@ function BuyTools() {
             navigate(`/tools-detail/?toolid=${item.tool_id}`, {
                 state: {
                     toolsDetails: item,
-                    transType:'buy'
+                    transType: 'buy'
                 },
             });
         }
-        favClick=false;
+        favClick = false;
 
     }
 
     const handleFavClick = async (event) => {
+        let itemIndex = event.target.attributes["index"].value
+        let eventAction = event.target.alt == "T" ? false : true;
+        let updateFav = true;
+
+
         favClick = true;
+        console.log(buyTools)
+
         try {
             const token = localStorage.getItem('authToken');
             axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
 
             let params = { tool_id: event.target.id }
-            if (event.target.checked == true) {
+            if (eventAction) {
                 const response = await axios.post(SAVE_FAVORITE, params);
                 if (response && response.data) {
-                    if (response.data.result.tool_id == 0) event.preventDefault();
-                    return response.data.result;
+                    if (response.data.result.tool_id == 0) {
+                        event.preventDefault();
+                        updateFav = false;
+                    }
                 }
             }
             else {
@@ -87,20 +99,31 @@ function BuyTools() {
                 if (response && response.data) {
                     if (response.data.result == 0) {
                         event.preventDefault();
+                        updateFav = false;
                     }
-                    return response.data.results;
                 }
             }
         } catch (error) {
             //event.target.checked=!event.target.checked;
             event.preventDefault();
+            updateFav = false;
             message.error("Error on updateing favorites..");
         }
+        if (updateFav) {
+            const newItems = [...buyTools];
+            newItems[itemIndex] = { ...buyTools[itemIndex], favoriteInd: eventAction };
+            setBuyTools(newItems);
+        }
+        return;
+    }
+
+    const imageError=(e)=>{
+       (e.target.parentElement).innerText="No Image"
     }
 
     return (
         <div>
-            <h1>Buy / Rent {!!previousSearch?previousSearch.category:""}</h1>
+            <h1>Buy / Rent {!!previousSearch ? previousSearch.category : ""}</h1>
             <div className="container-layout">
                 <div className="sidebar-filter"><div>
                     <SearchTools searchParam={searchParam} setSearchParam={setSearchParam} /></div> </div>
@@ -116,15 +139,21 @@ function BuyTools() {
                                     <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
 
                                     <div className={`fav_tool`}>
-                                        {item.favoriteInd == true ?
-                                            <input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick} defaultChecked />
+                                        {/* {item.favoriteInd == true ?
+                                            <>
+                                            <img src={heartTrue} alt="T" id={item.tool_id} index={index} onClick={handleFavClick} ></img>
+                                            </>
                                             :
-                                            <input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick} />
-                                        }   </div>
-
+                                            <>
+                                            <img src={heartFalse} alt="F" id={item.tool_id} index={index} onClick={handleFavClick} ></img>
+                                            </>
+                                            /* <input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick} /> */
+                                        }
+                                        {<img src={item.favoriteInd ? heartTrue : heartFalse} alt={item.favoriteInd ? "T" : "F"} index={index} id={item.tool_id} onClick={handleFavClick} ></img>}
+                                    </div>
                                     <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div>
                                     <div className="child-card-img">
-                                        <img className="card-img" src={item.tool_image[0]} alt={index} />
+                                        {((item.tool_image).length>0)?<img className="card-img" src={item.tool_image[0]} onError={imageError}/>:<div className='card-img'>No Image</div>}
                                     </div>
                                     <div className="card-price-tag">
                                         <div></div>

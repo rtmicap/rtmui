@@ -4,12 +4,10 @@ import './DetailCard.scss'; // Import your SCSS file
 import axios from '../../api/axios.js';
 import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls.js';
 import { message } from 'antd';
-
-
+import {formattedDateTime } from '../../utils/utils';
 
 // Map the image names from the JSON to the actual imported images
 //const imagesMap = [image1, image2, image3, image4];
-
 // Carousel Component
 const Carousel = (imagesMap) => {
     imagesMap=Object.values(imagesMap)[0];
@@ -28,6 +26,10 @@ const Carousel = (imagesMap) => {
       }
     };
 
+    const imageError=(e)=>{
+       (e.target.parentElement).innerText="No Image"
+    }
+
     
 
     return(imagesMap.length?
@@ -37,7 +39,7 @@ const Carousel = (imagesMap) => {
           <div className="img-btn-right"><input type="button" className="img-btn" onClick={nextSlide} value=">" /> </div>
         <div className="img-repo-container" style={{marginLeft:`${leftPos}%`,width:`${imagesMap.length*100}%`}}>
         {imagesMap.map((imageName, index) => (
-        <div className="img-container" key={index}><img  src={imageName} alt={`Slide ${index}`} /> </div>
+        <div className="img-container" key={index}><img  src={imageName} alt={`Slide ${index}`} onError={imageError}/> </div>
         ))
         }
         
@@ -174,7 +176,8 @@ const Carousel = (imagesMap) => {
          <h3>Seller</h3>
          <hr/>
          <p><span className="detailsCardSpan">Company Name : </span>{companyDetails.companyName} </p>
-         <p><span className="detailsCardSpan">Email        : </span>{companyDetails.offEmail}</p>
+         <p><span className="detailsCardSpan">Email        : </span>{companyDetails.offEmail + " (To be updated as Icap email id)"}</p>
+         <p><span className="detailsCardSpan">Posted On    : </span>{formattedDateTime(product.createdAt)}</p>
          </div>
          <div className='btn_container'>
          <input type="button" className="primarybutton" value="Add to Cart" onClick={handleAddToCart}/>
