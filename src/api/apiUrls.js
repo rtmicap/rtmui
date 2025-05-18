@@ -63,6 +63,7 @@ export const ADMIN_PASSWORD_CHANGE = "/users/updatepassword";
 export const SEARCH_TOOLS = "/tools/searchtools";
 export const SEARCH_SUGGESTIONS = "/tools/searchsuggestions";
 export const SAVE_TOOLS = "tools/savetools";
+export const EDIT_TOOL = "tools/updatetool";
 export const DELETE_TOOLS = "tools/deletetools";
 export const SAVE_FAVORITE = "/tools/addtofavorite";
 export const DELETE_FAVORITE = "/tools/deletefavorite";

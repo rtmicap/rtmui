@@ -59,7 +59,8 @@ function BuyTools() {
         if (!favClick) {
             navigate(`/tools-detail/?toolid=${item.tool_id}`, {
                 state: {
-                    toolsDetails: item
+                    toolsDetails: item,
+                    transType:'buy'
                 },
             });
         }
