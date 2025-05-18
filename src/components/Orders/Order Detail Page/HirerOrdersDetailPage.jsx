@@ -1,4 +1,4 @@
-import { Button, Descriptions, message, Space, Tag, Timeline } from 'antd';
+import { Descriptions, message, Space, Tag, Timeline } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -6,6 +6,7 @@ import { LeftCircleOutlined } from "@ant-design/icons";
 import axios from '../../../api/axios';
 import { GET_COMPANY_DETAILS_BY_ID } from '../../../api/apiUrls';
 import ShipmentDetails from '../../Shipment/ShipmentDetails/ShipmentDetails';
+import Button from '../../common/elements/ButtonElement';
 
 function HirerOrdersDetailPage() {
     const location = useLocation();
@@ -28,7 +29,7 @@ function HirerOrdersDetailPage() {
             if (error && error.response.status == 401) {
                 message.warning("Unauthorized! Please log in again!");
                 navigate("/login");
-            }else{
+            } else {
                 message.error("Error fetching Company Details");
             }
         }
@@ -67,20 +68,20 @@ function HirerOrdersDetailPage() {
             children:
                 (
                     <>
-                    {(order.goods_status!="" && order.goods_status!="goods_in_return")?
-                    <div className="processFlow">
-                    {order.goods_status=="goods_in_transit"?<Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag>:<div className="goodsstatus">GOODS IN TRANSIT</div>}
-                    {order.goods_status=="first_sample_preparation"?<Tag className={order.goods_status}>FIRST SAMPLE PREPARATION</Tag>:<div className="goodsstatus">FIRST SAMPLE PREPARATION</div>}
-                    {order.goods_status=="under_first_sample_approval"?<Tag className={order.goods_status}>UNDER FIRST SAMPLE APPROVAL</Tag>:<div className="goodsstatus">UNDER FIRST SAMPLE APPROVAL</div>}
-                    {order.goods_status=="first_sample_repeat"?<Tag className={order.goods_status}>FIRST SAMPLE REPEAT</Tag>:<div className="goodsstatus">FIRST SAMPLE REPEAT</div>}
-                    {order.goods_status=="production_in_progress"?<Tag className={order.goods_status}>PRODUCTION IN PROGRESS</Tag>:<div className="goodsstatus">PRODUCTION IN PROGRESS</div>}
-                    {order.goods_status=="production_complete"?<Tag className={order.goods_status}>PRODUCTION COMPLETE</Tag>:<div className="goodsstatus">PRODUCTION COMPLETE</div>}
-                    </div>
-                    :
-                     order.goods_status=="goods_in_return"?<div className="processFlow"><Tag className={order.goods_status}>GOODS IN RETURN</Tag></div>
-                        :
-                            <div className="goodsstatus">SHIPMENT PENDING</div>
-                    }
+                        {(order.goods_status != "" && order.goods_status != "goods_in_return") ?
+                            <div className="processFlow">
+                                {order.goods_status == "goods_in_transit" ? <Tag className={order.goods_status}>{order.goods_status.toUpperCase()}</Tag> : <div className="goodsstatus">GOODS IN TRANSIT</div>}
+                                {order.goods_status == "first_sample_preparation" ? <Tag className={order.goods_status}>FIRST SAMPLE PREPARATION</Tag> : <div className="goodsstatus">FIRST SAMPLE PREPARATION</div>}
+                                {order.goods_status == "under_first_sample_approval" ? <Tag className={order.goods_status}>UNDER FIRST SAMPLE APPROVAL</Tag> : <div className="goodsstatus">UNDER FIRST SAMPLE APPROVAL</div>}
+                                {order.goods_status == "first_sample_repeat" ? <Tag className={order.goods_status}>FIRST SAMPLE REPEAT</Tag> : <div className="goodsstatus">FIRST SAMPLE REPEAT</div>}
+                                {order.goods_status == "production_in_progress" ? <Tag className={order.goods_status}>PRODUCTION IN PROGRESS</Tag> : <div className="goodsstatus">PRODUCTION IN PROGRESS</div>}
+                                {order.goods_status == "production_complete" ? <Tag className={order.goods_status}>PRODUCTION COMPLETE</Tag> : <div className="goodsstatus">PRODUCTION COMPLETE</div>}
+                            </div>
+                            :
+                            order.goods_status == "goods_in_return" ? <div className="processFlow"><Tag className={order.goods_status}>GOODS IN RETURN</Tag></div>
+                                :
+                                <div className="goodsstatus">SHIPMENT PENDING</div>
+                        }
                     </>
                 )
 
@@ -140,9 +141,9 @@ function HirerOrdersDetailPage() {
     // }
 
     const handleShipmentRedirect = (record, value) => {
-       
+
         navigate(`/order-details/${record.order_id}/shipment-details`, {
-            state: {    
+            state: {
                 order: record,
                 reviewShipment: value == "reviewMaterials" ? true : false
             },
@@ -150,32 +151,32 @@ function HirerOrdersDetailPage() {
     };
 
     const handleSampleReportRedirect = (record, value) => {
-        let goods_status=["goods_in_transit","first_sample_preparation"];
-        if (record.goods_status!="" && goods_status.indexOf(record.goods_status)==-1) {
-        navigate(`/order-details/${record.order_id}/sample-report`, {
-            state: {
-                order: record,
-                reviewSampleReports: value == "reviewSampleReports" ? true : false
-            },
-        });
-        }   
-        else{
+        let goods_status = ["goods_in_transit", "first_sample_preparation"];
+        if (record.goods_status != "" && goods_status.indexOf(record.goods_status) == -1) {
+            navigate(`/order-details/${record.order_id}/sample-report`, {
+                state: {
+                    order: record,
+                    reviewSampleReports: value == "reviewSampleReports" ? true : false
+                },
+            });
+        }
+        else {
             message.destroy();
             message.error("First sample report is pending")
         }
     };
 
     const handleFinalReportRedirect = (record, value) => {
-        let goods_status=["production_complete"];
-        if (goods_status.indexOf(record.goods_status)>-1) {
-        navigate(`/order-details/${record.order_id}/final-report`, {
-            state: {
-                order: record,
-                reviewFinalReports: value == "reviewFinalReports" ? true : false
-            },
-        });
+        let goods_status = ["production_complete"];
+        if (goods_status.indexOf(record.goods_status) > -1) {
+            navigate(`/order-details/${record.order_id}/final-report`, {
+                state: {
+                    order: record,
+                    reviewFinalReports: value == "reviewFinalReports" ? true : false
+                },
+            });
         }
-        else{
+        else {
             message.destroy();
             message.error("Final Report is pending")
         }
@@ -184,7 +185,7 @@ function HirerOrdersDetailPage() {
     return (
         <>
             <div className="container">
-                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)}>Back</Button>
+                <Button icon={<LeftCircleOutlined />} type='link' onClick={() => navigate(-1)} value={'Back'} />
                 <h3 className='text-center'>Order Details</h3>
                 <hr />
                 <Descriptions
@@ -203,19 +204,16 @@ function HirerOrdersDetailPage() {
 
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <Space>
-                        <button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'shipMaterials')}>
-                            Ship Materials To Renter
-                        </button>
+                        <Button type='button' className="btn btn-primary btn-sm" onClick={() => handleShipmentRedirect(order, 'shipMaterials')}
+                            value={'Ship Materials To Renter'} />
 
                         {/* Sample Reports */}
-                        <button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'reviewSampleReports')}>
-                            Review Sample Report
-                        </button>
+                        <Button type='button' className="btn btn-warning btn-sm" onClick={() => handleSampleReportRedirect(order, 'reviewSampleReports')}
+                            value={'Review Sample Report'} />
 
                         {/* Final Reports */}
-                        <button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'reviewFinalReports')}>
-                            Review Final Report
-                        </button>
+                        <Button type='button' className="btn btn-dark btn-sm" onClick={() => handleFinalReportRedirect(order, 'reviewFinalReports')}
+                            value={'Review Final Report'} />
                     </Space>
                 </div>
                 {/* Lists of shipment details */}

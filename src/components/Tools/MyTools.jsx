@@ -5,12 +5,31 @@ import axios from '../../api/axios.js';
 import "./buy.scss"
 import { firstChrUpperCase } from "../../utils/utils.js";
 import { message } from 'antd';
+import BUTTON from '../common/elements/ButtonElement';
 
 function MyTools() {
   const [myTools, setMyTools] = useState([]);
+  let previousSearch = sessionStorage.getItem('searchParam') || null;
+  const [pageName, setPageName] = useState(JSON.parse(previousSearch).category);
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [isEdit, setIsEdit] = useState(true);
   let favClick = false;
+  const [filterText, setFilterText] = useState('');
+
+  const handleFilterChange = (e) => {
+    setFilterText(e.target.value);
+  };
+
+  const filteredTools = myTools.filter(tool =>
+    tool.tool_name.toLowerCase().includes(filterText.toLowerCase()) ||
+    tool.tool_description.toLowerCase().includes(filterText.toLowerCase()) ||
+    tool.tool_make.toLowerCase().includes(filterText.toLowerCase()) //||
+    /* tool.tool_condition.toLowerCase().includes(filterText.toLowerCase()) ||
+    tool.tool_rent_price.toString().includes(filterText) ||
+    tool.tool_selling_price.toString().includes(filterText) */ //||
+    //tool.tool_quantity.toString().includes(filterText)
+  );
 
   const getAllTools = async () => {
     try {
@@ -27,8 +46,9 @@ function MyTools() {
   }
 
   useEffect(() => {
+    
     getAllTools();
-  }, []);
+  },[]);
 
   const handleAddToolClick = () => {
     navigate('/sell-tools');
@@ -40,31 +60,32 @@ function MyTools() {
       navigate(`/tools-detail/?toolid=${item.tool_id}`, {
         state: {
           toolsDetails: item,
+          transType: 'sell'
         },
       });
     }
   }
 
   const toggleDelete = (event) => {
-    setIsVisible(!isVisible);
+    setIsDelete(!isDelete);
   };
-  const handleDeleteClick = async(event) => {
+  const handleDeleteClick = async (event) => {
     try {
-      favClick=true;
-      let tool_id=parseInt(event.target.id);
+      favClick = true;
+      let tool_id = parseInt(event.target.id);
       const token = localStorage.getItem('authToken');
       axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
-      const response = await axios.post(DELETE_TOOLS,{toolids:[tool_id]});
-      if (response && response.data.result>0) {
-        let newToolsList = myTools.filter((tool)=>{
-          if (tool.tool_id!=tool_id){
+      const response = await axios.post(DELETE_TOOLS, { toolids: [tool_id] });
+      if (response && response.data.result > 0) {
+        let newToolsList = myTools.filter((tool) => {
+          if (tool.tool_id != tool_id) {
             return (tool)
           };
         })
         setMyTools(newToolsList);
         message.success("Tool deleted!!");
         return;
-      }else{
+      } else {
         message.error("Error deleting tool..");
         return;
       }
@@ -78,48 +99,95 @@ function MyTools() {
 
   return (
     <div>
+      <h1>Sell {pageName}</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Sell Tools</h1>
+        
         <div className="addDelTool">
-          <input type="button" className="addTool" onClick={handleAddToolClick} value="Add Tool"/>
-          
-          <input type="button" className="delTool" onClick={toggleDelete} value={isVisible?"Cancel Delete":"Delete Tool"}/>
-        </div>
-      </div>
-      <div className="container-layout">
-        <div className="main-container">
-          <div className="grid-container">
-            {myTools.length > 0 ? (
-              myTools.map((item, index) => {
-                return (
-                  <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
-                    <div className="main-card">
-                      <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
-                      {isVisible && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
-                        X
-                      </div>}
-                      <div className="child-card-img">
-                        <img className="card-img" src={item.tool_image[0]} alt={index} />
-                      </div>
-                      {/* <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div> */}
-                      <div className="card-price-tag">
-                        <div></div>
-                        <div className="prim_price_tag">Buy  : ₹ {item.tool_selling_price == null ? "NA" : item.tool_selling_price}</div>
-                        <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div>
-                      </div>
-                      <hr />
-                      <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>
-                      <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_name)}</span></div>
-                    </div>
-                  </div>
-                )
-              })
-            ) : (
-              <p>No tools available</p>
-            )}
+        <div className="floatButtonsRight"> 
+          <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add" />
+          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isDelete ? "Cancel Delete" : "Delete"} />
           </div>
+          <input
+                type="search"
+                placeholder="Search tools"
+                value={filterText}
+                onChange={handleFilterChange}
+            />
+            {filterText ? (
+  <div className="container-layout">
+    <div className="main-container">
+      <div className="grid-container">
+        {filteredTools.length > 0 ? (
+          filteredTools.map((item, index) => {
+            return (
+              <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
+                <div className="main-card">
+                  <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
+                  {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                    X
+                  </div>}
+                  {isEdit && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                    E
+                  </div>}
+                  <div className="child-card-img">
+                    <img className="card-img" src={item.tool_image[0]} alt={index} />
+                  </div>
+                  <div className="card-price-tag">
+                    <div></div>
+                    <div className="prim_price_tag">Buy  : ₹ {item.tool_selling_price == null ? "NA" : item.tool_selling_price}</div>
+                    <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div>
+                  </div>
+                  <hr />
+                  <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>
+                  <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_name)}</span></div>
+                </div>
+              </div>
+            )
+          })
+        ) : (
+          <p>No tools available</p>
+        )}
+      </div>
+    </div>
+  </div>
+) : (<div className="container-layout">
+              <div className="main-container">
+                <div className="grid-container">
+                  {myTools.length > 0 ? (
+                    myTools.map((item, index) => {
+                      return (
+                        <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
+                          <div className="main-card">
+                            <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
+                            {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
+                              X
+                            </div>}
+                            <div className="child-card-img">
+                              <img className="card-img" src={item.tool_image[0]} alt={index} />
+                            </div>
+                            {/* <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div> */}
+                            <div className="card-price-tag">
+                              <div></div>
+                              <div className="prim_price_tag">Buy  : ₹ {item.tool_selling_price == null ? "NA" : item.tool_selling_price}</div>
+                              <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div>
+                            </div>
+                            <hr />
+                            <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>
+                            <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_name)}</span></div>
+                          </div>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <p>No tools available</p>
+                  )}
+                </div>
+              </div>
+            </div>)}
+            
         </div>
       </div>
+      
     </div>
   )
 }

@@ -5,9 +5,11 @@ import { LeftCircleOutlined, InfoCircleOutlined, UploadOutlined } from '@ant-des
 const { RangePicker } = DatePicker;
 import axios from "../../api/axios";
 import HeaderTitle from '../../utils/HeaderTitle';
-import { FILE_UPLOAD_URL, QUOTE_SAVE_URL } from '../../api/apiUrls';
+import { QUOTE_SAVE_URL } from '../../api/apiUrls';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import uploadFileToServer from '../FileUploadComponent/uploadFileToServer';
+import FileUploader from "../FileUploadComponent/FileUploader";
 dayjs.extend(utc);
 const { TextArea } = Input;
 
@@ -44,21 +46,7 @@ function BookingMachines() {
     // steps 
     const [step, setStep] = useState(1);
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
-
-    const fileUpload = async (file) => {
-        try {
-            const configHeaders = {
-                headers: { "content-type": "multipart/form-data" },
-            };
-            const formData = new FormData();
-            formData.append("fileName", file.originFileObj);
-            var response = await axios.post(FILE_UPLOAD_URL, formData, configHeaders);
-            // console.log("responseFileData: ", response);
-            return response.data.files[0];
-        } catch (error) {
-            return error;
-        }
-    }
+    const [files, setFiles] = useState([]);
 
     const onOk = (value) => {
         // console.log('onOk: ', value);
@@ -104,32 +92,32 @@ function BookingMachines() {
         setLoading(false);
     };
 
-    const handlePartDrawingFileChange = async (info) => {
-        let fileList = [...info.fileList];
-        // Limit to only one file
-        fileList = fileList.slice(-1);
-        // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
-        // Display an error message if more than one file is uploaded
-        if (fileList.length > 1) {
-            message.error('You can only upload one file');
-        } else {
-            setPartDrawingFileList(fileList);
-            if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
-                setFileLoading(true);
-                setIsSubmitDisabled(true);
-                // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
-                // console.log("fileRes: ", fileRes);
-                message.success("Part Drawing File Uploaded")
-                setViewPartDrawingFile(fileRes.fileUrl);
-                setFileLoading(false);
-                setIsSubmitDisabled(false);
+    // const handlePartDrawingFileChange = async (info) => {
+    //     let fileList = [...info.fileList];
+    //     // Limit to only one file
+    //     fileList = fileList.slice(-1);
+    //     // console.log("size: ", fileList[0].size / 1024 / 1024 < 2);
+    //     // Display an error message if more than one file is uploaded
+    //     if (fileList.length > 1) {
+    //         message.error('You can only upload one file');
+    //     } else {
+    //         setPartDrawingFileList(fileList);
+    //         if (fileList[0].size / 1024 / 1024 < 2) { // upto 2 MB upload size
+    //             setFileLoading(true);
+    //             setIsSubmitDisabled(true);
+    //             // update file upload api
+    //             const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
+    //             // console.log("fileRes: ", fileRes);
+    //             message.success("Part Drawing File Uploaded")
+    //             setViewPartDrawingFile(fileUrl);
+    //             setFileLoading(false);
+    //             setIsSubmitDisabled(false);
 
-            } else {
-                message.error('File size must less than 2 MB');
-            }
-        }
-    };
+    //         } else {
+    //             message.error('File size must less than 2 MB');
+    //         }
+    //     }
+    // };
 
     const handleProcessSheetFileChange = async (info) => {
         let fileList = [...info.fileList];
@@ -145,10 +133,10 @@ function BookingMachines() {
                 setProcessFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Process Sheet File Uploaded!")
-                setViewProcessSheetFile(fileRes.fileUrl);
+                setViewProcessSheetFile(fileUrl);
                 setProcessFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -171,10 +159,10 @@ function BookingMachines() {
                 setProgramFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Program Sheet File Uploaded!")
-                setViewProgramSheetFile(fileRes.fileUrl);
+                setViewProgramSheetFile(fileUrl);
                 setProgramFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -197,10 +185,10 @@ function BookingMachines() {
                 setSpecsFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Specs/Standards File Uploaded!")
-                setViewSpecsFile(fileRes.fileUrl);
+                setViewSpecsFile(fileUrl);
                 setSpecsFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -224,10 +212,10 @@ function BookingMachines() {
                 setOthersFileLoading(true);
                 setIsSubmitDisabled(true);
                 // update file upload api
-                const fileRes = await fileUpload(fileList[0]);
+                const fileUrl = await uploadFileToServer(fileList[0].originFileObj);
                 // console.log("fileRes: ", fileRes);
                 message.success("Others File Uploaded!")
-                setViewOthersFile(fileRes.fileUrl);
+                setViewOthersFile(fileUrl);
                 setOthersFileLoading(false);
                 setIsSubmitDisabled(false);
             } else {
@@ -264,6 +252,15 @@ function BookingMachines() {
         // Can not select days before today and today
         return current && current < dayjs().startOf('day');
     };
+
+    const handlePartDrawingFileChange = (files) => {
+        console.log("part draw files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setViewPartDrawingFile(files[0].url);
+        }
+    };
+
 
     return (
         <>
@@ -383,22 +380,12 @@ function BookingMachines() {
                                             message: 'Please upload part drawing!',
                                         },
                                     ]}>
-                                        <Flex gap="small" wrap>
-                                            <Upload
-                                                fileList={partDrawingFileList}
-                                                onChange={handlePartDrawingFileChange}
-                                                maxCount={1}
-                                                beforeUpload={() => false}
-                                                onRemove={handlePartDrawingRemove}
-                                                data={(file) => file.fileName = "FOO"}
-                                            >
-                                                <Button loading={fileLoading} icon={<UploadOutlined />}>{fileLoading ? 'Uploading..' : 'Upload Part Drawing'}</Button>
-                                            </Upload>
-                                            {viewPartDrawingFile &&
-                                                <Link to={viewPartDrawingFile} target={'_blank'}>View Part Drawing File</Link>
-                                            }
-                                        </Flex>
 
+                                        <FileUploader
+                                            value={files}
+                                            onChange={handlePartDrawingFileChange}
+                                            maxCount={1}
+                                        />
                                     </Form.Item>
 
                                 </div>

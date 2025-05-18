@@ -176,7 +176,6 @@ function HirerSampleReports() {
                                 }}
                                     rules={[
                                         {
-                                            required: true,
                                             message: 'Please update the part number!',
                                         },
                                     ]}

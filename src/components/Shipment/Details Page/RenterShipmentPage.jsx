@@ -23,7 +23,7 @@ import moment from 'moment/moment';
 import { useAuth } from '../../../contexts/AuthContext';
 import axios from '../../../api/axios';
 import { formattedDateTime } from '../../../utils/utils';
-import { CREATE_SHIPMENT_URL, FILE_UPLOAD_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
+import { CREATE_SHIPMENT_URL, GET_SHIPMENT_BY_ORDERID_URL, UPDATE_SHIPMENT_URL } from '../../../api/apiUrls';
 import { receiptConfirmation } from '../../../utils/selectOptionUtils';
 
 function RenterShipmentPage() {
@@ -154,7 +154,7 @@ function RenterShipmentPage() {
                             message.error("Please enter a valid quantity.");
                         }
                     } else {
-                        message.error(`Update Received quantity!`);
+                        message.success(`Update Received quantity!`);
                     }
                 },
             });

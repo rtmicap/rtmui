@@ -22,8 +22,6 @@ function getItem(label, key, icon, children) {
 }
 
 
-
-
 const items = [
     getItem('Dashboard', '/', <DashboardOutlined />),
     // getItem('Register a Machine', 'register-machine', <FileAddOutlined />),
@@ -41,13 +39,12 @@ const items = [
     // getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [
         getItem('Buy Tools', 'buy-tools', <PlusSquareOutlined />),
-        /* getItem('Sell Tools', 'sell-tools', <MinusSquareOutlined />), */
         getItem('Sell Tools', 'my-tools', <CheckSquareOutlined />),
     ]),
     getItem('Gauges', 'gauges', <FieldTimeOutlined />, [
         getItem('Buy Gauges', 'buy-gauges', <PlusSquareOutlined />),
-        getItem('Sell Gauges', 'sell-gauges', <MinusSquareOutlined />),
-        getItem('Rent Gauges', 'rent-gauges', <CheckSquareOutlined />),
+        getItem('Sell Gauges', 'my-gauges', <MinusSquareOutlined />),
+        
     ]),
     getItem('Sell Raw Material', 'sell-raw-materials', <FormatPainterOutlined />),
     getItem('Sell Scrap', 'sell-scrap', <ScissorOutlined />),
@@ -60,6 +57,7 @@ const items = [
         [
             getItem('Profile', 'profile', <FileProtectOutlined />),
         ]),
+    getItem('Co-Ordinators', 'coordinators', <FileAddOutlined />),
     getItem('Logout', 'logout', <LogoutOutlined />),
 ]
 
@@ -79,6 +77,13 @@ function Sidebar() {
                 }
             });
         } else { // navigate to other component
+            if(value.key == 'buy-gauges' || value.key == 'my-gauges'){
+                sessionStorage.setItem('searchParam', '{"category":"Gauges","query":"","condition":"both","type":"both"}');
+            }
+            
+            if(value.key == 'buy-tools'|| value.key == 'my-tools'){
+                sessionStorage.setItem('searchParam', '{"category":"Tools","query":"","condition":"both","type":"both"}');
+            }
             navigate(value.key)
             // if any side menu clicked then registered machines will be removed
             var existingFormDataArray = JSON.parse(localStorage.getItem('machines')) || [];

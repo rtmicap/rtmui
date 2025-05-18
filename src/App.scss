@@ -29,7 +29,40 @@
     height:100px;
     //width:1200px;
   }
+  //*******************  Button **************
+  .primarybutton{
+    background-color: #1677ff;
+    color: white;
+    padding: 10px; 
+    border: none;
+    border-radius: 5px;
+    width:105px;
+    margin:10px;
+   }
+   .primarybutton:hover{
+    background-color: #7ec1ff;
+    }
 
+   .secondarybutton{
+    background-color: #ee2222;
+    color: white;
+    padding: 10px; 
+    border: none;
+    border-radius: 5px;
+    width:105px;
+    margin:10px;
+   }
+   .secondarybutton:hover{
+    background-color: #ec7272;
+    }
+
+    .secondarybutton:active{
+        color: grey;
+    }
+    .floatButtonsRight{
+      float: right;
+     }
+  *//****************/
   //*************** Login page **********************
   .loginBtn{
     width:100px;
@@ -53,6 +86,26 @@
       margin:0;
     }
     margin-top:20px;
+  }
+  .UserTypeRadio{
+    width:20px;
+  }
+  .UserTypeLabel{
+    width:fit-content;
+  }
+  .radio-Container{
+    width:100px;
+    display: inline-block;
+    input,label{
+      display:inline-block;
+      margin-left:5px;
+    }
+    margin-left: 10px;;
+  }
+  .radion-mainContainer{
+    display: block;
+    width:230px;
+    margin:0 auto;
   }
   //*************** Login page **********************
   /* page not found */
@@ -146,3 +199,25 @@
   }
 
   //************Dashboard Page ***************
+
+  //************Manage Co-ordinators ****************
+  .coordinators-section{
+
+    div{
+      display: inline-block;
+    }
+    input[type=checkbox]{
+      display: inline-block;
+      width:auto;
+      margin-left:20px;
+      margin-right:10px;
+      transform: scale(1.5);
+    }
+    label{
+      display: inline-block;
+      font-weight: normal;
+      font-size: 16px;
+    }
+  }
+
+  //************ End Manage Co-ordinators ****************

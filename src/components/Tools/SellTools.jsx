@@ -7,6 +7,7 @@ import "./sell.scss";
 function SellTools() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
+        category:"Tools",
         name: "",
         description: "",
         specifications: "",
@@ -100,6 +101,7 @@ function SellTools() {
 
         // Construct the request payload with image URLs
         const payload = {
+            category:formData.category,
             toolname: formData.name,
             description: formData.description,
             specifications: formData.specifications,
@@ -114,7 +116,7 @@ function SellTools() {
         try {
             const token = localStorage.getItem("authToken");
             axios.defaults.headers.common["authorization"] = "Bearer " + token;
-
+            console.log(payload);
             const response = await axios.post(SAVE_TOOLS, payload);
             if (response.status === 200 && response.data.result) {
                 setMessage({ type: "success", text: "Tool listed successfully!" });
@@ -122,11 +124,11 @@ function SellTools() {
                     navigate("/my-tools"); // Navigate to MyTools page after showing the message
                 }, 2000);
             } else {
-                setMessage({ type: "error", text: "Error submitting tool. Please try again." });
+                setMessage({ type: "error", text: "Error submitting item. Please try again." });
             }
         } catch (error) {
             console.error("Error submitting tool:", error);
-            setMessage({ type: "error", text: "Error submitting tool. Please try again." });
+            setMessage({ type: "error", text: "Error submitting item. Please try again." });
         }
     };
 
@@ -138,7 +140,7 @@ function SellTools() {
 
     return (
         <div className="sell-tools-form">
-            <h1>Sell Your Tool</h1>
+            <h1>Sell Your Item</h1>
             {message && (
                 <div className={`message ${message.type}`}>
                     {message.text}
@@ -146,6 +148,13 @@ function SellTools() {
             )}
 
             <form onSubmit={handleSubmit}>
+            <label>
+                    Category:
+                    <select name="category" value={formData.category} onChange={handleChange}>
+                        <option value="tools">Tools</option>
+                        <option value="gauges">Gauges</option>
+                    </select>
+                </label>
                 <label>
                     Name:
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required />
