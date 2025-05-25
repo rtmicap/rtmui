@@ -93,6 +93,16 @@ const App = () => {
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keydown', handleUserActivity);
     window.addEventListener('click', handleUserActivity);
+    /* window.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
+
+    // Disables common shortcut keys for viewing source code (Ctrl+U, F12)
+    window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey && event.key === 'u') || event.key === 'F12') {
+            event.preventDefault();
+        }
+    }); */
     // Cleanup function to remove event listeners and clear timeout
     return () => {
       clearTimeout(timeoutId);
@@ -127,6 +137,14 @@ const App = () => {
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
 
+
+             {/* Gauges */}
+            <Route path='buy-gauges' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-gauges" element={<MyTools />} />
+            {/* <Route path="sell-gauges" element={<SellTools />} /> */}
+
+
             {/* Quotes */}
             <Route path='quotes' element={<Quotes />} />
 
@@ -145,10 +163,7 @@ const App = () => {
             {/* payment */}
             <Route path='payment' element={<Payment />} />
 
-            {/* Gauges */}
-            <Route path='buy-gauges' element={<BuyGauges />} />
-            <Route path="rent-gauges" element={<RentGauges />} />
-            <Route path="sell-gauges" element={<SellGauges />} />
+           
             {/* Raw Material */}
             <Route path='sell-raw-materials' element={<RawMaterial />} />
 

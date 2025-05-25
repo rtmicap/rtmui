@@ -14,6 +14,8 @@
   overflow: hidden;
   position:relative;
   min-width:250px;
+      border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 .img-repo-container{
   //border:1px solid red;
@@ -23,6 +25,12 @@
   //width:400%;
   transition: margin-left 0.5s;
   background:black;
+
+    font-weight: bold;
+    text-align: center;
+    color:rgb(114, 112, 112);
+    font-size:24px;
+
 }
 .Noimg-container{
   min-height:100px;
@@ -36,8 +44,6 @@
   width:100%;
   align-content: center;
   min-height:100px;
-  //border:1px solid blue;
-  //position:relative;
 }
  img{
  max-height: 90%;
@@ -69,21 +75,74 @@
     padding-top:2px;
  }
 
+ .tools_info_card{
+  display: block;
+
+  padding:0px;
+ }
+
  .titleCard{
-  margin-top:20px;
+  margin-top:10px;
+  border-radius:10px;
+  padding:10px;
+  border:1px solid grey;
+  margin-right:10px;
+  display: inline-block;
   width:100%;
  }
+
+ .seller_info{
+  margin-top:10px;
+  border-radius:10px;
+  padding:10px;
+  border:1px solid grey;
+  display: inline-block;
+ }
+
+ .pricing-info{
+  margin-top:10px;
+  border:1px solid grey;
+  border-radius:10px;
+  padding:10px;
+
+
+ }
+
  .detailsCardSpan{
   font-weight: bold;
  }
 
+ .additional-details{
+  margin-top:10px;
+  border:1px solid grey;
+  border-radius:10px;
+  padding:10px;
+ }
  .additional-details-content{
   overflow: scroll;
   overflow-x: hidden;
-  max-height:400px;
+  max-height:150px;
+  
  }
  .img-counter{
   text-align: center;
   color:white;
   background-color: black;
+ }
+ .editIcon{
+  border:1px solid red;
+  display:block;
+ }
+ .inputFields{
+  width:120px;
+  height:25px;
+ }
+ .inputTextArea{
+  width:100%;
+  min-height:150px;
+ }
+ .btn_container{
+  display:block;
+  margin:0 auto;
+  margin-top:10px;
  }
