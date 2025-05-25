@@ -28,7 +28,7 @@ import { typesOfGoods, uomChoices } from '../../../utils/selectOptionUtils';
 import ShipmentDetails from '../ShipmentDetails/ShipmentDetails';
 import uploadFileToServer from '../../FileUploadComponent/uploadFileToServer';
 import FileUploadComponent from '../../FileUploadComponent/FileUploadComponent';
-
+import FileUploader from "../../FileUploadComponent/FileUploader";
 function HirerShipmentPage() {
     const location = useLocation();
     const { authUser } = useAuth();
@@ -53,7 +53,6 @@ function HirerShipmentPage() {
     const [imageFileIsLoading, setImageFileIsLoading] = useState({});
     const [fileIsLoading, setFileIsLoading] = useState(false);
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
-
     // if (!order) {
     //     return <div>No order data found!</div>;
     // }
@@ -327,15 +326,23 @@ function HirerShipmentPage() {
         ),
     }));
 
-    const handleFileUpload = async (file, name) => {
-        setInvoiceFileLoading(true);
-        try {
-            const fileUrl = await uploadFileToServer(file, name);
-            console.log('Uploaded file URL:', fileUrl);
-            setInvoiceFile(fileUrl);
-            return fileUrl;
-        } finally {
-            setInvoiceFileLoading(false);
+    // const handleFileUpload = async (file, name) => {
+    //     setInvoiceFileLoading(true);
+    //     try {
+    //         const fileUrl = await uploadFileToServer(file, name);
+    //         console.log('Uploaded file URL:', fileUrl);
+    //         setInvoiceFile(fileUrl);
+    //         return fileUrl;
+    //     } finally {
+    //         setInvoiceFileLoading(false);
+    //     }
+    // };
+
+    const handleFileUpload = (files) => {
+        console.log("invoive files: ", files);
+        if (files.length > 0) {
+            // Assuming the first file's URL is what we want
+            setInvoiceFile(files[0].url);
         }
     };
 
@@ -406,7 +413,7 @@ function HirerShipmentPage() {
                                     },
                                 ]}
                             >
-                                <Flex gap="small" wrap>
+                                {/* <Flex gap="small" wrap>
                                     <FileUploadComponent
                                         accept=".pdf,.csv"
                                         buttonText="Attach Invoice/Delivery Challan"
@@ -422,7 +429,13 @@ function HirerShipmentPage() {
                                         </div>
                                     )}
 
-                                </Flex>
+                                </Flex> */}
+                                <FileUploader
+                                    acceptFile='.pdf,.xls,.xlsx,.csv'
+                                    value={invoiceFileList}
+                                    onChange={handleFileUpload}
+                                    maxCount={1}
+                                />
                             </Form.Item>
 
                         </div>
