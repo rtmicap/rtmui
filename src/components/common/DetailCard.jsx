@@ -243,7 +243,7 @@ const Carousel = (imagesMap) => {
                         </table>
                     </div>
                 ) : (
-                    <p>No audit records found for this page.</p>
+                    <p>No audit records found for this item.</p>
                 )}
             </div>
      
