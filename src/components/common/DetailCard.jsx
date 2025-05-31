@@ -131,7 +131,16 @@ const Carousel = (imagesMap) => {
       try {
         let productId =editProduct.tool_id;
         const response = await axios.get(`${GET_TOOLS_AUDIT}/${productId}`);
-        setAuditDetails(response.data.result);
+        let fetchedDetails = response.data.result;
+        // --- NEW: Sort the fetched details by created_at (latest on top) ---
+        if (fetchedDetails && fetchedDetails.length > 0) {
+            fetchedDetails.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return dateB.getTime() - dateA.getTime();
+            });
+        }
+        setAuditDetails(fetchedDetails);
         
     } catch (error) {
         if (error && error.response.status == 401) {
@@ -213,32 +222,27 @@ const Carousel = (imagesMap) => {
                         <table>
                             <thead>
                                 <tr>
-                                    
-                                    <th>Column Name</th>
+                                    <th>Changed field</th>
                                     <th>Old Value</th>
                                     <th>New Value</th>
                                     <th>Changed By</th>
                                     <th>Created At</th>
-                                    {/* <th>ID</th> removed as per new column request */}
                                 </tr>
                             </thead>
                             <tbody>
                                 {auditDetails.map((auditRecord) => (
-                                    <tr key={auditRecord.audit_id}> {/* Use audit_id as key, it's unique */}
-                                        
+                                    <tr key={auditRecord.audit_id}>
                                         <td>{auditRecord.column_name}</td>
                                         <td>{auditRecord.old_value}</td>
                                         <td>{auditRecord.new_value}</td>
                                         <td>{auditRecord.changed_by}</td>
                                         <td>{formattedDateTime(auditRecord.created_at)}</td>
-                                        {/* <td>{auditRecord.audit_id}</td> removed as per new column request*/}
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 ) : (
-                    // Display message if auditDetails is empty or null
                     <p>No audit records found for this page.</p>
                 )}
             </div>
