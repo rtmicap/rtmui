@@ -1,5 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react';
-import samimg from "../../assets/Total_Revenue.jpg"
+//import samimg from "../../assets/Total_Revenue.jpg"
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SearchTools from './SearchTools';
 import { SEARCH_TOOLS, SAVE_FAVORITE, DELETE_FAVORITE } from '../../api/apiUrls';
@@ -70,6 +70,10 @@ function BuyTools() {
 
     }
 
+    const gotoCart=()=>{
+        navigate('/cart-items');
+    }
+
     const handleFavClick = async (event) => {
         let itemIndex = event.target.attributes["index"].value
         let eventAction = event.target.alt == "T" ? false : true;
@@ -120,7 +124,7 @@ function BuyTools() {
 
     return (
         <div>
-            <h1>Buy / Rent {!!previousSearch ? previousSearch.category : ""}</h1>
+            <h1>Buy / Rent {!!previousSearch ? previousSearch.category : ""}</h1> <button className='cartLink' onClick={gotoCart}>View Cart</button>
             <div className="container-layout">
                 <div className="sidebar-filter"><div>
                     <SearchTools searchParam={searchParam} setSearchParam={setSearchParam} /></div> </div>

@@ -19,6 +19,7 @@
     display: inline-block;
     min-width: 545px;
     width: 100%;
+    text-align: center;
     //border:1px solid rgb(165, 163, 163);
 }
 
@@ -146,6 +147,17 @@
     text-align: right;
 }
 
+.cartLink {
+    background-color: transparent;
+    text-decoration: none;
+    color: #007185;
+    cursor: 'pointer';
+    padding-right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    float: right;
+    font-family: Arial, Helvetica, sans-serif;
+}
 .detailsCardSpan{
     font-weight: bold;
    }

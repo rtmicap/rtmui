@@ -2,8 +2,8 @@ import {React, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import './DetailCard.scss'; // Import your SCSS file
 import axios from '../../api/axios.js';
-import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls.js';
-import { message } from 'antd';
+import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID,ADD_TO_CART } from '../../api/apiUrls.js';
+import { Dropdown, message } from 'antd';
 import {formattedDateTime } from '../../utils/utils';
 
 // Map the image names from the JSON to the actual imported images
@@ -59,6 +59,7 @@ const Carousel = (imagesMap) => {
   const DetailCard = ({product, transtype}) => {
     const [isEdit,setIsEdit]=useState(false);
     const [editProduct,setEditProduct]=useState(product);
+    const [cartQty,setCartQty]=useState(1);
     const [companyDetails,setCompanyDetails]=useState({
       companyName:"",
       offEmail:"",
@@ -104,9 +105,37 @@ const Carousel = (imagesMap) => {
       setEditProduct(prevState => ({ ...prevState, [key]:value }));
     }
 
-    const handleAddToCart=()=>{
-      message.success("Item added to cart.")
+    const handleAddToCart = async () => {
+      
+
+      try {
+        const payload = {
+                      productId:product.tool_id,
+                      quantity: parseInt(cartQty),
+                      cartPrice: product.tool_selling_price
+                  };
+        const token = localStorage.getItem("authToken");
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
+        const response = await axios.post(ADD_TO_CART, payload);
+        if (response.status === 200 && response.data.result != {}) {
+           message.success("Item added to cart.");
+        }
+      } catch (error) {
+        console.log(error);
+
+        if(error.response.status === 400 && error.response.data.error=="Cannot add more than available quantity"){
+          message.error("Cannot add more than available quantity");
+        }else{
+        message.error("Add to cart failed");
+        }
+      }
+      setCartQty(1);
+
     }
+
+    const handleChangeCartQty = (e) => {
+    setCartQty(e.target.value);
+  };
 
     const getCompanyDetailsById = async () => {
             try {
@@ -180,7 +209,18 @@ const Carousel = (imagesMap) => {
          <p><span className="detailsCardSpan">Posted On    : </span>{formattedDateTime(product.createdAt)}</p>
          </div>
          <div className='btn_container'>
-         <input type="button" className="primarybutton" value="Add to Cart" onClick={handleAddToCart}/>
+          <div>{/* Quantity dropdown element */}
+                <label htmlFor="numberDropdown">Quantity </label>
+                <select className="itemQty" value={cartQty} onChange={handleChangeCartQty}>
+                  {[...Array(editProduct.tool_quantity).keys()].map((num) => (
+                    <option key={num+1} value={num+1}>
+                      {num+1}
+                    </option>
+                  ))}
+                </select>
+          </div>
+          
+         <button className="primarybutton" onClick={handleAddToCart}>Add to Cart </button>
          </div>
          </>
         }

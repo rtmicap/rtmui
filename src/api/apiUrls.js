@@ -69,3 +69,6 @@ export const SAVE_FAVORITE = "/tools/addtofavorite";
 export const DELETE_FAVORITE = "/tools/deletefavorite";
 export const GET_TOOL_BY_ID = "/tools/gettoolbyid";
 export const GET_TOOLS_BY_COMPANY_ID = "/tools/gettoolsbycompanyid";
+export const ADD_TO_CART = "/cart/addtocart";
+export const GET_CART = "/cart/getcartitems";
+export const DELETE_CART = "/cart/removecartitem";

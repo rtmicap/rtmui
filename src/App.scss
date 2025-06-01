@@ -29,6 +29,54 @@
     height:100px;
     //width:1200px;
   }
+
+  //*****************cart**************
+   .itemDetails{
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size:18px;
+    color:#353535;
+  }
+  .qtyLabel{
+      font-family: Arial, sans-serif;
+      color:#818181;
+    
+  
+  }
+    .imageContainer{
+    display: block;
+    text-align: center;
+    cursor: pointer;
+  }
+  .totalCartCost{
+    margin-top:30px;
+    margin-bottom:30px;
+    font-weight: bold;
+    font-Size: 18px;
+    span{
+      float: right;
+    }
+  }
+  .btnLink {
+      border: 'none';
+      color: #007185;
+      cursor: 'pointer';
+      padding: 0;
+      font-size: 14;
+      background-color:transparent;
+  }
+  .cartItemDetails{
+    margin-left:50px;
+    flex: 1;
+  }
+  .imageContainer{
+    font-size: 20px;
+    color:grey;
+    font-weight: bold;
+  }
+  .itemQty{
+  width:105px;
+ }
   //*******************  Button **************
   .primarybutton{
     background-color: #1677ff;
@@ -188,6 +236,7 @@
   //*************** Order page **********************
 
   //************Dashboard Page ***************
+ 
 
   .imagebox{
     margin:10px 10px 10px 10px;
