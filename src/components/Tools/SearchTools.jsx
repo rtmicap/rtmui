@@ -33,7 +33,7 @@ function SearchTools({searchParam, setSearchParam}) {
             let Unique_Result=new Set(result.map((item)=>{return item.tool_name;}));
             setResults(Array.from(Unique_Result));
           } catch (error) {
-            console.error('Error fetching search results:', error);
+            //console.error('Error fetching search results:', error);
           }
         }
       }, 0); // Debounce API calls

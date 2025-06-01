@@ -46,6 +46,7 @@ import FinalReports from './components/Final Reports/FinalReports';
 import './App.scss';
 import EditMachine from './components/EditMachine/EditMachine';
 import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
+import ViewCart from './components/Tools/ViewCart';
 
 const App = () => {
   const location = useLocation();
@@ -136,6 +137,7 @@ const App = () => {
             <Route path='tools-detail' element={<Tools_detail />} />
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
+            <Route path="cart-items" element={<ViewCart/>} />
 
 
              {/* Gauges */}
