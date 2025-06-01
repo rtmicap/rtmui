@@ -2,8 +2,8 @@ import {React, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import './DetailCard.scss'; // Import your SCSS file
 import axios from '../../api/axios.js';
-import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID,ADD_TO_CART } from '../../api/apiUrls.js';
-import { Dropdown, message } from 'antd';
+import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID,ADD_TO_CART, GET_TOOLS_AUDIT  } from '../../api/apiUrls.js';
+import { message } from 'antd';
 import {formattedDateTime } from '../../utils/utils';
 
 // Map the image names from the JSON to the actual imported images
@@ -63,7 +63,8 @@ const Carousel = (imagesMap) => {
     const [companyDetails,setCompanyDetails]=useState({
       companyName:"",
       offEmail:"",
-    })
+    });
+    const [auditDetails, setAuditDetails] = useState();
     const handleEditToolClick=async(e)=>{
       e.preventDefault();
       setIsEdit(!isEdit);
@@ -154,9 +155,36 @@ const Carousel = (imagesMap) => {
                 }
             }
         };
+    
+    const getAuditDetails = async () => {
+      try {
+        let productId =editProduct.tool_id;
+        const response = await axios.get(`${GET_TOOLS_AUDIT}/${productId}`);
+        let fetchedDetails = response.data.result;
+        // --- NEW: Sort the fetched details by created_at (latest on top) ---
+        if (fetchedDetails && fetchedDetails.length > 0) {
+            fetchedDetails.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return dateB.getTime() - dateA.getTime();
+            });
+        }
+        setAuditDetails(fetchedDetails);
+        
+    } catch (error) {
+        if (error && error.response.status == 401) {
+            message.warning("Unauthorized! Please log in again!");
+            navigate("/login");
+        } else {
+            message.error("Error fetching Company Details");
+        }
+    }
+    }
+    
         useEffect(()=>
           {
             getCompanyDetailsById();
+            getAuditDetails();
           },[])
 
     return (
@@ -225,6 +253,39 @@ const Carousel = (imagesMap) => {
          </>
         }
 
+<div className="audit-details">
+                <h3>Audit History</h3>
+                <hr />
+                {/* Conditionally render table or "No records" message */}
+                {auditDetails && auditDetails.length > 0 ? (
+                    <div className="audit-table-container"> {/* Optional: for styling purposes */}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Changed field</th>
+                                    <th>Old Value</th>
+                                    <th>New Value</th>
+                                    <th>Changed By</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {auditDetails.map((auditRecord) => (
+                                    <tr key={auditRecord.audit_id}>
+                                        <td>{auditRecord.column_name}</td>
+                                        <td>{auditRecord.old_value}</td>
+                                        <td>{auditRecord.new_value}</td>
+                                        <td>{auditRecord.changed_by}</td>
+                                        <td>{formattedDateTime(auditRecord.created_at)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p>No audit records found for this item.</p>
+                )}
+            </div>
      
       </div>
     );

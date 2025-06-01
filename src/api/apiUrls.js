@@ -72,3 +72,4 @@ export const GET_TOOLS_BY_COMPANY_ID = "/tools/gettoolsbycompanyid";
 export const ADD_TO_CART = "/cart/addtocart";
 export const GET_CART = "/cart/getcartitems";
 export const DELETE_CART = "/cart/removecartitem";
+export const GET_TOOLS_AUDIT = "/tools/gettoolsaudit";
