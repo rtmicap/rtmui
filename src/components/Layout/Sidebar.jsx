@@ -33,6 +33,7 @@ const items = [
     ]),
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('Hire Machines', 'hire-machine', <CalendarOutlined />),
+    getItem('Bookings Calendar', 'bookings-calendar', <CalendarOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
     // getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
