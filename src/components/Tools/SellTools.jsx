@@ -153,6 +153,8 @@ function SellTools() {
                     <select name="category" value={formData.category} onChange={handleChange}>
                         <option value="tools">Tools</option>
                         <option value="gauges">Gauges</option>
+                        <option value="scrap">Scrap</option>
+                        <option value="rawmat">Raw Material</option>
                     </select>
                 </label>
                 <label>

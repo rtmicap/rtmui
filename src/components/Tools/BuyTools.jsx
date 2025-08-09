@@ -27,13 +27,14 @@ function BuyTools() {
             return null
         }
     }
-    ); */
+    );  */
     const [searchParam, setSearchParam] = useState(previousSearch);
 
     const getAllTools = async () => {
         try {
             if (previousSearch != "" && searchParam != null) {
                 let params = typeof (searchParam) == "string" ? JSON.parse(searchParam) : searchParam;
+                console.log(searchParam, "   ", params);
                 if (params.query != "") {
                     const token = localStorage.getItem('authToken');
                     axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
@@ -53,7 +54,7 @@ function BuyTools() {
 
 
     useEffect(() => {
-        //searchParam?previousSearch=searchParam:setSearchParam(previousSearch);
+        searchParam?previousSearch=searchParam:setSearchParam(previousSearch);
         getAllTools();
     }, [searchParam]);
 

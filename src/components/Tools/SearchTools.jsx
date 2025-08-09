@@ -20,7 +20,8 @@ function SearchTools({searchParam, setSearchParam}) {
   const fetchResults = async(event) => {
         //setLoading(false);
       const delayDebounce = setTimeout(async() => {
-        const query = {"query":event.target.value.trim(),"category":JSON.parse(searchParam).category};
+        searchParam = typeof (searchParam) == "string" ? JSON.parse(searchParam) : searchParam
+        const query = {"query":event.target.value.trim(),"category":searchParam.category};
         if ((query.query).length==0){
           setDisplaySearch("none");
         }

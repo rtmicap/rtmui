@@ -144,6 +144,17 @@ const App = () => {
             <Route path='buy-gauges' element={<BuyTools />} />
             <Route path='tools-detail' element={<Tools_detail />} />
             <Route path="my-gauges" element={<MyTools />} />
+
+            {/* Scrap */}
+            <Route path='buy-scrap' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-scrap" element={<MyTools />} />
+            
+            {/* Raw Material */}
+            <Route path='buy-rawmat' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-rawmat" element={<MyTools />} />
+
             {/* <Route path="sell-gauges" element={<SellTools />} /> */}
 
 
