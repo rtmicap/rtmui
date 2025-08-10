@@ -34,6 +34,7 @@ const items = [
     ]),
     // getItem('Review Booking', 'review-booking', <ContactsOutlined />),
     getItem('Hire Machines', 'hire-machine', <CalendarOutlined />),
+    getItem('Bookings Calendar', 'bookings-calendar', <CalendarOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
     getItem('calendar', 'calendar', <CalendarOutlined />),
@@ -46,7 +47,14 @@ const items = [
     getItem('Gauges', 'gauges', <FieldTimeOutlined />, [
         getItem('Buy Gauges', 'buy-gauges', <PlusSquareOutlined />),
         getItem('Sell Gauges', 'my-gauges', <MinusSquareOutlined />),
-        
+    ]),
+    getItem('Scrap', 'scrap', <FieldTimeOutlined />, [
+        getItem('Buy Scrap', 'buy-scrap', <PlusSquareOutlined />),
+        getItem('Sell Scrap', 'my-scrap', <MinusSquareOutlined />),
+    ]),
+    getItem('Raw-Material', 'RawMat', <FieldTimeOutlined />, [
+        getItem('Buy Raw-Material', 'buy-rawmat', <PlusSquareOutlined />),
+        getItem('Sell Raw-Material', 'my-rawmat', <MinusSquareOutlined />),
     ]),
     getItem('Sell Raw Material', 'sell-raw-materials', <FormatPainterOutlined />),
     getItem('Sell Scrap', 'sell-scrap', <ScissorOutlined />),
@@ -79,13 +87,22 @@ function Sidebar() {
                 }
             });
         } else { // navigate to other component
-            if(value.key == 'buy-gauges' || value.key == 'my-gauges'){
+            if (value.key == 'buy-gauges' || value.key == 'my-gauges') {
                 sessionStorage.setItem('searchParam', '{"category":"Gauges","query":"","condition":"both","type":"both"}');
             }
-            
-            if(value.key == 'buy-tools'|| value.key == 'my-tools'){
+
+            if (value.key == 'buy-tools' || value.key == 'my-tools') {
                 sessionStorage.setItem('searchParam', '{"category":"Tools","query":"","condition":"both","type":"both"}');
             }
+
+            if (value.key == 'buy-scrap' || value.key == 'my-scrap') {
+                sessionStorage.setItem('searchParam', '{"category":"Scrap","query":"","condition":"both","type":"both"}');
+            }
+
+            if (value.key == 'buy-rawmat' || value.key == 'my-rawmat') {
+                sessionStorage.setItem('searchParam', '{"category":"Rawmat","query":"","condition":"both","type":"both"}');
+            }
+
             navigate(value.key)
             // if any side menu clicked then registered machines will be removed
             var existingFormDataArray = JSON.parse(localStorage.getItem('machines')) || [];

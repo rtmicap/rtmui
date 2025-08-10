@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { GET_TOOLS_BY_COMPANY_ID, DELETE_TOOLS } from '../../api/apiUrls.js';
 import axios from '../../api/axios.js';
 import "./buy.scss"
@@ -16,21 +16,33 @@ function MyTools() {
   const [isDelete, setIsDelete] = useState(false);
   const [isEdit, setIsEdit] = useState(true);
   let favClick = false;
+  let location = useLocation();
+
   const [filterText, setFilterText] = useState('');
 
   const handleFilterChange = (e) => {
     setFilterText(e.target.value);
   };
 
-  
+
 
   const getAllTools = async () => {
     try {
       const token = localStorage.getItem('authToken');
+      let filterCategory = (JSON.parse(sessionStorage.getItem('searchParam')).category).toLowerCase();
       axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
       const response = await axios.get(GET_TOOLS_BY_COMPANY_ID);
       if (response && response.data.result) {
-        setMyTools(response.data.result);
+        console.log(response.data.result);
+        let filteredList = (response.data.result).filter((tool) => {
+          console.log(tool.category, "Cat", filterCategory);
+          if (tool.category == filterCategory) {
+            console.log(tool.category);
+            return (tool)
+          };
+        })
+        console.log(filteredList)
+        setMyTools(filteredList);
       }
     } catch (error) {
       console.log(error);
@@ -39,9 +51,8 @@ function MyTools() {
   }
 
   useEffect(() => {
-    
     getAllTools();
-  },[]);
+  }, [location.pathname])
 
   const handleAddToolClick = () => {
     navigate('/sell-tools');
@@ -90,53 +101,51 @@ function MyTools() {
 
   }
 
-    const imageError=(e)=>{
-       (e.target.parentElement).innerText="No Image"
-    }
+  const imageError = (e) => {
+    (e.target.parentElement).innerText = "No Image"
+  }
   return (
     <div>
-      <h1>Sell {pageName}</h1>
+      <h1>Sell {JSON.parse(previousSearch).category}</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        
+
         <div className="addDelTool">
-        <div className="floatButtonsRight"> 
-          <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add" />
-          <input type="button" className="secondarybutton" onClick={toggleDelete} value={isDelete ? "Cancel Delete" : "Delete"} />
+          <div className="floatButtonsRight">
+            <input type="button" className="primarybutton" onClick={handleAddToolClick} value="Add" />
+            <input type="button" className="secondarybutton" onClick={toggleDelete} value={isDelete ? "Cancel Delete" : "Delete"} />
           </div>
           <input
-                type="search"
-                placeholder="Search tools"
-                value={filterText}
-                onChange={handleFilterChange}
-            />
-            <div className="container-layout">
-              <div className="main-container">
-                <div className="grid-container">
-                  {myTools.length > 0 ? (//mytool all results
-                    myTools.map((item, index) => {
-                      console.log("Page render");
-                      let display=false;
-                      if(filterText.length<3) {
-                          display=true;
-                      }
-                      else if((filterText.length>2) && 
-                      (item.tool_name.toLowerCase().includes(filterText.toLowerCase()) || 
-                      item.tool_description.toLowerCase().includes(filterText.toLowerCase()) || 
-                      item.tool_make.toLowerCase().includes(filterText.toLowerCase())))
-                        {
-                            display=true;
-                      }
+            type="search"
+            placeholder="filter item"
+            value={filterText}
+            onChange={handleFilterChange}
+          />
+          <div className="container-layout">
+            <div className="main-container">
+              <div className="grid-container">
+                {myTools.length > 0 ? (//mytool all results
+                  myTools.map((item, index) => {
+                    let display = false;
+                    if (filterText.length < 3) {
+                      display = true;
+                    }
+                    else if ((filterText.length > 2) &&
+                      (item.tool_name.toLowerCase().includes(filterText.toLowerCase()) ||
+                        item.tool_description.toLowerCase().includes(filterText.toLowerCase()) ||
+                        item.tool_make.toLowerCase().includes(filterText.toLowerCase()))) {
+                      display = true;
+                    }
 
-                      if(display){
+                    if (display) {
                       return (
-                       <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
+                        <div className="inline-cardblock" key={item.tool_id} onClick={() => cardClick(item)}>
                           <div className="main-card">
                             <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
                             {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
                               <img src={deleteIcon} title="Delete Item"></img>
                             </div>}
                             <div className="child-card-img">
-                               {((item.tool_image).length>0)?<img className="card-img" src={item.tool_image[0]} onError={imageError}/>:<div className='card-img'>No Image</div>}
+                              {((item.tool_image).length > 0) ? <img className="card-img" src={item.tool_image[0]} onError={imageError} /> : <div className='card-img'>No Image</div>}
                             </div>
                             {/* <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div> */}
                             <div className="card-price-tag">
@@ -151,18 +160,18 @@ function MyTools() {
                         </div>
                       )
                     }
-                    display=true;
-                    })
-                  )//mytool all results true part
-                 : (
+                    display = true;
+                  })
+                )//mytool all results true part
+                  : (
                     <p>No tools available</p>
                   )}
-                </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
-      
+
     </div>
   )
 }

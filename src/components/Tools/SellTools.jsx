@@ -7,7 +7,7 @@ import "./sell.scss";
 function SellTools() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        category:"Tools",
+        category: "Tools",
         name: "",
         description: "",
         specifications: "",
@@ -101,7 +101,7 @@ function SellTools() {
 
         // Construct the request payload with image URLs
         const payload = {
-            category:formData.category,
+            category: formData.category,
             toolname: formData.name,
             description: formData.description,
             specifications: formData.specifications,
@@ -148,11 +148,13 @@ function SellTools() {
             )}
 
             <form onSubmit={handleSubmit}>
-            <label>
+                <label>
                     Category:
                     <select name="category" value={formData.category} onChange={handleChange}>
                         <option value="tools">Tools</option>
                         <option value="gauges">Gauges</option>
+                        <option value="scrap">Scrap</option>
+                        <option value="rawmat">Raw Material</option>
                     </select>
                 </label>
                 <label>

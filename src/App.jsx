@@ -48,6 +48,7 @@ import EditMachine from './components/EditMachine/EditMachine';
 import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
 import ViewCart from './components/Tools/ViewCart';
 import MachineBookingSystem from './components/Calendar/MachineBookingSystem';
+import BookingsCalendar from './components/My Bookings/BookingsCalendar';
 
 const App = () => {
   const location = useLocation();
@@ -138,13 +139,22 @@ const App = () => {
             <Route path='tools-detail' element={<Tools_detail />} />
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
-            <Route path="cart-items" element={<ViewCart/>} />
-
-
-             {/* Gauges */}
+            <Route path="cart-items" element={<ViewCart />} />
+            {/* Gauges */}
             <Route path='buy-gauges' element={<BuyTools />} />
             <Route path='tools-detail' element={<Tools_detail />} />
             <Route path="my-gauges" element={<MyTools />} />
+
+            {/* Scrap */}
+            <Route path='buy-scrap' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-scrap" element={<MyTools />} />
+            
+            {/* Raw Material */}
+            <Route path='buy-rawmat' element={<BuyTools />} />
+            <Route path='tools-detail' element={<Tools_detail />} />
+            <Route path="my-rawmat" element={<MyTools />} />
+
             {/* <Route path="sell-gauges" element={<SellTools />} /> */}
 
 
@@ -165,11 +175,11 @@ const App = () => {
             <Route path="order-details/:orderId/final-report" element={<FinalReports />} />
             {/* My Bookings */}
             <Route path='my-bookings' element={<MyBookings />} />
-
+            <Route path='bookings-calendar' element={<BookingsCalendar />} />
             {/* payment */}
             <Route path='payment' element={<Payment />} />
 
-           
+
             {/* Raw Material */}
             <Route path='sell-raw-materials' element={<RawMaterial />} />
 

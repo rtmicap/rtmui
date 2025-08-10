@@ -74,3 +74,7 @@ export const ADD_TO_CART = "/cart/addtocart";
 export const GET_CART = "/cart/getcartitems";
 export const DELETE_CART = "/cart/removecartitem";
 export const GET_TOOLS_AUDIT = "/tools/gettoolsaudit";
+
+// Bookings 
+
+export const GET_ALL_BOOKINGS = "/booking/getAllBooking";
