@@ -31,6 +31,7 @@ import { useAuth } from './contexts/AuthContext';
 import AdminLayout from './components/Admin/AdminLayout';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import ListOfUsers from './components/Admin/Users/ListOfUsers';
+import AdminSubscriptionEditor from './components/Admin/subscription';
 import Missing from './components/Missing';
 import Quotes from './components/Quotes/Quotes';
 import Orders from './components/Orders/Orders';
@@ -48,6 +49,7 @@ import EditMachine from './components/EditMachine/EditMachine';
 import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
 import ViewCart from './components/Tools/ViewCart';
 import BookingsCalendar from './components/My Bookings/BookingsCalendar';
+import UserSubscription from './components/Subscription/UserSubscription';
 
 const App = () => {
   const location = useLocation();
@@ -139,8 +141,9 @@ const App = () => {
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
             <Route path="cart-items" element={<ViewCart />} />
-
-
+            {/* User Subscription */}
+            <Route path="user-subscription" element={<UserSubscription />} />
+            
             {/* Gauges */}
             <Route path='buy-gauges' element={<BuyTools />} />
             <Route path='tools-detail' element={<Tools_detail />} />
@@ -187,6 +190,7 @@ const App = () => {
           <Route path="/admin/*" element={<AdminLayout />}>
             <Route index path="dashboard" element={<AdminDashboard />} />
             <Route path="list-users" element={<ListOfUsers />} />
+            <Route path="subscription-editor" element={<AdminSubscriptionEditor />} />
           </Route>
         </Route>
 

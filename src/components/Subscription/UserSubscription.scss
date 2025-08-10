@@ -1,0 +1,87 @@
+/* Container for the entire subscription page */
+.subscription-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subscription-container h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2em;
+}
+
+/* Grid for the plan columns */
+.plan-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr);
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+
+/* Headers for the plans (Silver, Gold, Platinum, Custom) */
+.plan-header {
+  text-align: center;
+  padding: 15px 10px;
+  font-weight: bold;
+  border-right: 1px solid #ddd;
+  background-color: #f8f8f8;
+}
+
+/* Specific colors for each plan header */
+.plan-header.silver {
+  background-color: #f0f0f0;
+}
+
+.plan-header.gold {
+  background-color: #ffe6e6; /* Light peach/red */
+}
+
+.plan-header.platinum {
+  background-color: #e6ffe6; /* Light green */
+}
+
+.plan-header.custom {
+  background-color: #f8f8f8;
+}
+
+/* Labels for the features on the left side */
+.feature-label {
+  font-weight: bold;
+  padding: 15px 10px;
+  border-top: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  background-color: #f8f8f8;
+  display: flex;
+  align-items: center;
+}
+
+/* Styles for the individual feature cells */
+.feature-cell {
+  padding: 15px 10px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px; /* Ensure cells have a minimum height for alignment */
+}
+
+/* Styles for the "Annual subscription fees" row */
+.fees-label {
+  font-weight: bold;
+  padding: 15px 10px;
+  background-color: #f0f0f0;
+  border-right: 1px solid #ddd;
+}
+
+.fees-cell {
+  text-align: center;
+  font-weight: bold;
+  padding: 15px 10px;
+  border-right: 1px solid #ddd;
+  background-color: #f0f0f0;
+}
