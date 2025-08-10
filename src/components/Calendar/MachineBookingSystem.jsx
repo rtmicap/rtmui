@@ -1,53 +1,22 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import axios from 'axios';
-
-// Icon components as simple SVGs or text
-
-
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-
-// Create axios instance with default config
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  }
-});
-
-// Add auth token to requests
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+import { Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, RefreshCw, Search, Download, CheckCircle, XCircle, AlertCircle, Info, Activity, TrendingUp, BarChart3, Zap, Shield, Sun, Moon, Loader } from 'lucide-react';
+import axios from '../../api/axios.js';
+import { GET_ALL_BOOKINGS } from '../../api/apiUrls.js';
+import { message } from 'antd';
 
 const MachineBookingSystem = () => {
   // Core States
-  const [viewDays, setViewDays] = useState(7);
+  const [viewDays, setViewDays] = useState(14);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [filter, setFilter] = useState('');
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingModal, setBookingModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bookings, setBookings] = useState({});
   const [machines, setMachines] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [showStats, setShowStats] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [notifications, setNotifications] = useState([]);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [viewMode, setViewMode] = useState('timeline');
-  const [hoveredCell, setHoveredCell] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const refreshInterval = useRef(null);
   
@@ -55,32 +24,92 @@ const MachineBookingSystem = () => {
   const [stats, setStats] = useState({
     totalBookings: 0,
     activeBookings: 0,
-    utilization: 0,
-    upcomingBookings: 0,
+    cancelledBookings: 0,
+    changeOfDateBookings: 0,
     totalMachines: 0,
-    availableMachines: 0
+    availableMachines: 0,
+    utilizationRate: 0
   });
 
   const [bookingForm, setBookingForm] = useState({ 
+    machineid: '',
     plannedstartdatetime: '',
     plannedenddatetime: '',
-    status: 'accepted',
-    description: '',
-    priority: 'normal'
+    status: 'accepted'
   });
 
-  // Fetch bookings from API using axios
+  // Generate mock data for testing
+  const generateMockData = useCallback(() => {
+    console.log('Generating mock data for testing...');
+    const mockMachineIds = [5019, 5032, 5048, 5112, 5119, 5124, 5127, 5131, 5138, 5139, 5145, 5147, 5149, 5152, 5155];
+    const mockBookings = {};
+    
+    mockMachineIds.forEach((machineId, index) => {
+      const machineKey = `Machine_${machineId}`;
+      mockBookings[machineKey] = [];
+      
+      // Add some random bookings for demonstration
+      if (index % 3 === 0) { // Add booking to every 3rd machine
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() + Math.floor(Math.random() * 10));
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 7) + 1);
+        
+        mockBookings[machineKey].push({
+          id: 100 + index,
+          start: startDate,
+          end: endDate,
+          status: 'accepted',
+          type: 'booking',
+          description: `Mock Booking #${100 + index} for Machine ${machineId}`,
+          hirerCompany: 1025,
+          renterCompany: 1031,
+          quoteId: 2000 + index
+        });
+      }
+    });
+    
+    setMachines(mockMachineIds.map(id => `Machine_${id}`));
+    setBookings(mockBookings);
+    
+    // Calculate stats
+    const totalBookings = Object.values(mockBookings).flat().length;
+    setStats({
+      totalBookings,
+      activeBookings: totalBookings,
+      cancelledBookings: 0,
+      changeOfDateBookings: 0,
+      totalMachines: mockMachineIds.length,
+      availableMachines: mockMachineIds.length - totalBookings,
+      utilizationRate: Math.round((totalBookings / mockMachineIds.length) * 100)
+    });
+    
+    setLoading(false);
+    message.success('Demo data loaded successfully');
+  }, []);
+
+  // Fetch bookings from API
   const fetchBookings = useCallback(async () => {
+    console.log('Fetching bookings from API...');
     setLoading(true);
     setError(null);
+    
     try {
-      const response = await apiClient.get('/booking/getAllBooking');
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
+      }
       
-      if (response.data && response.data.results) {
+      const response = await axios.get(GET_ALL_BOOKINGS);
+      console.log('API Response:', response);
+      
+      if (response && response.data && response.data.results && Array.isArray(response.data.results)) {
         const processedBookings = {};
         const uniqueMachines = new Set();
         let totalBookingsCount = 0;
         let activeBookingsCount = 0;
+        let cancelledBookingsCount = 0;
+        let changeOfDateCount = 0;
         
         response.data.results.forEach(booking => {
           const machineKey = `Machine_${booking.machine_id}`;
@@ -90,17 +119,22 @@ const MachineBookingSystem = () => {
             processedBookings[machineKey] = [];
           }
           
+          const startDate = new Date(booking.actual_start_date_time);
+          const endDate = new Date(booking.actual_end_date_time);
+          
           const bookingData = {
             id: booking.booking_id,
-            start: new Date(booking.actual_start_date_time),
-            end: new Date(booking.actual_end_date_time),
+            start: startDate,
+            end: endDate,
             status: booking.booking_status,
-            type: booking.booking_status === 'accepted' ? 'booking' : 'block',
-            description: `Booking #${booking.booking_id} - Quote #${booking.quote_id}`,
+            type: booking.booking_status === 'accepted' ? 'booking' : 
+                  booking.booking_status === 'cancelled' ? 'cancelled' : 'change_date',
+            description: `Booking #${booking.booking_id}${booking.quote_id ? ` - Quote #${booking.quote_id}` : ''}`,
             hirerCompany: booking.hirer_company_id,
             renterCompany: booking.renter_company_id,
-            cancelled_reason: booking.cancelled_reason,
-            priority: 'normal'
+            cancelledReason: booking.cancelled_reason || '',
+            rescheduledReason: booking.rescheduled_reason || '',
+            quoteId: booking.quote_id
           };
           
           processedBookings[machineKey].push(bookingData);
@@ -108,68 +142,79 @@ const MachineBookingSystem = () => {
           
           if (booking.booking_status === 'accepted') {
             activeBookingsCount++;
+          } else if (booking.booking_status === 'cancelled') {
+            cancelledBookingsCount++;
+          } else if (booking.booking_status === 'change_of_date') {
+            changeOfDateCount++;
           }
         });
         
         setBookings(processedBookings);
-        setMachines(Array.from(uniqueMachines).sort());
+        const sortedMachines = Array.from(uniqueMachines).sort((a, b) => {
+          const numA = parseInt(a.replace('Machine_', ''));
+          const numB = parseInt(b.replace('Machine_', ''));
+          return numA - numB;
+        });
+        setMachines(sortedMachines);
         
-        // Calculate stats
-        const utilizationRate = (activeBookingsCount / (uniqueMachines.size * 30)) * 100;
+        const totalMachinesCount = uniqueMachines.size;
+        const utilizationRate = totalMachinesCount > 0 ? 
+          Math.round((activeBookingsCount / totalMachinesCount) * 100) : 0;
+        
         setStats({
           totalBookings: totalBookingsCount,
           activeBookings: activeBookingsCount,
-          utilization: Math.min(utilizationRate, 100),
-          upcomingBookings: Math.floor(activeBookingsCount * 0.3),
-          totalMachines: uniqueMachines.size,
-          availableMachines: uniqueMachines.size - Math.floor(activeBookingsCount / 2)
+          cancelledBookings: cancelledBookingsCount,
+          changeOfDateBookings: changeOfDateCount,
+          totalMachines: totalMachinesCount,
+          availableMachines: totalMachinesCount - Math.floor(activeBookingsCount / 2),
+          utilizationRate
         });
 
-        // Show success notification
-        addNotification('Data refreshed successfully', 'success');
+        message.success(`Loaded ${totalBookingsCount} bookings for ${totalMachinesCount} machines`);
+        console.log('Bookings processed successfully');
+      } else {
+        console.warn('No valid data received from API, using mock data');
+        generateMockData();
       }
     } catch (err) {
-      console.error('Error fetching bookings:', err);
-      setError('Failed to fetch bookings. Retrying...');
-      addNotification('Failed to fetch bookings', 'error');
-      
-      // Retry after 3 seconds
-      setTimeout(fetchBookings, 3000);
+      console.error('API Error:', err);
+      setError('API connection failed. Using demo data.');
+      generateMockData();
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [generateMockData]);
 
-  // Auto-refresh functionality
+  // Auto-refresh
   useEffect(() => {
     if (autoRefresh) {
-      refreshInterval.current = setInterval(fetchBookings, 30000);
-      return () => clearInterval(refreshInterval.current);
+      refreshInterval.current = setInterval(fetchBookings, 60000);
+      return () => {
+        if (refreshInterval.current) {
+          clearInterval(refreshInterval.current);
+        }
+      };
     }
   }, [autoRefresh, fetchBookings]);
 
+  // Initial fetch
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Notification system
-  const addNotification = (message, type = 'info') => {
-    const id = Date.now();
-    const notification = { id, message, type };
-    setNotifications(prev => [...prev, notification]);
-    
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 5000);
-  };
-
+  // Filtered machines
   const filteredMachines = useMemo(() => {
-    return machines.filter(machine => 
-      machine.toLowerCase().includes(filter.toLowerCase()) ||
-      machine.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [machines, filter, searchQuery]);
+    if (!searchQuery) return machines;
+    
+    return machines.filter(machine => {
+      const machineNumber = machine.replace('Machine_', '');
+      return machineNumber.includes(searchQuery) || 
+             machine.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }, [machines, searchQuery]);
 
+  // Get dates for current view
   const getDates = () => {
     const dates = [];
     for (let i = 0; i < viewDays; i++) {
@@ -180,10 +225,6 @@ const MachineBookingSystem = () => {
     return dates;
   };
 
-  const formatDate = (date) => {
-    return `${date.getDate()}-${date.toLocaleString('en', { month: 'short' })}`;
-  };
-
   const formatDateTime = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -191,20 +232,25 @@ const MachineBookingSystem = () => {
     return `${year}-${month}-${day} 06:00:00`;
   };
 
+  // Navigation
   const navigate = (direction) => {
     const newDate = new Date(currentDate);
-    const multiplier = direction.includes('Fast') ? 2 : 1;
-    const days = viewDays * multiplier;
+    const multiplier = direction.includes('Fast') ? viewDays : Math.ceil(viewDays / 2);
     
     if (direction.includes('prev')) {
-      newDate.setDate(currentDate.getDate() - days);
+      newDate.setDate(currentDate.getDate() - multiplier);
     } else {
-      newDate.setDate(currentDate.getDate() + days);
+      newDate.setDate(currentDate.getDate() + multiplier);
     }
     
     setCurrentDate(newDate);
   };
 
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Get cell status for a specific machine and date
   const getCellStatus = (machine, date) => {
     const machineBookings = bookings[machine] || [];
     for (const booking of machineBookings) {
@@ -219,14 +265,14 @@ const MachineBookingSystem = () => {
         return {
           ...booking,
           isStart: cellDate.getTime() === startDate.getTime(),
-          isEnd: cellDate.getTime() === endDate.getTime(),
-          duration: Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
+          isEnd: cellDate.getTime() === endDate.getTime()
         };
       }
     }
     return null;
   };
 
+  // Handle cell click
   const handleCellClick = (machine, date) => {
     const existingBooking = getCellStatus(machine, date);
     if (!existingBooking) {
@@ -235,70 +281,87 @@ const MachineBookingSystem = () => {
       
       const startDate = new Date(date);
       const endDate = new Date(date);
-      endDate.setDate(endDate.getDate() + 3);
+      endDate.setDate(endDate.getDate() + 1);
       
       setBookingForm({
+        machineid: parseInt(machineId),
         plannedstartdatetime: formatDateTime(startDate),
         plannedenddatetime: formatDateTime(endDate),
-        status: 'accepted',
-        description: '',
-        priority: 'normal'
+        status: 'accepted'
       });
       
       setBookingModal(true);
     } else {
-      setSelectedBooking(existingBooking);
+      message.info(`Booking #${existingBooking.id} - ${existingBooking.status}`);
     }
   };
 
+  // Submit booking
   const handleBookingSubmit = async () => {
-    if (!selectedSlot || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) {
-      addNotification('Please fill in all required fields', 'warning');
+    if (!bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) {
+      message.warning('Please fill in all required fields');
+      return;
+    }
+
+    const startDate = new Date(bookingForm.plannedstartdatetime);
+    const endDate = new Date(bookingForm.plannedenddatetime);
+    
+    if (endDate <= startDate) {
+      message.warning('End date must be after start date');
       return;
     }
 
     setSubmitting(true);
     try {
-      const requestBody = {
-        machineid: parseInt(selectedSlot.machineId),
-        plannedstartdatetime: bookingForm.plannedstartdatetime,
-        plannedenddatetime: bookingForm.plannedenddatetime,
-        status: bookingForm.status
-      };
-
-      const response = await apiClient.post('/booking/createBooking', requestBody);
-
-      if (response.status === 200 || response.status === 201) {
-        await fetchBookings();
-        setBookingModal(false);
-        setSelectedSlot(null);
-        addNotification('Booking created successfully!', 'success');
+      console.log('Creating booking with payload:', bookingForm);
+      
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
       }
+      
+      const response = await axios.post('/booking/createBooking', bookingForm);
+      console.log('Booking creation response:', response);
+      
+      await fetchBookings();
+      setBookingModal(false);
+      setSelectedSlot(null);
+      setBookingForm({
+        machineid: '',
+        plannedstartdatetime: '',
+        plannedenddatetime: '',
+        status: 'accepted'
+      });
+      
+      message.success('Booking created successfully!');
+      
     } catch (err) {
-      addNotification('Failed to create booking', 'error');
       console.error('Error creating booking:', err);
+      message.error(`Failed to create booking: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Export data
   const exportData = () => {
-    const csvContent = "data:text/csv;charset=utf-8,Machine,Start,End,Status\n" + 
-      Object.entries(bookings).flatMap(([machine, machineBookings]) =>
-        machineBookings.map(booking => 
-          `${machine},${booking.start},${booking.end},${booking.status}`
-        )
-      ).join("\n");
+    const csvHeader = "Machine ID,Booking ID,Start Date,End Date,Status,Hirer Company,Renter Company,Quote ID\n";
+    const csvContent = Object.entries(bookings).flatMap(([machine, machineBookings]) =>
+      machineBookings.map(booking => 
+        `${machine.replace('Machine_', '')},${booking.id},${booking.start.toISOString()},${booking.end.toISOString()},${booking.status},${booking.hirerCompany},${booking.renterCompany},${booking.quoteId || ''}`
+      )
+    ).join("\n");
     
-    const encodedUri = encodeURI(csvContent);
+    const fullCsvContent = "data:text/csv;charset=utf-8," + csvHeader + csvContent;
+    const encodedUri = encodeURI(fullCsvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "bookings_export.csv");
+    link.setAttribute("download", `machine_bookings_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    addNotification('Data exported successfully', 'success');
+    message.success('Booking data exported to CSV');
   };
 
   const dates = getDates();
@@ -312,44 +375,106 @@ const MachineBookingSystem = () => {
     return day === 0 || day === 6;
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'accepted': return '#10B981';
+      case 'cancelled': return '#EF4444';
+      case 'change_of_date': return '#F59E0B';
+      default: return '#6B7280';
+    }
+  };
+
   return (
-    <div className="w-full">
-      {/* Header Section */}
-      <div className="bg-white rounded-lg shadow-sm mb-4">
-        <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-          <div className="flex justify-between items-center">
+    <div style={{ width: '100%', height: '100%' }}>
+      {/* Header */}
+      <div style={{ 
+        backgroundColor: 'white', 
+        borderRadius: '6px', 
+        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', 
+        marginBottom: '16px' 
+      }}>
+        <div style={{ 
+          backgroundColor: '#2563eb', 
+          color: 'white', 
+          padding: '16px', 
+          borderTopLeftRadius: '6px',
+          borderTopRightRadius: '6px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h1 className="text-xl font-semibold">Machine Booking System</h1>
-              <p className="text-blue-100 text-sm">Resource Management Platform</p>
+              <h1 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Machine Booking Calendar</h1>
+              <p style={{ color: 'rgba(219, 234, 254, 1)', fontSize: '14px', margin: '4px 0 0 0' }}>Resource Management & Scheduling</p>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="p-2 bg-white/20 rounded hover:bg-white/30 transition-colors"
-                title="Toggle theme"
-              >
-                {darkMode ? <Sun /> : <Moon />}
-              </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => setShowStats(!showStats)}
-                className="p-2 bg-white/20 rounded hover:bg-white/30 transition-colors"
+                style={{ 
+                  padding: '8px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
                 title="Toggle stats"
               >
-                <BarChart3 />
+                <BarChart3 size={16} />
               </button>
               <button
                 onClick={exportData}
-                className="p-2 bg-white/20 rounded hover:bg-white/30 transition-colors"
-                title="Export data"
+                style={{ 
+                  padding: '8px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title="Export CSV"
               >
-                <Download />
+                <Download size={16} />
+              </button>
+              <button
+                onClick={fetchBookings}
+                style={{ 
+                  padding: '8px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title="Refresh data"
+                disabled={loading}
+              >
+                <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               </button>
               <button
                 onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`p-2 bg-white/20 rounded hover:bg-white/30 transition-colors ${autoRefresh ? 'animate-spin-slow' : ''}`}
+                style={{ 
+                  padding: '8px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  outline: autoRefresh ? '2px solid rgba(255, 255, 255, 0.5)' : 'none'
+                }}
                 title="Auto refresh"
               >
-                <RefreshCw />
+                <Activity size={16} />
               </button>
             </div>
           </div>
@@ -357,104 +482,136 @@ const MachineBookingSystem = () => {
 
         {/* Stats Dashboard */}
         {showStats && (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 p-4 bg-gray-50">
-            <div className="text-center p-3 rounded-lg bg-blue-500 text-white">
-              <Activity />
-              <div className="text-xl font-bold mt-1">{stats.totalBookings}</div>
-              <div className="text-xs">Total Bookings</div>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
+            gap: '8px', 
+            padding: '12px',
+            backgroundColor: '#f9fafb'
+          }}>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#3b82f6', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <Activity size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.totalBookings}</div>
+              <div style={{ fontSize: '12px' }}>Total</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-blue-500 text-white">
-              <CheckCircle />
-              <div className="text-xl font-bold mt-1">{stats.activeBookings}</div>
-              <div className="text-xs">Active</div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#10b981', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <CheckCircle size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.activeBookings}</div>
+              <div style={{ fontSize: '12px' }}>Active</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-gray-500 text-white">
-              <TrendingUp />
-              <div className="text-xl font-bold mt-1">{stats.utilization.toFixed(1)}%</div>
-              <div className="text-xs">Utilization</div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#ef4444', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <XCircle size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.cancelledBookings}</div>
+              <div style={{ fontSize: '12px' }}>Cancelled</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-gray-500 text-white">
-              <Clock />
-              <div className="text-xl font-bold mt-1">{stats.upcomingBookings}</div>
-              <div className="text-xs">Upcoming</div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#f59e0b', color: 'white' }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.changeOfDateBookings}</div>
+              <div style={{ fontSize: '12px' }}>Rescheduled</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-blue-500 text-white">
-              <Zap />
-              <div className="text-xl font-bold mt-1">{stats.totalMachines}</div>
-              <div className="text-xs">Machines</div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#6366f1', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <Zap size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.totalMachines}</div>
+              <div style={{ fontSize: '12px' }}>Machines</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-gray-500 text-white">
-              <Shield />
-              <div className="text-xl font-bold mt-1">{stats.availableMachines}</div>
-              <div className="text-xs">Available</div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#14b8a6', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <Shield size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.availableMachines}</div>
+              <div style={{ fontSize: '12px' }}>Available</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#8b5cf6', color: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+                <TrendingUp size={16} />
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.utilizationRate}%</div>
+              <div style={{ fontSize: '12px' }}>Utilization</div>
             </div>
           </div>
         )}
 
-        {/* Filter Section */}
-        <div className="p-4 border-b">
-          <div className="flex flex-col gap-3">
-            <input
-              type="text"
-              placeholder="Search machines, bookings..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            <div className="flex gap-2">
-              <button
-                onClick={() => setViewMode('timeline')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewMode === 'timeline'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                =� Timeline
-              </button>
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewMode === 'calendar'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                =� Calendar
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                =� List
-              </button>
+        {/* Search and Controls */}
+        <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }}>
+                <Search size={16} />
+              </div>
+              <input
+                type="text"
+                placeholder="Search machines (e.g., 5121, 5152)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  paddingLeft: '36px',
+                  paddingRight: '16px',
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
+                  fontSize: '14px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  outline: 'none',
+                  backgroundColor: 'white',
+                  color: '#111827'
+                }}
+              />
             </div>
           </div>
         </div>
 
         {/* View Controls */}
-        <div className="p-4 flex justify-between items-center">
-          <div className="text-lg font-semibold text-gray-700">
-            {viewDays} Days View
+        <div style={{ 
+          padding: '12px', 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          gap: '12px',
+          borderBottom: '1px solid #e5e7eb'
+        }}>
+          <div style={{ fontSize: '16px', fontWeight: '600', color: '#374151' }}>
+            {viewDays} Days View ({filteredMachines.length} machines)
           </div>
           
-          <div className="flex gap-2">
-            {[1, 7, 14, 30].map(days => (
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <button
+              onClick={goToToday}
+              style={{
+                padding: '4px 12px',
+                fontSize: '12px',
+                backgroundColor: '#2563eb',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Today
+            </button>
+            {[7, 14, 30, 60].map(days => (
               <button
                 key={days}
                 onClick={() => setViewDays(days)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewDays === days 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  backgroundColor: viewDays === days ? '#2563eb' : '#f3f4f6',
+                  color: viewDays === days ? 'white' : '#374151'
+                }}
               >
-                {days} Day{days > 1 ? 's' : ''}
+                {days}d
               </button>
             ))}
           </div>
@@ -462,169 +619,293 @@ const MachineBookingSystem = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 bg-red-100 text-red-700 flex items-center gap-3">
-            <AlertCircle />
-            <span>{error}</span>
+          <div style={{ 
+            padding: '16px', 
+            backgroundColor: '#fef2f2', 
+            border: '1px solid #fecaca', 
+            color: '#b91c1c',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <AlertCircle size={16} />
+            <span style={{ flex: '1' }}>{error}</span>
             <button 
               onClick={fetchBookings} 
-              className="ml-auto px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              style={{
+                padding: '4px 12px',
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              disabled={loading}
             >
-              Retry
+              {loading ? 'Retrying...' : 'Retry'}
             </button>
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div className="p-8">
-            <div className="flex items-center justify-center gap-3">
-              <Loader />
-              <span className="text-gray-600">Loading booking data...</span>
+          <div style={{ padding: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <Loader size={20} style={{ animation: 'spin 1s linear infinite', color: '#2563eb' }} />
+              <span style={{ color: '#6b7280' }}>Loading booking data...</span>
             </div>
           </div>
         )}
 
-        {/* Timeline Grid */}
-        {!loading && viewMode === 'timeline' && (
-          <div className="overflow-x-auto">
-            <div className="min-w-[800px] p-4">
+        {/* Calendar Grid */}
+        {!loading && (
+          <div style={{ overflowY: 'auto', maxHeight: '60vh' }}>
+            <div style={{ minWidth: '100%' }}>
               {/* Navigation Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex gap-2">
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between', 
+                marginBottom: '16px', 
+                padding: '0 16px' 
+              }}>
+                <div style={{ display: 'flex', gap: '4px' }}>
                   <button
                     onClick={() => navigate('prevFast')}
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    style={{
+                      padding: '8px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    title="Previous period"
                   >
-                    <ChevronsLeft />
+                    <ChevronsLeft size={16} />
                   </button>
                   <button
                     onClick={() => navigate('prev')}
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    style={{
+                      padding: '8px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    title="Previous"
                   >
-                    <ChevronLeft />
+                    <ChevronLeft size={16} />
                   </button>
                 </div>
                 
-                <h2 className="text-lg font-semibold text-gray-800">
+                <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
                   {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h2>
                 
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '4px' }}>
                   <button
                     onClick={() => navigate('next')}
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    style={{
+                      padding: '8px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    title="Next"
                   >
-                    <ChevronRight />
+                    <ChevronRight size={16} />
                   </button>
                   <button
                     onClick={() => navigate('nextFast')}
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    style={{
+                      padding: '8px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    title="Next period"
                   >
-                    <ChevronsRight />
+                    <ChevronsRight size={16} />
                   </button>
                 </div>
               </div>
 
-              {/* Timeline Table */}
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border border-gray-300 p-2 bg-gray-50 text-left font-medium text-gray-700 w-32">
-                      Machine
-                    </th>
-                    {dates.map((date, idx) => (
-                      <th 
-                        key={idx} 
-                        className={`border border-gray-300 p-2 text-center font-medium min-w-[100px] ${
-                          isToday(date) 
-                            ? 'bg-blue-600 text-white' 
-                            : isWeekend(date)
-                              ? 'bg-gray-100 text-gray-600'
-                              : 'bg-gray-50 text-gray-700'
-                        }`}
-                      >
-                        <div className="text-xs">
-                          {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                        </div>
-                        <div className="text-sm font-bold">
-                          {formatDate(date)}
-                        </div>
-                        {isToday(date) && (
-                          <div className="text-xs">Today</div>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMachines.length === 0 ? (
-                    <tr>
-                      <td colSpan={dates.length + 1} className="text-center p-8 text-gray-500">
-                        No machines found
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredMachines.map((machine) => (
-                      <tr key={machine} className="hover:bg-gray-50">
-                        <td className="border border-gray-300 p-2 font-medium text-gray-700 bg-gray-50">
-                          {machine.replace('Machine_', 'Mac')}
-                        </td>
-                        {dates.map((date, idx) => {
-                          const status = getCellStatus(machine, date);
-                          let cellStyle = {};
-                          let cellContent = null;
-                          let cellClass = "border border-gray-300 p-2 h-12 relative cursor-pointer hover:bg-gray-100";
-                          
-                          if (status) {
-                            const bgColor = status.type === 'booking' 
-                              ? '#3B82F6'
-                              : '#D4A574';
-                            
-                            cellStyle.backgroundColor = bgColor;
-                            cellClass = "border border-gray-300 p-2 h-12 relative text-white";
-                            
-                            if (status.isStart) {
-                              cellContent = (
-                                <span className="text-xs font-medium">
-                                  {formatDate(status.start)}
-                                </span>
-                              );
-                            } else if (status.isEnd && !status.isStart) {
-                              cellContent = (
-                                <span className="text-xs font-medium float-right">
-                                  {formatDate(status.end)}
-                                </span>
-                              );
-                            }
-                          }
-                          
-                          return (
-                            <td 
-                              key={idx} 
-                              className={cellClass}
-                              style={cellStyle}
-                              onClick={() => !status && handleCellClick(machine, date)}
-                              title={status ? status.description : 'Click to book'}
-                            >
-                              {cellContent}
-                            </td>
-                          );
-                        })}
+              {/* Table */}
+              <div style={{ 
+                overflow: 'hidden', 
+                borderRadius: '4px', 
+                border: '1px solid #d1d5db', 
+                margin: '0 16px' 
+              }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse', 
+                    minWidth: '800px',
+                    fontSize: '14px'
+                  }}>
+                    <thead>
+                      <tr>
+                        <th style={{
+                          border: '1px solid #d1d5db',
+                          padding: '12px',
+                          textAlign: 'left',
+                          fontWeight: '500',
+                          width: '96px',
+                          position: 'sticky',
+                          left: 0,
+                          zIndex: 20,
+                          backgroundColor: '#f9fafb',
+                          color: '#374151'
+                        }}>
+                          Machine ID
+                        </th>
+                        {dates.map((date, idx) => (
+                          <th 
+                            key={idx} 
+                            style={{
+                              border: '1px solid #d1d5db',
+                              padding: '8px',
+                              textAlign: 'center',
+                              fontWeight: '500',
+                              minWidth: '70px',
+                              backgroundColor: isToday(date) 
+                                ? '#2563eb' 
+                                : isWeekend(date)
+                                  ? '#f3f4f6'
+                                  : '#f9fafb',
+                              color: isToday(date) 
+                                ? 'white' 
+                                : isWeekend(date)
+                                  ? '#6b7280'
+                                  : '#374151'
+                            }}
+                          >
+                            <div style={{ fontSize: '12px' }}>
+                              {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                            </div>
+                            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                              {date.getDate()}-{date.toLocaleString('en', { month: 'short' })}
+                            </div>
+                            {isToday(date) && (
+                              <div style={{ fontSize: '12px', opacity: '0.75' }}>Today</div>
+                            )}
+                          </th>
+                        ))}
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {filteredMachines.length === 0 ? (
+                        <tr>
+                          <td colSpan={dates.length + 1} style={{ 
+                            textAlign: 'center', 
+                            padding: '32px', 
+                            color: '#6b7280' 
+                          }}>
+                            {searchQuery ? 'No machines found matching your search' : 'No machines available'}
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredMachines.map((machine) => (
+                          <tr key={machine} style={{ backgroundColor: 'transparent' }}>
+                            <td style={{
+                              border: '1px solid #d1d5db',
+                              padding: '12px',
+                              fontWeight: '500',
+                              fontSize: '14px',
+                              position: 'sticky',
+                              left: 0,
+                              zIndex: 10,
+                              backgroundColor: '#f9fafb',
+                              color: '#374151'
+                            }}>
+                              {machine.replace('Machine_', '')}
+                            </td>
+                            {dates.map((date, idx) => {
+                              const status = getCellStatus(machine, date);
+                              let cellStyle = {
+                                border: '1px solid #d1d5db',
+                                padding: '4px',
+                                height: '40px',
+                                position: 'relative',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                textAlign: 'center'
+                              };
+                              let cellContent = null;
+                              
+                              if (status) {
+                                cellStyle.backgroundColor = getStatusColor(status.status);
+                                cellStyle.color = 'white';
+                                cellStyle.fontWeight = '500';
+                                
+                                if (status.isStart) {
+                                  cellContent = `#${status.id}`;
+                                }
+                              } else {
+                                cellStyle.backgroundColor = 'transparent';
+                              }
+                              
+                              return (
+                                <td 
+                                  key={idx} 
+                                  style={cellStyle}
+                                  onClick={() => handleCellClick(machine, date)}
+                                  title={status ? `Booking #${status.id} - ${status.status}` : 'Click to create booking'}
+                                >
+                                  {cellContent}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               {/* Legend */}
-              <div className="flex gap-4 justify-center mt-4 p-4 bg-gray-50 rounded">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-500 rounded"></div>
-                  <span className="text-sm font-medium text-gray-700">Booking</span>
+              <div style={{ 
+                display: 'flex', 
+                gap: '16px', 
+                justifyContent: 'center', 
+                flexWrap: 'wrap', 
+                marginTop: '16px', 
+                padding: '12px', 
+                borderRadius: '4px', 
+                margin: '16px 16px 0 16px',
+                backgroundColor: '#f9fafb' 
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    width: '12px', 
+                    height: '12px', 
+                    borderRadius: '2px', 
+                    backgroundColor: '#10b981' 
+                  }}></div>
+                  <span style={{ fontSize: '12px', color: '#374151' }}>Accepted</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded" style={{ backgroundColor: '#D4A574' }}></div>
-                  <span className="text-sm font-medium text-gray-700">Block/Maintenance</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    width: '12px', 
+                    height: '12px', 
+                    borderRadius: '2px', 
+                    backgroundColor: '#ef4444' 
+                  }}></div>
+                  <span style={{ fontSize: '12px', color: '#374151' }}>Cancelled</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ 
+                    width: '12px', 
+                    height: '12px', 
+                    borderRadius: '2px', 
+                    backgroundColor: '#f59e0b' 
+                  }}></div>
+                  <span style={{ fontSize: '12px', color: '#374151' }}>Change of Date</span>
                 </div>
               </div>
             </div>
@@ -638,88 +919,254 @@ const MachineBookingSystem = () => {
           setSelectedSlot(null);
           setBookingModal(true);
         }}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          width: '48px',
+          height: '48px',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          zIndex: 40
+        }}
+        title="Create new booking"
       >
-        <Plus />
+        <Plus size={20} />
       </button>
-
-      {/* Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {notifications.map(notification => (
-          <div
-            key={notification.id}
-            className={`p-3 rounded-lg shadow-lg flex items-center gap-2 animate-slideIn ${
-              notification.type === 'success' 
-                ? 'bg-green-500 text-white' 
-                : notification.type === 'error'
-                  ? 'bg-red-500 text-white'
-                  : notification.type === 'warning'
-                    ? 'bg-yellow-500 text-white'
-                    : 'bg-blue-500 text-white'
-            }`}
-          >
-            {notification.type === 'success' && <CheckCircle />}
-            {notification.type === 'error' && <XCircle />}
-            {notification.type === 'warning' && <AlertCircle />}
-            {notification.type === 'info' && <Info />}
-            <span className="text-sm font-medium">{notification.message}</span>
-          </div>
-        ))}
-      </div>
 
       {/* Booking Modal */}
       {bookingModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-              <h2 className="text-lg font-semibold">Create New Booking</h2>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px',
+          zIndex: 50
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+            maxWidth: '448px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#2563eb',
+              color: 'white',
+              padding: '16px',
+              borderTopLeftRadius: '8px',
+              borderTopRightRadius: '8px'
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Create New Booking</h2>
+              <p style={{ fontSize: '14px', color: 'rgba(219, 234, 254, 1)', margin: '4px 0 0 0' }}>
+                Schedule a machine reservation
+              </p>
             </div>
             
-            <div className="p-4">
+            <div style={{ padding: '16px' }}>
               {selectedSlot && (
-                <div className="mb-4 p-3 bg-blue-50 rounded">
-                  <p className="text-sm"><strong>Machine:</strong> {selectedSlot.machine.replace('Machine_', 'Mac')}</p>
-                  <p className="text-sm"><strong>Date:</strong> {formatDate(selectedSlot.date)}</p>
+                <div style={{
+                  marginBottom: '16px',
+                  padding: '12px',
+                  backgroundColor: '#eff6ff',
+                  borderRadius: '4px',
+                  borderLeft: '4px solid #3b82f6'
+                }}>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>
+                    <strong>Machine ID:</strong> {selectedSlot.machineId}
+                  </p>
+                  <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+                    <strong>Selected Date:</strong> {selectedSlot.date.toLocaleDateString()}
+                  </p>
                 </div>
               )}
               
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {!selectedSlot && (
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      marginBottom: '4px',
+                      color: '#374151' 
+                    }}>
+                      Machine ID
+                    </label>
+                    <select
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: '#111827'
+                      }}
+                      value={bookingForm.machineid}
+                      onChange={(e) => setBookingForm({...bookingForm, machineid: parseInt(e.target.value)})}
+                    >
+                      <option value="">Select a machine...</option>
+                      {machines.map(machine => (
+                        <option key={machine} value={machine.replace('Machine_', '')}>
+                          Machine {machine.replace('Machine_', '')}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    marginBottom: '4px',
+                    color: '#374151' 
+                  }}>
+                    Start Date & Time *
+                  </label>
                   <input
                     type="text"
                     value={bookingForm.plannedstartdatetime}
                     onChange={(e) => setBookingForm({...bookingForm, plannedstartdatetime: e.target.value})}
                     placeholder="YYYY-MM-DD HH:MM:SS"
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'white',
+                      color: '#111827'
+                    }}
                   />
+                  <p style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>
+                    Format: 2025-01-15 06:00:00
+                  </p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    marginBottom: '4px',
+                    color: '#374151' 
+                  }}>
+                    End Date & Time *
+                  </label>
                   <input
                     type="text"
                     value={bookingForm.plannedenddatetime}
                     onChange={(e) => setBookingForm({...bookingForm, plannedenddatetime: e.target.value})}
                     placeholder="YYYY-MM-DD HH:MM:SS"
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'white',
+                      color: '#111827'
+                    }}
                   />
+                  <p style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>
+                    Format: 2025-01-16 18:00:00
+                  </p>
                 </div>
                 
-                <div className="flex gap-3 pt-4">
+                <div>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    marginBottom: '4px',
+                    color: '#374151' 
+                  }}>
+                    Status
+                  </label>
+                  <select
+                    value={bookingForm.status}
+                    onChange={(e) => setBookingForm({...bookingForm, status: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'white',
+                      color: '#111827'
+                    }}
+                  >
+                    <option value="accepted">Accepted</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px', paddingTop: '16px' }}>
                   <button
                     onClick={handleBookingSubmit}
-                    disabled={submitting}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+                    disabled={submitting || !bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime}
+                    style={{
+                      flex: 1,
+                      backgroundColor: '#2563eb',
+                      color: 'white',
+                      padding: '12px 16px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontWeight: '500',
+                      cursor: submitting ? 'not-allowed' : 'pointer',
+                      opacity: (submitting || !bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) ? 0.5 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
                   >
-                    {submitting ? 'Creating...' : 'Create Booking'}
+                    {submitting ? (
+                      <>
+                        <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                        Creating...
+                      </>
+                    ) : 'Create Booking'}
                   </button>
                   <button
                     onClick={() => {
                       setBookingModal(false);
                       setSelectedSlot(null);
+                      setBookingForm({
+                        machineid: '',
+                        plannedstartdatetime: '',
+                        plannedenddatetime: '',
+                        status: 'accepted'
+                      });
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
+                    style={{
+                      flex: 1,
+                      padding: '12px 16px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      backgroundColor: '#f3f4f6',
+                      color: '#374151'
+                    }}
                   >
                     Cancel
                   </button>
@@ -729,37 +1176,6 @@ const MachineBookingSystem = () => {
           </div>
         </div>
       )}
-
-      {/* Custom CSS */}
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-        
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        
-        .animate-spin-slow {
-          animation: spin 3s linear infinite;
-        }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };
