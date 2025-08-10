@@ -85,21 +85,22 @@ function Sidebar() {
                 }
             });
         } else { // navigate to other component
-            if(value.key == 'buy-gauges' || value.key == 'my-gauges'){
+            if (value.key == 'buy-gauges' || value.key == 'my-gauges') {
                 sessionStorage.setItem('searchParam', '{"category":"Gauges","query":"","condition":"both","type":"both"}');
             }
-            
-            if(value.key == 'buy-tools'|| value.key == 'my-tools'){
+
+            if (value.key == 'buy-tools' || value.key == 'my-tools') {
                 sessionStorage.setItem('searchParam', '{"category":"Tools","query":"","condition":"both","type":"both"}');
             }
 
-            if(value.key == 'buy-scrap'|| value.key == 'my-tools'){
+            if (value.key == 'buy-scrap' || value.key == 'my-scrap') {
                 sessionStorage.setItem('searchParam', '{"category":"Scrap","query":"","condition":"both","type":"both"}');
             }
 
-            if(value.key == 'buy-rawmat'|| value.key == 'my-tools'){
+            if (value.key == 'buy-rawmat' || value.key == 'my-rawmat') {
                 sessionStorage.setItem('searchParam', '{"category":"Rawmat","query":"","condition":"both","type":"both"}');
             }
+
             navigate(value.key)
             // if any side menu clicked then registered machines will be removed
             var existingFormDataArray = JSON.parse(localStorage.getItem('machines')) || [];

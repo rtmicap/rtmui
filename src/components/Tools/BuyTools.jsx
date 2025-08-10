@@ -29,12 +29,10 @@ function BuyTools() {
     }
     );  */
     const [searchParam, setSearchParam] = useState(previousSearch);
-
     const getAllTools = async () => {
         try {
             if (previousSearch != "" && searchParam != null) {
                 let params = typeof (searchParam) == "string" ? JSON.parse(searchParam) : searchParam;
-                console.log(searchParam, "   ", params);
                 if (params.query != "") {
                     const token = localStorage.getItem('authToken');
                     axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
@@ -51,11 +49,10 @@ function BuyTools() {
             navigate('/login');
         }
     }
-
-
     useEffect(() => {
-        searchParam?previousSearch=searchParam:setSearchParam(previousSearch);
+        searchParam ? previousSearch = searchParam : setSearchParam(previousSearch);
         getAllTools();
+        setBuyTools([])
     }, [searchParam]);
 
     const cardClick = (item) => {
@@ -71,7 +68,7 @@ function BuyTools() {
 
     }
 
-    const gotoCart=()=>{
+    const gotoCart = () => {
         navigate('/cart-items');
     }
 
@@ -119,8 +116,8 @@ function BuyTools() {
         return;
     }
 
-    const imageError=(e)=>{
-       (e.target.parentElement).innerText="No Image"
+    const imageError = (e) => {
+        (e.target.parentElement).innerText = "No Image"
     }
 
     return (
@@ -151,11 +148,11 @@ function BuyTools() {
                                             </>
                                             /* <input type="checkbox" title="Favorite" id={item.tool_id} onClick={handleFavClick} /> */
                                         }
-                                        {<img src={item.favoriteInd ? heartTrue : heartFalse} alt={item.favoriteInd ? "T" : "F"} index={index} id={item.tool_id} onClick={handleFavClick} title={item.favoriteInd ? "Delete favorite":"Add favorite"}></img>}
+                                        {<img src={item.favoriteInd ? heartTrue : heartFalse} alt={item.favoriteInd ? "T" : "F"} index={index} id={item.tool_id} onClick={handleFavClick} title={item.favoriteInd ? "Delete favorite" : "Add favorite"}></img>}
                                     </div>
                                     <div className="card-distance">{firstChrUpperCase(item.distance)} Kms away</div>
                                     <div className="child-card-img">
-                                        {((item.tool_image).length>0)?<img className="card-img" src={item.tool_image[0]} onError={imageError}/>:<div className='card-img'>No Image</div>}
+                                        {((item.tool_image).length > 0) ? <img className="card-img" src={item.tool_image[0]} onError={imageError} /> : <div className='card-img'>No Image</div>}
                                     </div>
                                     <div className="card-price-tag">
                                         <div></div>
