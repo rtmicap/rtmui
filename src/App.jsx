@@ -139,8 +139,6 @@ const App = () => {
             <Route path="my-tools" element={<MyTools />} />
             <Route path="sell-tools" element={<SellTools />} />
             <Route path="cart-items" element={<ViewCart />} />
-
-
             {/* Gauges */}
             <Route path='buy-gauges' element={<BuyTools />} />
             <Route path='tools-detail' element={<Tools_detail />} />
