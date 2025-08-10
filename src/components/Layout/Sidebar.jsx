@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useEffect, useState } from "react";
 import Navbar from '../Navbar/Navbar'
+import MachineBookingSystem from '../Calendar/MachineBookingSystem';
 
 
 function getItem(label, key, icon, children) {
@@ -35,6 +36,7 @@ const items = [
     getItem('Hire Machines', 'hire-machine', <CalendarOutlined />),
     getItem('Quotes', 'quotes', <ContactsOutlined />),
     getItem('Orders', 'orders', <UnorderedListOutlined />),
+    getItem('calendar', 'calendar', <CalendarOutlined />),
     // getItem('My Bookings', 'my-bookings', <UnorderedListOutlined />),
     // getItem('Payment', 'payment', <CreditCardOutlined />),
     getItem('Tools', 'tools', <ToolOutlined />, [

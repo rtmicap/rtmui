@@ -51,6 +51,7 @@ export const GET_MACHINES_BY_ID = "/machines/getMachinesByCompanyId";
 export const GET_MACHINES_BY_MACHONE_ID = "/machines/getMachinesByMachineId";
 // Update Machines
 export const UPDATE_MACHINES_BY_ID = "/machines/updatemachine";
+export const BOOKING_UPDATE_BY_ID = "/booking/getAllBooking";
 // ******************************///*****************///
 //Admin URLS
 

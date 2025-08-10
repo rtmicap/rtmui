@@ -47,6 +47,7 @@ import './App.scss';
 import EditMachine from './components/EditMachine/EditMachine';
 import ManageCoordinator from './components/Profile/coordinator/ManageCoordinator';
 import ViewCart from './components/Tools/ViewCart';
+import MachineBookingSystem from './components/Calendar/MachineBookingSystem';
 
 const App = () => {
   const location = useLocation();
@@ -149,6 +150,9 @@ const App = () => {
 
             {/* Quotes */}
             <Route path='quotes' element={<Quotes />} />
+
+           {/* /calendar */}
+            <Route path='calendar' element={<MachineBookingSystem/>} />
 
             {/* review-booking */}
             <Route path='review-booking' element={<ReviewBooking />} />
