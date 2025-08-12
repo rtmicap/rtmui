@@ -7,7 +7,7 @@ import "./sell.scss";
 function SellTools() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        category: "Tools",
+        category: "",
         name: "",
         description: "",
         specifications: "",
@@ -23,6 +23,8 @@ function SellTools() {
     const [message, setMessage] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    let itemCategory = JSON.parse(sessionStorage.getItem('searchParam')).category;
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -101,12 +103,11 @@ function SellTools() {
 
         // Construct the request payload with image URLs
         const payload = {
-            category: formData.category,
+            category: itemCategory.toLowerCase(),
             toolname: formData.name,
             description: formData.description,
             specifications: formData.specifications,
             make: formData.make,
-            rentprice: parseFloat(formData.rentPrice) || 0,
             sellingprice: parseFloat(formData.sellingPrice) || 0,
             quantity: parseInt(formData.quantity, 10) || 0,
             condition: formData.condition,
@@ -149,51 +150,38 @@ function SellTools() {
 
             <form onSubmit={handleSubmit}>
                 <label>
-                    Category:
-                    <select name="category" value={formData.category} onChange={handleChange}>
-                        <option value="tools">Tools</option>
-                        <option value="gauges">Gauges</option>
-                        <option value="scrap">Scrap</option>
-                        <option value="rawmat">Raw Material</option>
-                    </select>
-                </label>
-                <label>
-                    Name:
+                    Name
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                 </label>
 
                 <label>
-                    Description:
+                    Description
                     <textarea name="description" value={formData.description} onChange={handleChange} required />
                 </label>
 
                 <label>
-                    Specifications:
+                    Specifications
                     <textarea name="specifications" value={formData.specifications} onChange={handleChange} required />
                 </label>
 
                 <label>
-                    Make:
+                    Make
                     <input type="text" name="make" value={formData.make} onChange={handleChange} required />
                 </label>
 
-                <label>
-                    Rent Price:
-                    <input type="text" name="rentPrice" value={formData.rentPrice} onChange={handleChange} required />
-                </label>
 
                 <label>
-                    Selling Price:
+                    Selling Price (Rs)
                     <input type="text" name="sellingPrice" value={formData.sellingPrice} onChange={handleChange} required />
                 </label>
 
                 <label>
-                    Quantity:
+                    Quantity
                     <input type="text" name="quantity" value={formData.quantity} onChange={handleChange} required />
                 </label>
 
                 <label>
-                    Condition:
+                    Condition
                     <select name="condition" value={formData.condition} onChange={handleChange}>
                         <option value="new">New</option>
                         <option value="used">Used</option>
@@ -201,7 +189,7 @@ function SellTools() {
                 </label>
 
                 <label>
-                    Upload Images (Max 4):
+                    Upload Images (Max 4)
                     <div className="file-upload-container">
                         <input
                             id="file-upload-input"
@@ -237,7 +225,7 @@ function SellTools() {
                 </div>
 
 
-                <button type="submit">Sell Tool</button>
+                <button type="button" className="primarybutton">Register</button>
             </form>
         </div>
     );

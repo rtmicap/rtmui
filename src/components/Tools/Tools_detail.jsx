@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {message} from 'antd';
-import DetailCard from '../common/DetailCard'; 
+import DetailCard from './DetailCard.jsx'; 
 import { Link, useLocation, useNavigate, useSearchParams  } from 'react-router-dom';
 import {firstChrUpperCase} from "../../utils/utils.js";
 import { GET_TOOL_BY_ID } from '../../api/apiUrls.js';

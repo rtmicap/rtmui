@@ -35,7 +35,6 @@ function MyTools() {
       if (response && response.data.result) {
         console.log(response.data.result);
         let filteredList = (response.data.result).filter((tool) => {
-          console.log(tool.category, "Cat", filterCategory);
           if (tool.category == filterCategory) {
             console.log(tool.category);
             return (tool)
@@ -132,7 +131,10 @@ function MyTools() {
                     else if ((filterText.length > 2) &&
                       (item.tool_name.toLowerCase().includes(filterText.toLowerCase()) ||
                         item.tool_description.toLowerCase().includes(filterText.toLowerCase()) ||
-                        item.tool_make.toLowerCase().includes(filterText.toLowerCase()))) {
+                        item.tool_make.toLowerCase().includes(filterText.toLowerCase()) ||
+                        item.tool_make.toLowerCase().includes(filterText.toLowerCase()) || 
+                        item.tool_condition.toLowerCase().includes(filterText.toLowerCase())))
+                      {
                       display = true;
                     }
 
@@ -151,7 +153,7 @@ function MyTools() {
                             <div className="card-price-tag">
                               <div></div>
                               <div className="prim_price_tag">Buy  : ₹ {item.tool_selling_price == null ? "NA" : item.tool_selling_price}</div>
-                              <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div>
+                             {/*  <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div> */}
                             </div>
                             <hr />
                             <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>
