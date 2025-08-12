@@ -13,8 +13,8 @@ function SearchTools({ searchParam, setSearchParam }) {
   const condRef = useRef();
   const typeRef = useRef();
   const navigate = useNavigate();
-  const [condition, setCondition] = useState("new");
-  const [type, setType] = useState("both");
+  const [condition, setCondition] = useState();
+  const [type, setType] = useState();
   const [searchText, setSearchText] = useState("");
   let location = useLocation();
 
@@ -107,15 +107,8 @@ function SearchTools({ searchParam, setSearchParam }) {
           <option value="used">Used</option>
         </select></div>
 
-      <div className="search_cells_container">
-        <label>Buy/Rent</label><select name="tools_sellType" ref={typeRef} defaultValue={type} id="type" onChange={handleSelectclick}>
-          <option value="both">Both</option>
-          <option value="buy">Buy</option>
-          <option value="rent">Rent</option>
-        </select></div>
-
       <div className="searchbox_container">
-        <div>Name</div>
+        <div>Search Item</div>
         <div className="searchText_inlineblock">
           <input
             type="search"

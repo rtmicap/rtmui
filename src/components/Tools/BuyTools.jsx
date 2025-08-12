@@ -122,7 +122,7 @@ function BuyTools() {
 
     return (
         <div>
-            <h1>Buy / Rent {!!previousSearch ? previousSearch.category : ""}</h1> <button className='cartLink' onClick={gotoCart}>View Cart</button>
+            <h1>Buy {!!previousSearch ? previousSearch.category : ""}</h1> <button className='cartLink' onClick={gotoCart}>View Cart</button>
             <div className="container-layout">
                 <div className="sidebar-filter"><div>
                     <SearchTools searchParam={searchParam} setSearchParam={setSearchParam} /></div> </div>
@@ -157,7 +157,6 @@ function BuyTools() {
                                     <div className="card-price-tag">
                                         <div></div>
                                         <div className="prim_price_tag">Buy  : ₹ {item.tool_selling_price == null ? "NA" : item.tool_selling_price}</div>
-                                        <div className="sec_price_tag">Rent : ₹ {item.tool_rent_price == null ? "NA" : item.tool_rent_price}</div>
                                     </div>
                                     <hr />
                                     <div className="card-desc"><span className="detailsCardSpan">{firstChrUpperCase(item.tool_make)}</span></div>

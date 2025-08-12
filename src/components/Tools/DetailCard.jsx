@@ -4,7 +4,7 @@ import './DetailCard.scss'; // Import your SCSS file
 import axios from '../../api/axios.js';
 import { EDIT_TOOL,GET_COMPANY_DETAILS_BY_ID,ADD_TO_CART, GET_TOOLS_AUDIT  } from '../../api/apiUrls.js';
 import { message } from 'antd';
-import {formattedDateTime } from '../../utils/utils';
+import {formattedDateTime } from '../../utils/utils.js';
 
 // Map the image names from the JSON to the actual imported images
 //const imagesMap = [image1, image2, image3, image4];
@@ -72,7 +72,6 @@ const Carousel = (imagesMap) => {
           const payload = {
                       toolid:editProduct.tool_id,
                       specifications: editProduct.tool_specifications,
-                      rentprice: parseFloat(editProduct.tool_rent_price),
                       sellingprice: parseFloat(editProduct.tool_selling_price),
                       quantity: parseInt(editProduct.tool_quantity, 10)
                   };
@@ -185,7 +184,7 @@ const Carousel = (imagesMap) => {
           {
             getCompanyDetailsById();
             getAuditDetails();
-          },[])
+          },[editProduct])
 
     return (
       <div className="detail-card-container">
@@ -193,7 +192,7 @@ const Carousel = (imagesMap) => {
         <div className="tools_info_card">
         <div className="titleCard">
         <h3>{product.tool_name}</h3>
-        <p><span className="detailsCardSpan">Make         : </span>{product.tool_make + transtype} </p>
+        <p><span className="detailsCardSpan">Make         : </span>{product.tool_make} </p>
         <p><span className="detailsCardSpan">Description  : </span>{product.tool_description}</p>
         <p><span className="detailsCardSpan">Availble QTY : </span>{(isEdit)?<input className="inputFields" type="text" name="tool_quantity" defaultValue={editProduct.tool_quantity} onChange={handleOnChange}/>:editProduct.tool_quantity}</p>
         </div>
@@ -205,11 +204,6 @@ const Carousel = (imagesMap) => {
             <p><span className="detailsCardSpan">Sell Price: ₹ </span>{(isEdit)?<input className="inputFields" type="text" name="tool_selling_price" defaultValue={editProduct.tool_selling_price} onChange={handleOnChange}/>:editProduct.tool_selling_price}</p>
             :
             <p><span className="detailsCardSpan">Sell Price: </span> Not Available</p>
-          }
-          {(product.tool_rent_price!=null)?
-          <p><span className="detailsCardSpan">Rent Price: ₹ </span>{(isEdit)?<input className="inputFields" type="text" name="tool_rent_price" defaultValue={editProduct.tool_rent_price} onChange={handleOnChange}/>:editProduct.tool_rent_price} <span> / day</span></p>
-            :
-            <p><span className="detailsCardSpan">Rent Price: </span> Not Available</p>
           }
         </div>
         <div className="additional-details">
