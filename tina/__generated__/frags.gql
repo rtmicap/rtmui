@@ -1,0 +1,11 @@
+fragment PricingParts on Pricing {
+  __typename
+  features {
+    __typename
+    feature_name
+    silver
+    gold
+    platinum
+    custom
+  }
+}

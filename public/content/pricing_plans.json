@@ -1,0 +1,121 @@
+[
+  {
+    "feature_name": "Suitability",
+    "silver": "Micro Industries",
+    "gold": "Small industries",
+    "platinum": "Medium industries and Above",
+    "custom": "Call us for your customized plan"
+  },
+  {
+    "feature_name": "Machine registration",
+    "silver": "5",
+    "gold": "8",
+    "platinum": "12",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Hiring hours",
+    "silver": "Unlimited",
+    "gold": "Unlimited",
+    "platinum": "Unlimited",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Rental hours",
+    "silver": "Unlimited",
+    "gold": "Unlimited",
+    "platinum": "Unlimited",
+    "custom": "-"
+  },
+  {
+    "feature_name": "No of Quotes / Orders",
+    "silver": "Unlimited",
+    "gold": "Unlimited",
+    "platinum": "Unlimited",
+    "custom": "-"
+  },
+  {
+    "feature_name": "No of users (email id)",
+    "silver": "1",
+    "gold": "3",
+    "platinum": "5",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Tools registration",
+    "silver": "8",
+    "gold": "12",
+    "platinum": "18",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Gauge registration",
+    "silver": "8",
+    "gold": "12",
+    "platinum": "18",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Raw material registration",
+    "silver": "3",
+    "gold": "5",
+    "platinum": "8",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Scrap registration",
+    "silver": "3",
+    "gold": "5",
+    "platinum": "8",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Data analytics",
+    "silver": "Nil",
+    "gold": "Yes",
+    "platinum": "Yes",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Chatbox",
+    "silver": "NA",
+    "gold": "Yes",
+    "platinum": "Yes",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Email notifications",
+    "silver": "Yes",
+    "gold": "Yes",
+    "platinum": "Yes",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Zero Cancellation charges",
+    "silver": "NA",
+    "gold": "3",
+    "platinum": "5",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Payment support",
+    "silver": "Yes",
+    "gold": "Yes",
+    "platinum": "Yes",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Network Discount at renewal (hire partners)",
+    "silver": "Not applicable",
+    "gold": "Applicable upto 2000 Rs at the rate of Rs. 40 per hiring partner",
+    "platinum": "Applicable upto 5000 Rs at the rate of Rs. 50 per hiring partner",
+    "custom": "-"
+  },
+  {
+    "feature_name": "Annual subscription fees",
+    "silver": "14999.00",
+    "gold": "19999.00",
+    "platinum": "25599.00",
+    "custom": "-"
+  }
+]
