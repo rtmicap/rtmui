@@ -144,7 +144,7 @@ function MyTools() {
                           <div className="main-card">
                             <div className={`tool_condition tool_${item.tool_condition}`}>{firstChrUpperCase(item.tool_condition)}</div>
                             {isDelete && <div className={`fav_tool`} id={item.tool_id} onClick={handleDeleteClick}>
-                              <img src={deleteIcon} title="Delete Item"></img>
+                              <img src={deleteIcon} id={item.tool_id} title="Delete Item"></img>
                             </div>}
                             <div className="child-card-img">
                               {((item.tool_image).length > 0) ? <img className="card-img" src={item.tool_image[0]} onError={imageError} /> : <div className='card-img'>No Image</div>}
