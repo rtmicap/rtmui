@@ -1,15 +1,16 @@
+
+
 // import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-// import { Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, RefreshCw, Search, Download, CheckCircle, XCircle, AlertCircle, Info, Activity, TrendingUp, BarChart3, Zap, Shield, Sun, Moon, Loader } from 'lucide-react';
-// import axios from '../../api/axios.js';
-// import { GET_ALL_BOOKINGS } from '../../api/apiUrls.js';
-// import { message } from 'antd';
+// import { Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, RefreshCw, Search, Download, CheckCircle, XCircle, AlertCircle, Info, Activity, TrendingUp, BarChart3, Zap, Shield, Sun, Moon, Loader, Trash2 } from 'lucide-react';
 
 // const MachineBookingSystem = () => {
 //   // Core States
-//   const [viewDays, setViewDays] = useState(14);
+//   const [viewDays, setViewDays] = useState(7);
 //   const [currentDate, setCurrentDate] = useState(new Date());
 //   const [selectedSlot, setSelectedSlot] = useState(null);
 //   const [bookingModal, setBookingModal] = useState(false);
+//   const [cancelModal, setCancelModal] = useState(false);
+//   const [selectedBooking, setSelectedBooking] = useState(null);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 //   const [bookings, setBookings] = useState({});
@@ -26,6 +27,7 @@
 //     activeBookings: 0,
 //     cancelledBookings: 0,
 //     changeOfDateBookings: 0,
+//     blockedBookings: 0,
 //     totalMachines: 0,
 //     availableMachines: 0,
 //     utilizationRate: 0
@@ -35,57 +37,71 @@
 //     machineid: '',
 //     plannedstartdatetime: '',
 //     plannedenddatetime: '',
-//     status: 'accepted'
+//     notes: ''
+//   });
+
+//   const [cancelForm, setCancelForm] = useState({
+//     reason: ''
 //   });
 
 //   // Generate mock data for testing
 //   const generateMockData = useCallback(() => {
 //     console.log('Generating mock data for testing...');
-//     const mockMachineIds = [5019, 5032, 5048, 5112, 5119, 5124, 5127, 5131, 5138, 5139, 5145, 5147, 5149, 5152, 5155];
+//     // Using actual machine IDs from API response instead of mock ones
+//     const apiMachineIds = [5019, 5032, 5048, 5112, 5119, 5124, 5127, 5131, 5138, 5139, 5145, 5147, 5149, 5152, 5155];
 //     const mockBookings = {};
     
-//     mockMachineIds.forEach((machineId, index) => {
+//     apiMachineIds.forEach((machineId, index) => {
 //       const machineKey = `Machine_${machineId}`;
 //       mockBookings[machineKey] = [];
       
 //       // Add some random bookings for demonstration
-//       if (index % 3 === 0) { // Add booking to every 3rd machine
+//       if (index % 4 === 0) { // Add booking to every 4th machine
 //         const startDate = new Date();
 //         startDate.setDate(startDate.getDate() + Math.floor(Math.random() * 10));
 //         const endDate = new Date(startDate);
-//         endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 7) + 1);
+//         endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 5) + 1);
+        
+//         // Mix of blocked (manual) and accepted (backend) bookings
+//         const isManualBooking = Math.random() > 0.5;
         
 //         mockBookings[machineKey].push({
 //           id: 100 + index,
 //           start: startDate,
 //           end: endDate,
-//           status: 'accepted',
-//           type: 'booking',
-//           description: `Mock Booking #${100 + index} for Machine ${machineId}`,
+//           status: isManualBooking ? 'blocked' : 'accepted',
+//           type: isManualBooking ? 'blocked' : 'booking',
+//           description: `${isManualBooking ? 'Manual' : 'System'} Booking #${100 + index} for Machine ${machineId}`,
 //           hirerCompany: 1025,
 //           renterCompany: 1031,
-//           quoteId: 2000 + index
+//           quoteId: isManualBooking ? null : 2000 + index,
+//           notes: isManualBooking ? 'Manually created booking' : 'System generated booking'
 //         });
 //       }
 //     });
     
-//     setMachines(mockMachineIds.map(id => `Machine_${id}`));
+//     setMachines(apiMachineIds.map(id => `Machine_${id}`));
 //     setBookings(mockBookings);
     
 //     // Calculate stats
-//     const totalBookings = Object.values(mockBookings).flat().length;
+//     const allBookings = Object.values(mockBookings).flat();
+//     const totalBookings = allBookings.length;
+//     const activeBookings = allBookings.filter(b => b.status === 'accepted').length;
+//     const blockedBookings = allBookings.filter(b => b.status === 'blocked').length;
+    
 //     setStats({
 //       totalBookings,
-//       activeBookings: totalBookings,
+//       activeBookings,
+//       blockedBookings,
 //       cancelledBookings: 0,
 //       changeOfDateBookings: 0,
-//       totalMachines: mockMachineIds.length,
-//       availableMachines: mockMachineIds.length - totalBookings,
-//       utilizationRate: Math.round((totalBookings / mockMachineIds.length) * 100)
+//       totalMachines: apiMachineIds.length,
+//       availableMachines: apiMachineIds.length - totalBookings,
+//       utilizationRate: Math.round((totalBookings / apiMachineIds.length) * 100)
 //     });
     
 //     setLoading(false);
-//     message.success('Demo data loaded successfully');
+//     console.log('Demo data loaded successfully with blocked/accepted bookings');
 //   }, []);
 
 //   // Fetch bookings from API
@@ -95,12 +111,43 @@
 //     setError(null);
     
 //     try {
-//       const token = localStorage.getItem("authToken");
-//       if (token) {
-//         axios.defaults.headers.common["authorization"] = "Bearer " + token;
-//       }
+//       // Simulate API call - replace with actual axios call
+//       const response = await new Promise((resolve) => {
+//         setTimeout(() => {
+//           resolve({
+//             data: {
+//               results: [
+//                 {
+//                   booking_id: 282,
+//                   machine_id: 5148,
+//                   actual_start_date_time: "2025-08-14T07:01:00.000Z",
+//                   actual_end_date_time: "2025-08-16T05:01:00.000Z",
+//                   booking_status: "accepted",
+//                   hirer_company_id: 1025,
+//                   renter_company_id: 1040,
+//                   quote_id: 2464,
+//                   cancelled_reason: "",
+//                   rescheduled_reason: ""
+//                 },
+//                 // Add more sample data with blocked status
+//                 {
+//                   booking_id: 283,
+//                   machine_id: 5019,
+//                   actual_start_date_time: "2025-08-15T08:00:00.000Z",
+//                   actual_end_date_time: "2025-08-17T17:00:00.000Z",
+//                   booking_status: "blocked",
+//                   hirer_company_id: null,
+//                   renter_company_id: null,
+//                   quote_id: null,
+//                   cancelled_reason: "",
+//                   rescheduled_reason: ""
+//                 }
+//               ]
+//             }
+//           });
+//         }, 1000);
+//       });
       
-//       const response = await axios.get(GET_ALL_BOOKINGS);
 //       console.log('API Response:', response);
       
 //       if (response && response.data && response.data.results && Array.isArray(response.data.results)) {
@@ -108,6 +155,7 @@
 //         const uniqueMachines = new Set();
 //         let totalBookingsCount = 0;
 //         let activeBookingsCount = 0;
+//         let blockedBookingsCount = 0;
 //         let cancelledBookingsCount = 0;
 //         let changeOfDateCount = 0;
         
@@ -127,14 +175,14 @@
 //             start: startDate,
 //             end: endDate,
 //             status: booking.booking_status,
-//             type: booking.booking_status === 'accepted' ? 'booking' : 
-//                   booking.booking_status === 'cancelled' ? 'cancelled' : 'change_date',
+//             type: booking.booking_status,
 //             description: `Booking #${booking.booking_id}${booking.quote_id ? ` - Quote #${booking.quote_id}` : ''}`,
 //             hirerCompany: booking.hirer_company_id,
 //             renterCompany: booking.renter_company_id,
 //             cancelledReason: booking.cancelled_reason || '',
 //             rescheduledReason: booking.rescheduled_reason || '',
-//             quoteId: booking.quote_id
+//             quoteId: booking.quote_id,
+//             notes: booking.booking_status === 'blocked' ? 'Manually blocked slot' : 'System booking'
 //           };
           
 //           processedBookings[machineKey].push(bookingData);
@@ -142,6 +190,8 @@
           
 //           if (booking.booking_status === 'accepted') {
 //             activeBookingsCount++;
+//           } else if (booking.booking_status === 'blocked') {
+//             blockedBookingsCount++;
 //           } else if (booking.booking_status === 'cancelled') {
 //             cancelledBookingsCount++;
 //           } else if (booking.booking_status === 'change_of_date') {
@@ -159,20 +209,20 @@
         
 //         const totalMachinesCount = uniqueMachines.size;
 //         const utilizationRate = totalMachinesCount > 0 ? 
-//           Math.round((activeBookingsCount / totalMachinesCount) * 100) : 0;
+//           Math.round(((activeBookingsCount + blockedBookingsCount) / totalMachinesCount) * 100) : 0;
         
 //         setStats({
 //           totalBookings: totalBookingsCount,
 //           activeBookings: activeBookingsCount,
+//           blockedBookings: blockedBookingsCount,
 //           cancelledBookings: cancelledBookingsCount,
 //           changeOfDateBookings: changeOfDateCount,
 //           totalMachines: totalMachinesCount,
-//           availableMachines: totalMachinesCount - Math.floor(activeBookingsCount / 2),
+//           availableMachines: totalMachinesCount - activeBookingsCount - blockedBookingsCount,
 //           utilizationRate
 //         });
 
-//         message.success(`Loaded ${totalBookingsCount} bookings for ${totalMachinesCount} machines`);
-//         console.log('Bookings processed successfully');
+//         console.log(`Loaded ${totalBookingsCount} bookings for ${totalMachinesCount} machines`);
 //       } else {
 //         console.warn('No valid data received from API, using mock data');
 //         generateMockData();
@@ -276,6 +326,7 @@
 //   const handleCellClick = (machine, date) => {
 //     const existingBooking = getCellStatus(machine, date);
 //     if (!existingBooking) {
+//       // Create new booking
 //       const machineId = machine.replace('Machine_', '');
 //       setSelectedSlot({ machine, machineId, date });
       
@@ -287,19 +338,22 @@
 //         machineid: parseInt(machineId),
 //         plannedstartdatetime: formatDateTime(startDate),
 //         plannedenddatetime: formatDateTime(endDate),
-//         status: 'accepted'
+//         notes: ''
 //       });
       
 //       setBookingModal(true);
 //     } else {
-//       message.info(`Booking #${existingBooking.id} - ${existingBooking.status}`);
+//       // Show cancel modal for existing booking
+//       setSelectedBooking(existingBooking);
+//       setCancelForm({ reason: '' });
+//       setCancelModal(true);
 //     }
 //   };
 
 //   // Submit booking
 //   const handleBookingSubmit = async () => {
 //     if (!bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) {
-//       message.warning('Please fill in all required fields');
+//       console.log('Please fill in all required fields');
 //       return;
 //     }
 
@@ -307,21 +361,19 @@
 //     const endDate = new Date(bookingForm.plannedenddatetime);
     
 //     if (endDate <= startDate) {
-//       message.warning('End date must be after start date');
+//       console.log('End date must be after start date');
 //       return;
 //     }
 
 //     setSubmitting(true);
 //     try {
-//       console.log('Creating booking with payload:', bookingForm);
+//       console.log('Creating booking with payload:', {
+//         ...bookingForm,
+//         booking_status: 'blocked' // Manual bookings are blocked
+//       });
       
-//       const token = localStorage.getItem("authToken");
-//       if (token) {
-//         axios.defaults.headers.common["authorization"] = "Bearer " + token;
-//       }
-      
-//       const response = await axios.post('/booking/createBooking', bookingForm);
-//       console.log('Booking creation response:', response);
+//       // Simulate API call
+//       await new Promise(resolve => setTimeout(resolve, 1000));
       
 //       await fetchBookings();
 //       setBookingModal(false);
@@ -330,14 +382,43 @@
 //         machineid: '',
 //         plannedstartdatetime: '',
 //         plannedenddatetime: '',
-//         status: 'accepted'
+//         notes: ''
 //       });
       
-//       message.success('Booking created successfully!');
+//       console.log('Booking created successfully!');
       
 //     } catch (err) {
 //       console.error('Error creating booking:', err);
-//       message.error(`Failed to create booking: ${err.message}`);
+//       console.log(`Failed to create booking: ${err.message}`);
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   // Cancel booking
+//   const handleBookingCancel = async () => {
+//     if (!cancelForm.reason.trim()) {
+//       console.log('Please provide a reason for cancellation');
+//       return;
+//     }
+
+//     setSubmitting(true);
+//     try {
+//       console.log('Cancelling booking:', selectedBooking.id, 'Reason:', cancelForm.reason);
+      
+//       // Simulate API call
+//       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+//       await fetchBookings();
+//       setCancelModal(false);
+//       setSelectedBooking(null);
+//       setCancelForm({ reason: '' });
+      
+//       console.log('Booking cancelled successfully!');
+      
+//     } catch (err) {
+//       console.error('Error cancelling booking:', err);
+//       console.log(`Failed to cancel booking: ${err.message}`);
 //     } finally {
 //       setSubmitting(false);
 //     }
@@ -345,10 +426,10 @@
 
 //   // Export data
 //   const exportData = () => {
-//     const csvHeader = "Machine ID,Booking ID,Start Date,End Date,Status,Hirer Company,Renter Company,Quote ID\n";
+//     const csvHeader = "Machine ID,Booking ID,Start Date,End Date,Status,Hirer Company,Renter Company,Quote ID,Notes\n";
 //     const csvContent = Object.entries(bookings).flatMap(([machine, machineBookings]) =>
 //       machineBookings.map(booking => 
-//         `${machine.replace('Machine_', '')},${booking.id},${booking.start.toISOString()},${booking.end.toISOString()},${booking.status},${booking.hirerCompany},${booking.renterCompany},${booking.quoteId || ''}`
+//         `${machine.replace('Machine_', '')},${booking.id},${booking.start.toISOString()},${booking.end.toISOString()},${booking.status},${booking.hirerCompany || ''},${booking.renterCompany || ''},${booking.quoteId || ''},"${booking.notes || ''}"`
 //       )
 //     ).join("\n");
     
@@ -361,7 +442,7 @@
 //     link.click();
 //     document.body.removeChild(link);
     
-//     message.success('Booking data exported to CSV');
+//     console.log('Booking data exported to CSV');
 //   };
 
 //   const dates = getDates();
@@ -377,7 +458,8 @@
 
 //   const getStatusColor = (status) => {
 //     switch (status) {
-//       case 'accepted': return '#10B981';
+//       case 'accepted': return '#3B82F6'; // Blue for backend/system bookings
+//       case 'blocked': return '#10B981';  // Green for manual bookings
 //       case 'cancelled': return '#EF4444';
 //       case 'change_of_date': return '#F59E0B';
 //       default: return '#6B7280';
@@ -443,7 +525,7 @@
 //               <button
 //                 onClick={fetchBookings}
 //                 style={{ 
-//                   padding: '8px', 
+//                   padding: '8px 12px', 
 //                   backgroundColor: 'rgba(255, 255, 255, 0.2)', 
 //                   border: 'none',
 //                   borderRadius: '4px',
@@ -451,12 +533,14 @@
 //                   cursor: 'pointer',
 //                   display: 'flex',
 //                   alignItems: 'center',
-//                   justifyContent: 'center'
+//                   justifyContent: 'center',
+//                   fontSize: '14px',
+//                   fontWeight: '500'
 //                 }}
 //                 title="Refresh data"
 //                 disabled={loading}
 //               >
-//                 <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+//                 {loading ? 'Loading...' : 'Refresh'}
 //               </button>
 //               <button
 //                 onClick={() => setAutoRefresh(!autoRefresh)}
@@ -489,19 +573,26 @@
 //             padding: '12px',
 //             backgroundColor: '#f9fafb'
 //           }}>
-//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#3b82f6', color: 'white' }}>
+//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#6366f1', color: 'white' }}>
 //               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
 //                 <Activity size={16} />
 //               </div>
 //               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.totalBookings}</div>
 //               <div style={{ fontSize: '12px' }}>Total</div>
 //             </div>
-//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#10b981', color: 'white' }}>
+//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#3B82F6', color: 'white' }}>
 //               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
 //                 <CheckCircle size={16} />
 //               </div>
 //               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.activeBookings}</div>
-//               <div style={{ fontSize: '12px' }}>Active</div>
+//               <div style={{ fontSize: '12px' }}>System</div>
+//             </div>
+//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#10b981', color: 'white' }}>
+//               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+//                 <Shield size={16} />
+//               </div>
+//               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.blockedBookings}</div>
+//               <div style={{ fontSize: '12px' }}>Manual</div>
 //             </div>
 //             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#ef4444', color: 'white' }}>
 //               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
@@ -514,16 +605,9 @@
 //               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.changeOfDateBookings}</div>
 //               <div style={{ fontSize: '12px' }}>Rescheduled</div>
 //             </div>
-//             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#6366f1', color: 'white' }}>
-//               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-//                 <Zap size={16} />
-//               </div>
-//               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.totalMachines}</div>
-//               <div style={{ fontSize: '12px' }}>Machines</div>
-//             </div>
 //             <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#14b8a6', color: 'white' }}>
 //               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-//                 <Shield size={16} />
+//                 <Zap size={16} />
 //               </div>
 //               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.availableMachines}</div>
 //               <div style={{ fontSize: '12px' }}>Available</div>
@@ -579,41 +663,42 @@
 //           borderBottom: '1px solid #e5e7eb'
 //         }}>
 //           <div style={{ fontSize: '16px', fontWeight: '600', color: '#374151' }}>
-//             {viewDays} Days View ({filteredMachines.length} machines)
-//           </div>
-          
-//           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-//             <button
-//               onClick={goToToday}
-//               style={{
-//                 padding: '4px 12px',
-//                 fontSize: '12px',
-//                 backgroundColor: '#2563eb',
-//                 color: 'white',
-//                 border: 'none',
-//                 borderRadius: '4px',
-//                 cursor: 'pointer'
-//               }}
-//             >
-//               Today
-//             </button>
-//             {[7, 14, 30, 60].map(days => (
+//             {viewDays === 1 ? 'Today View' : `${viewDays} Days View`} ({filteredMachines.length} machines)
+//           </div>      
+//           <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
 //               <button
-//                 key={days}
-//                 onClick={() => setViewDays(days)}
+//                 onClick={() => setViewDays(1)}
 //                 style={{
-//                   padding: '4px 8px',
-//                   fontSize: '12px',
+//                   padding: '6px 16px',
+//                   fontSize: '13px',
 //                   border: 'none',
-//                   borderRadius: '4px',
+//                   borderRadius: '6px',
 //                   cursor: 'pointer',
-//                   backgroundColor: viewDays === days ? '#2563eb' : '#f3f4f6',
-//                   color: viewDays === days ? 'white' : '#374151'
+//                   fontWeight: '500',
+//                   backgroundColor: viewDays === 1 ? '#2563eb' : 'transparent',
+//                   color: viewDays === 1 ? 'white' : '#374151',
+//                   transition: 'all 0.2s'
 //                 }}
 //               >
-//                 {days}d
+//                 Today
 //               </button>
-//             ))}
+//               <button
+//                 onClick={() => setViewDays(7)}
+//                 style={{
+//                   padding: '6px 16px',
+//                   fontSize: '13px',
+//                   border: 'none',
+//                   borderRadius: '6px',
+//                   cursor: 'pointer',
+//                   fontWeight: '500',
+//                   backgroundColor: viewDays === 7 ? '#2563eb' : 'transparent',
+//                   color: viewDays === 7 ? 'white' : '#374151',
+//                   transition: 'all 0.2s'
+//                 }}
+//               >
+//                 7 Days
+//               </button>
+//             </div>
 //           </div>
 //         </div>
 
@@ -668,67 +753,169 @@
 //                 alignItems: 'center', 
 //                 justifyContent: 'space-between', 
 //                 marginBottom: '16px', 
-//                 padding: '0 16px' 
+//                 padding: '0 16px',
+//                 backgroundColor: '#f8fafc',
+//                 borderRadius: '8px',
+//                 margin: '0 16px 16px 16px',
+//                 paddingTop: '12px',
+//                 paddingBottom: '12px'
 //               }}>
-//                 <div style={{ display: 'flex', gap: '4px' }}>
+//                 {/* Navigation Controls */}
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 //                   <button
 //                     onClick={() => navigate('prevFast')}
 //                     style={{
-//                       padding: '8px',
-//                       border: 'none',
-//                       borderRadius: '4px',
+//                       padding: '8px 12px',
+//                       border: '1px solid #d1d5db',
+//                       borderRadius: '6px',
 //                       cursor: 'pointer',
-//                       backgroundColor: 'transparent'
+//                       backgroundColor: 'white',
+//                       color: '#374151',
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       gap: '4px',
+//                       fontSize: '14px',
+//                       fontWeight: '500',
+//                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+//                       transition: 'all 0.2s'
 //                     }}
-//                     title="Previous period"
+//                     title={`Previous ${viewDays === 1 ? 'day' : `${viewDays} days`}`}
+//                     onMouseEnter={(e) => {
+//                       e.target.style.backgroundColor = '#f3f4f6';
+//                       e.target.style.transform = 'translateY(-1px)';
+//                       e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+//                     }}
+//                     onMouseLeave={(e) => {
+//                       e.target.style.backgroundColor = 'white';
+//                       e.target.style.transform = 'translateY(0)';
+//                       e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+//                     }}
 //                   >
-//                     <ChevronsLeft size={16} />
+//                     <span style={{ fontSize: '16px', fontWeight: 'bold' }}>�</span>
+//                     <span>{viewDays === 1 ? 'Prev Day' : 'Prev'}</span>
 //                   </button>
 //                   <button
 //                     onClick={() => navigate('prev')}
 //                     style={{
-//                       padding: '8px',
-//                       border: 'none',
-//                       borderRadius: '4px',
+//                       padding: '8px 12px',
+//                       border: '1px solid #d1d5db',
+//                       borderRadius: '6px',
 //                       cursor: 'pointer',
-//                       backgroundColor: 'transparent'
+//                       backgroundColor: 'white',
+//                       color: '#374151',
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       gap: '4px',
+//                       fontSize: '14px',
+//                       fontWeight: '500',
+//                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+//                       transition: 'all 0.2s'
 //                     }}
 //                     title="Previous"
+//                     onMouseEnter={(e) => {
+//                       e.target.style.backgroundColor = '#f3f4f6';
+//                       e.target.style.transform = 'translateY(-1px)';
+//                       e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+//                     }}
+//                     onMouseLeave={(e) => {
+//                       e.target.style.backgroundColor = 'white';
+//                       e.target.style.transform = 'translateY(0)';
+//                       e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+//                     }}
 //                   >
-//                     <ChevronLeft size={16} />
+//                     <span style={{ fontSize: '16px', fontWeight: 'bold' }}>9</span>
 //                   </button>
 //                 </div>
                 
-//                 <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
-//                   {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-//                 </h2>
+//                 {/* Current Period Display */}
+//                 <div style={{ textAlign: 'center', flex: 1 }}>
+//                   <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+//                     {viewDays === 1 
+//                       ? currentDate.toLocaleDateString('en-US', { 
+//                           weekday: 'long', 
+//                           year: 'numeric', 
+//                           month: 'long', 
+//                           day: 'numeric' 
+//                         })
+//                       : currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+//                     }
+//                   </h2>
+//                   {viewDays > 1 && (
+//                     <p style={{ fontSize: '14px', color: '#6b7280', margin: '2px 0 0 0' }}>
+//                       {currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {' '}
+//                       {(() => {
+//                         const endDate = new Date(currentDate);
+//                         endDate.setDate(currentDate.getDate() + viewDays - 1);
+//                         return endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+//                       })()}
+//                     </p>
+//                   )}
+//                 </div>
                 
-//                 <div style={{ display: 'flex', gap: '4px' }}>
+//                 {/* Forward Navigation */}
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 //                   <button
 //                     onClick={() => navigate('next')}
 //                     style={{
-//                       padding: '8px',
-//                       border: 'none',
-//                       borderRadius: '4px',
+//                       padding: '8px 12px',
+//                       border: '1px solid #d1d5db',
+//                       borderRadius: '6px',
 //                       cursor: 'pointer',
-//                       backgroundColor: 'transparent'
+//                       backgroundColor: 'white',
+//                       color: '#374151',
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       gap: '4px',
+//                       fontSize: '14px',
+//                       fontWeight: '500',
+//                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+//                       transition: 'all 0.2s'
 //                     }}
 //                     title="Next"
+//                     onMouseEnter={(e) => {
+//                       e.target.style.backgroundColor = '#f3f4f6';
+//                       e.target.style.transform = 'translateY(-1px)';
+//                       e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+//                     }}
+//                     onMouseLeave={(e) => {
+//                       e.target.style.backgroundColor = 'white';
+//                       e.target.style.transform = 'translateY(0)';
+//                       e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+//                     }}
 //                   >
-//                     <ChevronRight size={16} />
+//                     <span style={{ fontSize: '16px', fontWeight: 'bold' }}>:</span>
 //                   </button>
 //                   <button
 //                     onClick={() => navigate('nextFast')}
 //                     style={{
-//                       padding: '8px',
-//                       border: 'none',
-//                       borderRadius: '4px',
+//                       padding: '8px 12px',
+//                       border: '1px solid #d1d5db',
+//                       borderRadius: '6px',
 //                       cursor: 'pointer',
-//                       backgroundColor: 'transparent'
+//                       backgroundColor: 'white',
+//                       color: '#374151',
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       gap: '4px',
+//                       fontSize: '14px',
+//                       fontWeight: '500',
+//                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+//                       transition: 'all 0.2s'
 //                     }}
-//                     title="Next period"
+//                     title={`Next ${viewDays === 1 ? 'day' : `${viewDays} days`}`}
+//                     onMouseEnter={(e) => {
+//                       e.target.style.backgroundColor = '#f3f4f6';
+//                       e.target.style.transform = 'translateY(-1px)';
+//                       e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+//                     }}
+//                     onMouseLeave={(e) => {
+//                       e.target.style.backgroundColor = 'white';
+//                       e.target.style.transform = 'translateY(0)';
+//                       e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+//                     }}
 //                   >
-//                     <ChevronsRight size={16} />
+//                     <span>{viewDays === 1 ? 'Next Day' : 'Next'}</span>
+//                     <span style={{ fontSize: '16px', fontWeight: 'bold' }}>�</span>
 //                   </button>
 //                 </div>
 //               </div>
@@ -854,7 +1041,9 @@
 //                                   key={idx} 
 //                                   style={cellStyle}
 //                                   onClick={() => handleCellClick(machine, date)}
-//                                   title={status ? `Booking #${status.id} - ${status.status}` : 'Click to create booking'}
+//                                   title={status ? 
+//                                     `Booking #${status.id} - ${status.status === 'blocked' ? 'Manual Booking' : 'System Booking'} (Click to cancel)` : 
+//                                     'Click to create booking'}
 //                                 >
 //                                   {cellContent}
 //                                 </td>
@@ -885,9 +1074,18 @@
 //                     width: '12px', 
 //                     height: '12px', 
 //                     borderRadius: '2px', 
+//                     backgroundColor: '#3B82F6' 
+//                   }}></div>
+//                   <span style={{ fontSize: '12px', color: '#374151' }}>System Booking</span>
+//                 </div>
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+//                   <div style={{ 
+//                     width: '12px', 
+//                     height: '12px', 
+//                     borderRadius: '2px', 
 //                     backgroundColor: '#10b981' 
 //                   }}></div>
-//                   <span style={{ fontSize: '12px', color: '#374151' }}>Accepted</span>
+//                   <span style={{ fontSize: '12px', color: '#374151' }}>Manual Booking</span>
 //                 </div>
 //                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 //                   <div style={{ 
@@ -905,7 +1103,7 @@
 //                     borderRadius: '2px', 
 //                     backgroundColor: '#f59e0b' 
 //                   }}></div>
-//                   <span style={{ fontSize: '12px', color: '#374151' }}>Change of Date</span>
+//                   <span style={{ fontSize: '12px', color: '#374151' }}>Rescheduled</span>
 //                 </div>
 //               </div>
 //             </div>
@@ -972,9 +1170,9 @@
 //               borderTopLeftRadius: '8px',
 //               borderTopRightRadius: '8px'
 //             }}>
-//               <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Create New Booking</h2>
+//               <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Create Manual Booking</h2>
 //               <p style={{ fontSize: '14px', color: 'rgba(219, 234, 254, 1)', margin: '4px 0 0 0' }}>
-//                 Schedule a machine reservation
+//                 Block machine slot manually
 //               </p>
 //             </div>
             
@@ -1039,7 +1237,7 @@
 //                     marginBottom: '4px',
 //                     color: '#374151' 
 //                   }}>
-//                     Start Date & Time *
+//                     Start Date 
 //                   </label>
 //                   <input
 //                     type="text"
@@ -1069,7 +1267,7 @@
 //                     marginBottom: '4px',
 //                     color: '#374151' 
 //                   }}>
-//                     End Date & Time *
+//                     End Date
 //                   </label>
 //                   <input
 //                     type="text"
@@ -1099,11 +1297,13 @@
 //                     marginBottom: '4px',
 //                     color: '#374151' 
 //                   }}>
-//                     Status
+//                     Notes
 //                   </label>
-//                   <select
-//                     value={bookingForm.status}
-//                     onChange={(e) => setBookingForm({...bookingForm, status: e.target.value})}
+//                   <textarea
+//                     value={bookingForm.notes}
+//                     onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
+//                     placeholder="Add any notes for this booking..."
+//                     rows={3}
 //                     style={{
 //                       width: '100%',
 //                       padding: '8px 12px',
@@ -1111,12 +1311,10 @@
 //                       borderRadius: '6px',
 //                       outline: 'none',
 //                       backgroundColor: 'white',
-//                       color: '#111827'
+//                       color: '#111827',
+//                       resize: 'vertical'
 //                     }}
-//                   >
-//                     <option value="accepted">Accepted</option>
-//                     <option value="pending">Pending</option>
-//                   </select>
+//                   />
 //                 </div>
                 
 //                 <div style={{ display: 'flex', gap: '12px', paddingTop: '16px' }}>
@@ -1144,7 +1342,7 @@
 //                         <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
 //                         Creating...
 //                       </>
-//                     ) : 'Create Booking'}
+//                     ) : 'Block Slot'}
 //                   </button>
 //                   <button
 //                     onClick={() => {
@@ -1154,7 +1352,7 @@
 //                         machineid: '',
 //                         plannedstartdatetime: '',
 //                         plannedenddatetime: '',
-//                         status: 'accepted'
+//                         notes: ''
 //                       });
 //                     }}
 //                     style={{
@@ -1169,6 +1367,155 @@
 //                     }}
 //                   >
 //                     Cancel
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Cancel Booking Modal */}
+//       {cancelModal && selectedBooking && (
+//         <div style={{
+//           position: 'fixed',
+//           top: 0,
+//           left: 0,
+//           right: 0,
+//           bottom: 0,
+//           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//           display: 'flex',
+//           alignItems: 'center',
+//           justifyContent: 'center',
+//           padding: '16px',
+//           zIndex: 50
+//         }}>
+//           <div style={{
+//             backgroundColor: 'white',
+//             borderRadius: '8px',
+//             boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+//             maxWidth: '448px',
+//             width: '100%',
+//             maxHeight: '90vh',
+//             overflowY: 'auto'
+//           }}>
+//             <div style={{
+//               backgroundColor: '#ef4444',
+//               color: 'white',
+//               padding: '16px',
+//               borderTopLeftRadius: '8px',
+//               borderTopRightRadius: '8px'
+//             }}>
+//               <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+//                 <Trash2 size={20} />
+//                 Cancel Booking
+//               </h2>
+//               <p style={{ fontSize: '14px', color: 'rgba(254, 202, 202, 1)', margin: '4px 0 0 0' }}>
+//                 Remove this booking from the calendar
+//               </p>
+//             </div>
+            
+//             <div style={{ padding: '16px' }}>
+//               <div style={{
+//                 marginBottom: '16px',
+//                 padding: '12px',
+//                 backgroundColor: '#fef2f2',
+//                 borderRadius: '4px',
+//                 borderLeft: '4px solid #ef4444'
+//               }}>
+//                 <p style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>
+//                   <strong>Booking ID:</strong> #{selectedBooking.id}
+//                 </p>
+//                 <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 4px 0' }}>
+//                   <strong>Machine:</strong> {selectedBooking.id ? machines.find(m => m.includes(''))?.replace('Machine_', '') || 'Unknown' : 'Unknown'}
+//                 </p>
+//                 <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 4px 0' }}>
+//                   <strong>Duration:</strong> {selectedBooking.start?.toLocaleDateString()} - {selectedBooking.end?.toLocaleDateString()}
+//                 </p>
+//                 <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+//                   <strong>Type:</strong> {selectedBooking.status === 'blocked' ? 'Manual Booking' : 'System Booking'}
+//                 </p>
+//               </div>
+              
+//               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+//                 <div>
+//                   <label style={{ 
+//                     display: 'block', 
+//                     fontSize: '14px', 
+//                     fontWeight: '500', 
+//                     marginBottom: '4px',
+//                     color: '#374151' 
+//                   }}>
+//                     Cancellation Reason *
+//                   </label>
+//                   <textarea
+//                     value={cancelForm.reason}
+//                     onChange={(e) => setCancelForm({...cancelForm, reason: e.target.value})}
+//                     placeholder="Please provide a reason for cancelling this booking..."
+//                     rows={4}
+//                     style={{
+//                       width: '100%',
+//                       padding: '8px 12px',
+//                       border: '1px solid #d1d5db',
+//                       borderRadius: '6px',
+//                       outline: 'none',
+//                       backgroundColor: 'white',
+//                       color: '#111827',
+//                       resize: 'vertical'
+//                     }}
+//                   />
+//                 </div>
+                
+//                 <div style={{ display: 'flex', gap: '12px', paddingTop: '16px' }}>
+//                   <button
+//                     onClick={handleBookingCancel}
+//                     disabled={submitting || !cancelForm.reason.trim()}
+//                     style={{
+//                       flex: 1,
+//                       backgroundColor: '#ef4444',
+//                       color: 'white',
+//                       padding: '12px 16px',
+//                       border: 'none',
+//                       borderRadius: '6px',
+//                       fontWeight: '500',
+//                       cursor: submitting || !cancelForm.reason.trim() ? 'not-allowed' : 'pointer',
+//                       opacity: submitting || !cancelForm.reason.trim() ? 0.5 : 1,
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       justifyContent: 'center',
+//                       gap: '8px'
+//                     }}
+//                   >
+//                     {submitting ? (
+//                       <>
+//                         <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
+//                         Cancelling...
+//                       </>
+//                     ) : (
+//                       <>
+//                         <Trash2 size={16} />
+//                         Cancel Booking
+//                       </>
+//                     )}
+//                   </button>
+//                   <button
+//                     onClick={() => {
+//                       setCancelModal(false);
+//                       setSelectedBooking(null);
+//                       setCancelForm({ reason: '' });
+//                     }}
+//                     style={{
+//                       flex: 1,
+//                       padding: '12px 16px',
+//                       border: 'none',
+//                       borderRadius: '6px',
+//                       fontWeight: '500',
+//                       cursor: 'pointer',
+//                       backgroundColor: '#f3f4f6',
+//                       color: '#374151'
+//                     }}
+//                   >
+//                     Keep Booking
 //                   </button>
 //                 </div>
 //               </div>
@@ -1467,11 +1814,20 @@ const MachineBookingSystem = () => {
   // Navigation
   const navigate = (direction) => {
     const newDate = new Date(currentDate);
-    const multiplier = direction.includes('Fast') ? viewDays : Math.ceil(viewDays / 2);
     
-    if (direction.includes('prev')) {
+    if (direction === 'prev') {
+      // Single step: go to previous day
+      newDate.setDate(currentDate.getDate() - 1);
+    } else if (direction === 'next') {
+      // Single step: go to next day
+      newDate.setDate(currentDate.getDate() + 1);
+    } else if (direction === 'prevFast') {
+      // Fast navigation: go back by current view period
+      const multiplier = viewDays;
       newDate.setDate(currentDate.getDate() - multiplier);
-    } else {
+    } else if (direction === 'nextFast') {
+      // Fast navigation: go forward by current view period
+      const multiplier = viewDays;
       newDate.setDate(currentDate.getDate() + multiplier);
     }
     
@@ -1671,23 +2027,6 @@ const MachineBookingSystem = () => {
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                onClick={() => setShowStats(!showStats)}
-                style={{ 
-                  padding: '8px', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                title="Toggle stats"
-              >
-                <BarChart3 size={16} />
-              </button>
-              <button
                 onClick={exportData}
                 style={{ 
                   padding: '8px', 
@@ -1704,50 +2043,12 @@ const MachineBookingSystem = () => {
               >
                 <Download size={16} />
               </button>
-              <button
-                onClick={fetchBookings}
-                style={{ 
-                  padding: '8px 12px', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                title="Refresh data"
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : 'Refresh'}
-              </button>
-              <button
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                style={{ 
-                  padding: '8px', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  outline: autoRefresh ? '2px solid rgba(255, 255, 255, 0.5)' : 'none'
-                }}
-                title="Auto refresh"
-              >
-                <Activity size={16} />
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Stats Dashboard */}
-        {showStats && (
+        {/* Stats Dashboard - Commented out */}
+        {/* {showStats && (
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
@@ -1802,7 +2103,7 @@ const MachineBookingSystem = () => {
               <div style={{ fontSize: '12px' }}>Utilization</div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Search and Controls */}
         <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
@@ -1848,56 +2149,39 @@ const MachineBookingSystem = () => {
             {viewDays === 1 ? 'Today View' : `${viewDays} Days View`} ({filteredMachines.length} machines)
           </div>
           
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
             <button
-              onClick={goToToday}
+              onClick={() => setViewDays(1)}
               style={{
-                padding: '6px 12px',
+                padding: '6px 16px',
                 fontSize: '13px',
-                backgroundColor: '#10b981',
-                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontWeight: '500'
+                fontWeight: '500',
+                backgroundColor: viewDays === 1 ? '#2563eb' : 'transparent',
+                color: viewDays === 1 ? 'white' : '#374151',
+                transition: 'all 0.2s'
               }}
             >
-              Go to Today
+              Today
             </button>
-            <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
-              <button
-                onClick={() => setViewDays(1)}
-                style={{
-                  padding: '6px 16px',
-                  fontSize: '13px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  backgroundColor: viewDays === 1 ? '#2563eb' : 'transparent',
-                  color: viewDays === 1 ? 'white' : '#374151',
-                  transition: 'all 0.2s'
-                }}
-              >
-                Today
-              </button>
-              <button
-                onClick={() => setViewDays(7)}
-                style={{
-                  padding: '6px 16px',
-                  fontSize: '13px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  backgroundColor: viewDays === 7 ? '#2563eb' : 'transparent',
-                  color: viewDays === 7 ? 'white' : '#374151',
-                  transition: 'all 0.2s'
-                }}
-              >
-                7 Days
-              </button>
-            </div>
+            <button
+              onClick={() => setViewDays(7)}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                backgroundColor: viewDays === 7 ? '#2563eb' : 'transparent',
+                color: viewDays === 7 ? 'white' : '#374151',
+                transition: 'all 0.2s'
+              }}
+            >
+              7 Days
+            </button>
           </div>
         </div>
 
@@ -2010,7 +2294,7 @@ const MachineBookingSystem = () => {
                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
                       transition: 'all 0.2s'
                     }}
-                    title="Previous"
+                    title="Previous day"
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = '#f3f4f6';
                       e.target.style.transform = 'translateY(-1px)';
@@ -2070,7 +2354,7 @@ const MachineBookingSystem = () => {
                       boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
                       transition: 'all 0.2s'
                     }}
-                    title="Next"
+                    title="Next day"
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = '#f3f4f6';
                       e.target.style.transform = 'translateY(-1px)';
@@ -2436,13 +2720,17 @@ const MachineBookingSystem = () => {
                     marginBottom: '4px',
                     color: '#374151' 
                   }}>
-                    Start Date 
+                    Start Date *
                   </label>
                   <input
-                    type="text"
-                    value={bookingForm.plannedstartdatetime}
-                    onChange={(e) => setBookingForm({...bookingForm, plannedstartdatetime: e.target.value})}
-                    placeholder="YYYY-MM-DD HH:MM:SS"
+                    type="date"
+                    value={bookingForm.plannedstartdatetime ? bookingForm.plannedstartdatetime.split(' ')[0] : ''}
+                    onChange={(e) => {
+                      const dateValue = e.target.value;
+                      if (dateValue) {
+                        setBookingForm({...bookingForm, plannedstartdatetime: `${dateValue} 06:00:00`});
+                      }
+                    }}
                     style={{
                       width: '100%',
                       padding: '8px 12px',
@@ -2453,9 +2741,6 @@ const MachineBookingSystem = () => {
                       color: '#111827'
                     }}
                   />
-                  <p style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>
-                    Format: 2025-01-15 06:00:00
-                  </p>
                 </div>
                 
                 <div>
@@ -2466,13 +2751,17 @@ const MachineBookingSystem = () => {
                     marginBottom: '4px',
                     color: '#374151' 
                   }}>
-                    End Date
+                    End Date *
                   </label>
                   <input
-                    type="text"
-                    value={bookingForm.plannedenddatetime}
-                    onChange={(e) => setBookingForm({...bookingForm, plannedenddatetime: e.target.value})}
-                    placeholder="YYYY-MM-DD HH:MM:SS"
+                    type="date"
+                    value={bookingForm.plannedenddatetime ? bookingForm.plannedenddatetime.split(' ')[0] : ''}
+                    onChange={(e) => {
+                      const dateValue = e.target.value;
+                      if (dateValue) {
+                        setBookingForm({...bookingForm, plannedenddatetime: `${dateValue} 18:00:00`});
+                      }
+                    }}
                     style={{
                       width: '100%',
                       padding: '8px 12px',
@@ -2483,9 +2772,6 @@ const MachineBookingSystem = () => {
                       color: '#111827'
                     }}
                   />
-                  <p style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>
-                    Format: 2025-01-16 18:00:00
-                  </p>
                 </div>
                 
                 <div>
