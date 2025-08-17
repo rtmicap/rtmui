@@ -225,7 +225,7 @@ function SellTools() {
                 </div>
 
 
-                <button type="button" className="primarybutton">Register</button>
+                <button type="button" className="primarybutton" onClick={handleSubmit}>Register</button>
             </form>
         </div>
     );
