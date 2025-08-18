@@ -50,6 +50,7 @@ import ManageCoordinator from './components/Profile/coordinator/ManageCoordinato
 import ViewCart from './components/Tools/ViewCart';
 import BookingsCalendar from './components/My Bookings/BookingsCalendar';
 import UserSubscription from './components/Subscription/UserSubscription';
+import Invoice from './components/Invoice/invoice';
 
 const App = () => {
   const location = useLocation();
@@ -168,6 +169,7 @@ const App = () => {
             <Route path='bookings-calendar' element={<BookingsCalendar />} />
             {/* payment */}
             <Route path='payment' element={<Payment />} />
+            <Route path='invoice' element={<Invoice />} />
 
 
             {/* Raw Material */}
