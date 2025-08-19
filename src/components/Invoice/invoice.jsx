@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Invoice from './invoice_component'; // Adjust the path as needed
+import Invoice from './invoice_component';
+import { GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls';
+import axios from 'axios';
 
 // Function to generate a unique invoice number
 const generateUniqueInvoiceNumber = () => {
@@ -28,25 +30,28 @@ const InvoicePage = () => {
     grandTotal: 0,
   });
 
-  useEffect(() => {
-    const fetchCompanyData = () => ({
-      name: 'Your Company Name',
-      address: '123 Business Lane, City, State, ZIP',
-      gstin: '27ABCDE1234F1Z5',
-      email: 'contact@yourcompany.com',
-      phone: '+91 9876543210',
-    });
+   useEffect(() => {
+    // We create a single async function to fetch all the data
+    const fetchInvoiceData = async () => {
+      try {
+        // Fetch company details
+        const token = localStorage.getItem('authToken');
+        axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+        const companyResponse = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
+          params: { companyId: 1040 }
+        });
+        setCompanyInfo(companyResponse.data);
 
-    const fetchCustomerData = () => ({
-      name: 'Customer Name',
-      address: '456 Customer St, New Town, State, ZIP',
-      phone: '+91 1234567890',
-      email: 'customer@email.com',
-      gstin: '27FGHIJ5678K2Z6',
-    });
+        // You would perform a similar call for customer data
+        const customerResponse = await axios.get(GET_COMPANY_DETAILS_BY_ID);
+        setCustomerInfo(customerResponse.data);
 
-    setCompanyInfo(fetchCompanyData());
-    setCustomerInfo(fetchCustomerData());
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchInvoiceData();
   }, []);
 
   useEffect(() => {
