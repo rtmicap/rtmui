@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Invoice from './invoice_component';
 import { GET_COMPANY_DETAILS_BY_ID } from '../../api/apiUrls';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 // Function to generate a unique invoice number
 const generateUniqueInvoiceNumber = () => {
@@ -13,13 +13,15 @@ const generateUniqueInvoiceNumber = () => {
 };
 
 const InvoicePage = () => {
+  const [loading, setLoading] = useState(false);
   const [companyInfo, setCompanyInfo] = useState({});
   const [customerInfo, setCustomerInfo] = useState({});
+  const [orderNumber, setOrderNumber] = useState('1111');
   const [invoiceDetails, setInvoiceDetails] = useState({
     invoiceNumber: generateUniqueInvoiceNumber(),
     date: new Date().toISOString().slice(0, 10),
     paymentTerms: '100% advanced payment',
-    orderNumber: '',
+    orderNumber: orderNumber,
   });
   const [items, setItems] = useState([
     { description: '', partNumber: '', quantity: 1, unitPrice: 0, total: 0 }
@@ -30,28 +32,56 @@ const InvoicePage = () => {
     grandTotal: 0,
   });
 
-   useEffect(() => {
-    // We create a single async function to fetch all the data
-    const fetchInvoiceData = async () => {
+  const fetchInvoicerData = async () => {
       try {
+        setLoading(true);
         // Fetch company details
         const token = localStorage.getItem('authToken');
         axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
         const companyResponse = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
           params: { companyId: 1040 }
         });
-        setCompanyInfo(companyResponse.data);
-
-        // You would perform a similar call for customer data
-        const customerResponse = await axios.get(GET_COMPANY_DETAILS_BY_ID);
-        setCustomerInfo(customerResponse.data);
-
+        const resData = companyResponse.data.data;
+        const invoicerInfo = {
+          name: resData.companyName,
+          address: resData.address,
+          gstin: resData.gstin,
+          email: resData.factoryEmail
+        };
+        setCompanyInfo(invoicerInfo);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchInvoiceData();
+  const fetchInvoiceeData = async () => {
+      try {
+        setLoading(true);
+        // Fetch company details
+        const token = localStorage.getItem('authToken');
+        axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
+        const companyResponse = await axios.get(GET_COMPANY_DETAILS_BY_ID, {
+          params: { companyId: 1023 }
+        });
+        const resData = companyResponse.data.data;
+        const invoiceeInfo = {
+          name: resData.companyName,
+          address: resData.address,
+          gstin: resData.gstin,
+          email: resData.factoryEmail
+        };
+        setCustomerInfo(invoiceeInfo);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+
+   useEffect(() => {
+    // We create a single async function to fetch all the data
+    
+    fetchInvoicerData();
+    fetchInvoiceeData();
   }, []);
 
   useEffect(() => {

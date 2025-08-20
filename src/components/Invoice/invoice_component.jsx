@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import './Invoice.scss';
 
@@ -29,7 +28,6 @@ const Invoice = ({
           <p>{companyInfo.address}</p>
           <p>GSTIN: {companyInfo.gstin}</p>
           <p>Email: {companyInfo.email}</p>
-          <p>Phone: {companyInfo.phone}</p>
         </div>
         <div className="invoice-details">
           <h2>Invoice Details:</h2>
@@ -81,11 +79,12 @@ const Invoice = ({
         <h2>Bill To:</h2>
         <p>{customerInfo.name}</p>
         <p>{customerInfo.address}</p>
-        <p>Phone: {customerInfo.phone}</p>
         <p>Email: {customerInfo.email}</p>
         <p>GSTIN: {customerInfo.gstin}</p>
       </div>
 
+
+<div className="responsive-table-wrapper">
       <table className="items-table">
         <thead>
           <tr>
@@ -142,6 +141,7 @@ const Invoice = ({
           ))}
         </tbody>
       </table>
+      </div>
 
       <button className="add-row-btn" onClick={addItemRow}>
         + Add Item/Service
