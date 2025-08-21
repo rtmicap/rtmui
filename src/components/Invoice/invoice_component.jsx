@@ -10,7 +10,11 @@ const Invoice = ({
   handleInvoiceChange,
   handleItemChange,
   addItemRow,
-  removeItemRow
+  removeItemRow,
+  taxes,
+  handleTaxChange,
+  addTaxField,
+  removeTaxField
 }) => {
   const paymentTerms = [
     '100% advanced payment',
@@ -26,8 +30,8 @@ const Invoice = ({
           <h2>From:</h2>
           <p>{companyInfo.name}</p>
           <p>{companyInfo.address}</p>
-          <p>GSTIN: {companyInfo.gstin}</p>
           <p>Email: {companyInfo.email}</p>
+          <p>GSTIN: {companyInfo.gstin}</p>
         </div>
         <div className="invoice-details">
           <h2>Invoice Details:</h2>
@@ -148,19 +152,44 @@ const Invoice = ({
       </button>
 
       <div className="invoice-totals">
-        <div className="total-row">
-          <span>Subtotal:</span>
-          <span>₹ {totals.subtotal.toFixed(2)}</span>
-        </div>
-        <div className="total-row">
-          <span>GST (18%):</span>
-          <span>₹ {totals.gst.toFixed(2)}</span>
-        </div>
-        <div className="total-row total-amount">
-          <span>Grand Total:</span>
-          <span>₹ {totals.grandTotal.toFixed(2)}</span>
-        </div>
+  <div className="total-row">
+    <span>Subtotal:</span>
+    <span>₹ {totals.subtotal.toFixed(2)}</span>
+  </div>
+  {taxes.map((tax, index) => (
+    <div className="total-row tax-row" key={index}>
+      <div className="tax-name">
+        <input 
+          type="text" 
+          name="name" 
+          placeholder="Tax Name"
+          value={tax.name}
+          onChange={(e) => handleTaxChange(index, e)} 
+        />
+        <input 
+          type="number" 
+          name="rate" 
+          value={tax.rate}
+          onChange={(e) => handleTaxChange(index, e)}
+        />
+        <span className="tax-percentage">%</span>
       </div>
+      <div className="tax-amount-container">
+        <span className="tax-amount">₹ {tax.amount.toFixed(2)}</span>
+        {taxes.length > 1 && (
+          <button onClick={() => removeTaxField(index)}>Remove</button>
+        )}
+      </div>
+    </div>
+  ))}
+  <button className="add-tax-btn" onClick={addTaxField}>
+    + Add Tax Field
+  </button>
+  <div className="total-row total-amount">
+    <span>Grand Total:</span>
+    <span>₹ {totals.grandTotal.toFixed(2)}</span>
+  </div>
+</div>
     </div>
   );
 };
@@ -187,17 +216,24 @@ Invoice.propTypes = {
     orderNumber: PropTypes.string,
   }).isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
-    description: PropTypes.string,
-    partNumber: PropTypes.string,
-    quantity: PropTypes.number,
-    unitPrice: PropTypes.number,
-    total: PropTypes.number,
-  })).isRequired,
-  totals: PropTypes.shape({
-    subtotal: PropTypes.number,
-    gst: PropTypes.number,
-    grandTotal: PropTypes.number,
-  }).isRequired,
+  description: PropTypes.string,
+  partNumber: PropTypes.string,
+  quantity: PropTypes.number,
+  unitPrice: PropTypes.number,
+  total: PropTypes.number,
+})).isRequired,
+taxes: PropTypes.arrayOf(PropTypes.shape({
+  name: PropTypes.string,
+  rate: PropTypes.number,
+  amount: PropTypes.number,
+})).isRequired,
+totals: PropTypes.shape({
+  subtotal: PropTypes.number,
+  grandTotal: PropTypes.number,
+}).isRequired,
+handleTaxChange: PropTypes.func.isRequired,
+addTaxField: PropTypes.func.isRequired,
+removeTaxField: PropTypes.func.isRequired,
   handleInvoiceChange: PropTypes.func.isRequired,
   handleItemChange: PropTypes.func.isRequired,
   addItemRow: PropTypes.func.isRequired,

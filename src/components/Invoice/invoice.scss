@@ -34,6 +34,7 @@ body {
   display: flex;
   justify-content: space-between;
   margin-bottom: 40px;
+  flex-wrap: wrap; 
 }
 
 .from-section h2, .invoice-details h2, .bill-to-section h2 {
@@ -42,10 +43,17 @@ body {
   margin-bottom: 10px;
 }
 
+.from-section, .invoice-details {
+  width: 50%;
+  padding-right: 20px;
+}
+
 .from-section p, .bill-to-section p {
   margin: 0;
   line-height: 1.5;
   color: #555;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .invoice-details .detail-row {
@@ -73,9 +81,9 @@ body {
 
 .bill-to-section {
   margin-bottom: 40px;
+  width: 50%;
 }
 
-/* New wrapper for responsive table */
 .responsive-table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -83,7 +91,7 @@ body {
 }
 
 .items-table {
-  min-width: 600px; /* Ensures the table doesn't get too narrow */
+  min-width: 600px;
   width: 100%;
   border-collapse: collapse;
 }
@@ -161,6 +169,81 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   color: #000;
+}
+
+/* NEW STYLES: Fixes for dynamic tax fields */
+.invoice-totals .total-row.tax-row {
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%; 
+}
+
+.invoice-totals .total-row.tax-row .tax-name {
+  display: flex;
+  align-items: center;
+  margin-left: 300px;
+}
+
+.invoice-totals .total-row.tax-row input {
+  font-size: 1em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.invoice-totals .total-row.tax-row input[name="name"] {
+  width: 150px;
+  margin-right: 5px;
+}
+
+.invoice-totals .total-row.tax-row input[name="rate"] {
+  width: 60px;
+  text-align: right;
+}
+
+.tax-percentage {
+  margin-right: 10px;
+  margin-left: 5px;
+}
+
+.tax-amount-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.tax-amount {
+  font-weight: normal;
+  color: #555;
+  white-space: nowrap;
+}
+
+.invoice-totals .total-row.tax-row button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 10px;
+}
+
+.add-tax-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1em;
+  transition: background-color 0.2s;
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+.add-tax-btn:hover {
+  background-color: #218838;
 }
 
 /* Responsive styles for smaller screens */
