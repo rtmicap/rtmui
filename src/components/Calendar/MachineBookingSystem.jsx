@@ -1,6 +1,10 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, RefreshCw, Search, Download, CheckCircle, XCircle, AlertCircle, Info, Activity, TrendingUp, BarChart3, Zap, Shield, Sun, Moon, Loader, Trash2 } from 'lucide-react';
+import { Search, Download, Plus, Loader, Trash2, AlertCircle } from 'lucide-react';
+import { Button } from 'antd';
+import axios from '../../api/axios.js';
+import { GET_ALL_BOOKINGS } from '../../api/apiUrls.js';
+import { message } from 'antd';
+import './MachineBookingSystem.scss';
 
 const MachineBookingSystem = () => {
   // Core States
@@ -15,9 +19,14 @@ const MachineBookingSystem = () => {
   const [bookings, setBookings] = useState({});
   const [machines, setMachines] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [showStats, setShowStats] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [machineType, setMachineType] = useState('');
+  const [machineCategory, setMachineCategory] = useState('');
+  const [selectedMachineId, setSelectedMachineId] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [machineTypes, setMachineTypes] = useState([]);
+  const [categoryAndType, setCategoryAndType] = useState({});
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const refreshInterval = useRef(null);
   
   // Stats
@@ -43,65 +52,67 @@ const MachineBookingSystem = () => {
     reason: ''
   });
 
-  // Generate mock data for testing
-  const generateMockData = useCallback(() => {
-    console.log('Generating mock data for testing...');
-    // Using actual machine IDs from API response instead of mock ones
-    const apiMachineIds = [5019, 5032, 5048, 5112, 5119, 5124, 5127, 5131, 5138, 5139, 5145, 5147, 5149, 5152, 5155];
-    const mockBookings = {};
-    
-    apiMachineIds.forEach((machineId, index) => {
-      const machineKey = `Machine_${machineId}`;
-      mockBookings[machineKey] = [];
-      
-      // Add some random bookings for demonstration
-      if (index % 4 === 0) { // Add booking to every 4th machine
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() + Math.floor(Math.random() * 10));
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 5) + 1);
-        
-        // Mix of blocked (manual) and accepted (backend) bookings
-        const isManualBooking = Math.random() > 0.5;
-        
-        mockBookings[machineKey].push({
-          id: 100 + index,
-          start: startDate,
-          end: endDate,
-          status: isManualBooking ? 'blocked' : 'accepted',
-          type: isManualBooking ? 'blocked' : 'booking',
-          description: `${isManualBooking ? 'Manual' : 'System'} Booking #${100 + index} for Machine ${machineId}`,
-          hirerCompany: 1025,
-          renterCompany: 1031,
-          quoteId: isManualBooking ? null : 2000 + index,
-          notes: isManualBooking ? 'Manually created booking' : 'System generated booking'
-        });
+  // API URLs
+  const GET_MACHINE_CAT_TYPE = "/machines/getMachinesByCatAndType";
+
+  // Fetch machine categories and types
+  const fetchMachineCategoriesAndTypes = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
       }
-    });
-    
-    setMachines(apiMachineIds.map(id => `Machine_${id}`));
-    setBookings(mockBookings);
-    
-    // Calculate stats
-    const allBookings = Object.values(mockBookings).flat();
-    const totalBookings = allBookings.length;
-    const activeBookings = allBookings.filter(b => b.status === 'accepted').length;
-    const blockedBookings = allBookings.filter(b => b.status === 'blocked').length;
-    
-    setStats({
-      totalBookings,
-      activeBookings,
-      blockedBookings,
-      cancelledBookings: 0,
-      changeOfDateBookings: 0,
-      totalMachines: apiMachineIds.length,
-      availableMachines: apiMachineIds.length - totalBookings,
-      utilizationRate: Math.round((totalBookings / apiMachineIds.length) * 100)
-    });
-    
-    setLoading(false);
-    console.log('Demo data loaded successfully with blocked/accepted bookings');
+      
+      const response = await axios.get(GET_MACHINE_CAT_TYPE);
+      const machineCategories = response.data;
+      console.log("Machine categories and types: ", machineCategories);
+      
+      setCategoryAndType(machineCategories);
+      
+      // Transform categories for dropdown
+      const machineKeys = Object.keys(machineCategories);
+      const categoryOptions = machineKeys.map(category => ({
+        value: category,
+        label: category
+      }));
+      setCategories(categoryOptions);
+      
+    } catch (error) {
+      console.error('Error fetching machine categories and types:', error);
+      message.error('Failed to load machine categories');
+    }
   }, []);
+
+  // Handle category change
+  const handleCategoryChange = (value) => {
+    setMachineCategory(value);
+    setMachineType(''); // Reset machine type when category changes
+    
+    if (value && categoryAndType[value]) {
+      const types = categoryAndType[value];
+      const typeOptions = types.map(type => ({
+        value: type,
+        label: type
+      }));
+      setMachineTypes(typeOptions);
+    } else {
+      setMachineTypes([]);
+    }
+    
+    // Clear machine ID selection when using other filters
+    if (value) {
+      setSelectedMachineId('');
+    }
+  };
+
+  // Handle machine type change
+  const handleMachineTypeChange = (value) => {
+    setMachineType(value);
+    // Clear machine ID selection when using other filters
+    if (value) {
+      setSelectedMachineId('');
+    }
+  };
 
   // Fetch bookings from API
   const fetchBookings = useCallback(async () => {
@@ -110,44 +121,14 @@ const MachineBookingSystem = () => {
     setError(null);
     
     try {
-      // Simulate API call - replace with actual axios call
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: {
-              results: [
-                {
-                  booking_id: 282,
-                  machine_id: 5148,
-                  actual_start_date_time: "2025-08-14T07:01:00.000Z",
-                  actual_end_date_time: "2025-08-16T05:01:00.000Z",
-                  booking_status: "accepted",
-                  hirer_company_id: 1025,
-                  renter_company_id: 1040,
-                  quote_id: 2464,
-                  cancelled_reason: "",
-                  rescheduled_reason: ""
-                },
-                // Add more sample data with blocked status
-                {
-                  booking_id: 283,
-                  machine_id: 5019,
-                  actual_start_date_time: "2025-08-15T08:00:00.000Z",
-                  actual_end_date_time: "2025-08-17T17:00:00.000Z",
-                  booking_status: "blocked",
-                  hirer_company_id: null,
-                  renter_company_id: null,
-                  quote_id: null,
-                  cancelled_reason: "",
-                  rescheduled_reason: ""
-                }
-              ]
-            }
-          });
-        }, 1000);
-      });
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
+      }
       
-      console.log('API Response:', response);
+      // Actual API call
+      const response = await axios.get(GET_ALL_BOOKINGS);
+      console.log("getAllBookings: ", response.data);
       
       if (response && response.data && response.data.results && Array.isArray(response.data.results)) {
         const processedBookings = {};
@@ -169,11 +150,13 @@ const MachineBookingSystem = () => {
           const startDate = new Date(booking.actual_start_date_time);
           const endDate = new Date(booking.actual_end_date_time);
           
+          console.log(`Processing booking ${booking.booking_id} with status: ${booking.booking_status}`); // Debug log
+          
           const bookingData = {
             id: booking.booking_id,
             start: startDate,
             end: endDate,
-            status: booking.booking_status,
+            status: booking.booking_status, // This should be 'accepted', 'blocked', etc.
             type: booking.booking_status,
             description: `Booking #${booking.booking_id}${booking.quote_id ? ` - Quote #${booking.quote_id}` : ''}`,
             hirerCompany: booking.hirer_company_id,
@@ -181,7 +164,9 @@ const MachineBookingSystem = () => {
             cancelledReason: booking.cancelled_reason || '',
             rescheduledReason: booking.rescheduled_reason || '',
             quoteId: booking.quote_id,
-            notes: booking.booking_status === 'blocked' ? 'Manually blocked slot' : 'System booking'
+            notes: booking.booking_status === 'blocked' ? 'Manually blocked slot' : 'System booking',
+            createdAt: booking.createdAt,
+            updatedAt: booking.updatedAt
           };
           
           processedBookings[machineKey].push(bookingData);
@@ -221,19 +206,24 @@ const MachineBookingSystem = () => {
           utilizationRate
         });
 
+        message.success(`Loaded ${totalBookingsCount} bookings for ${totalMachinesCount} machines`);
         console.log(`Loaded ${totalBookingsCount} bookings for ${totalMachinesCount} machines`);
       } else {
-        console.warn('No valid data received from API, using mock data');
-        generateMockData();
+        console.warn('No valid data received from API');
+        message.warning('No booking data found');
+        setMachines([]);
+        setBookings({});
       }
     } catch (err) {
       console.error('API Error:', err);
-      setError('API connection failed. Using demo data.');
-      generateMockData();
+      setError('Failed to load booking data. Please check your connection and try again.');
+      message.error('Failed to load booking data. Please check your connection and try again.');
+      setMachines([]);
+      setBookings({});
     } finally {
       setLoading(false);
     }
-  }, [generateMockData]);
+  }, []);
 
   // Auto-refresh
   useEffect(() => {
@@ -250,20 +240,47 @@ const MachineBookingSystem = () => {
   // Initial fetch
   useEffect(() => {
     fetchBookings();
-  }, [fetchBookings]);
+    fetchMachineCategoriesAndTypes();
+  }, [fetchBookings, fetchMachineCategoriesAndTypes]);
 
   // Filtered machines
   const filteredMachines = useMemo(() => {
-    if (!searchQuery) return machines;
+    let filtered = machines;
     
-    return machines.filter(machine => {
-      const machineNumber = machine.replace('Machine_', '');
-      return machineNumber.includes(searchQuery) || 
-             machine.toLowerCase().includes(searchQuery.toLowerCase());
-    });
-  }, [machines, searchQuery]);
+    // Filter by selected machine ID first
+    if (selectedMachineId) {
+      filtered = filtered.filter(machine => 
+        machine.replace('Machine_', '') === selectedMachineId
+      );
+      return filtered; // Return only the selected machine
+    }
+    
+    // Filter by search query
+    if (searchQuery) {
+      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
+      filtered = filtered.filter(machine => {
+        const machineNumber = machine.replace('Machine_', '').toLowerCase();
+        const machineName = machine.toLowerCase();
+        return searchTerms.every(term => 
+          machineNumber.includes(term) || machineName.includes(term)
+        );
+      });
+    }
+    
+    // Filter by machine type
+    if (machineType && !selectedMachineId) {
+      console.log('Filtering by machine type:', machineType);
+    }
+    
+    // Filter by machine category
+    if (machineCategory && !selectedMachineId) {
+      console.log('Filtering by machine category:', machineCategory);
+    }
+    
+    return filtered;
+  }, [machines, searchQuery, machineType, machineCategory, selectedMachineId]);
 
-  // Get dates for current view
+  // Helper functions
   const getDates = () => {
     const dates = [];
     for (let i = 0; i < viewDays; i++) {
@@ -281,22 +298,17 @@ const MachineBookingSystem = () => {
     return `${year}-${month}-${day} 06:00:00`;
   };
 
-  // Navigation
   const navigate = (direction) => {
     const newDate = new Date(currentDate);
     
     if (direction === 'prev') {
-      // Single step: go to previous day
       newDate.setDate(currentDate.getDate() - 1);
     } else if (direction === 'next') {
-      // Single step: go to next day
       newDate.setDate(currentDate.getDate() + 1);
     } else if (direction === 'prevFast') {
-      // Fast navigation: go back by current view period
       const multiplier = viewDays;
       newDate.setDate(currentDate.getDate() - multiplier);
     } else if (direction === 'nextFast') {
-      // Fast navigation: go forward by current view period
       const multiplier = viewDays;
       newDate.setDate(currentDate.getDate() + multiplier);
     }
@@ -308,7 +320,6 @@ const MachineBookingSystem = () => {
     setCurrentDate(new Date());
   };
 
-  // Get cell status for a specific machine and date
   const getCellStatus = (machine, date) => {
     const machineBookings = bookings[machine] || [];
     for (const booking of machineBookings) {
@@ -330,38 +341,36 @@ const MachineBookingSystem = () => {
     return null;
   };
 
-  // Handle cell click
   const handleCellClick = (machine, date) => {
     const existingBooking = getCellStatus(machine, date);
     if (!existingBooking) {
-      // Create new booking
       const machineId = machine.replace('Machine_', '');
       setSelectedSlot({ machine, machineId, date });
       
-      const startDate = new Date(date);
-      const endDate = new Date(date);
-      endDate.setDate(endDate.getDate() + 1);
-      
       setBookingForm({
         machineid: parseInt(machineId),
-        plannedstartdatetime: formatDateTime(startDate),
-        plannedenddatetime: formatDateTime(endDate),
+        plannedstartdatetime: '',
+        plannedenddatetime: '',
         notes: ''
       });
       
       setBookingModal(true);
     } else {
-      // Show cancel modal for existing booking
-      setSelectedBooking(existingBooking);
-      setCancelForm({ reason: '' });
-      setCancelModal(true);
+      // Show cancel modal ONLY for manual bookings (blocked status)
+      if (existingBooking.status === 'blocked') {
+        setSelectedBooking(existingBooking);
+        setCancelForm({ reason: '' });
+        setCancelModal(true);
+      } else {
+        // For system bookings, show message - no cancel popup
+        message.info(`System Booking${existingBooking.quoteId ? ` - Quote #${existingBooking.quoteId}` : ` #${existingBooking.id}`} - Cannot be cancelled manually`);
+      }
     }
   };
 
-  // Submit booking
   const handleBookingSubmit = async () => {
     if (!bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) {
-      console.log('Please fill in all required fields');
+      message.warning('Please fill in all required fields');
       return;
     }
 
@@ -369,19 +378,42 @@ const MachineBookingSystem = () => {
     const endDate = new Date(bookingForm.plannedenddatetime);
     
     if (endDate <= startDate) {
-      console.log('End date must be after start date');
+      message.warning('End date must be after start date');
       return;
     }
 
     setSubmitting(true);
     try {
-      console.log('Creating booking with payload:', {
-        ...bookingForm,
-        booking_status: 'blocked' // Manual bookings are blocked
-      });
+      // Format dates properly for API
+      const formatDateForAPI = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        return date.toISOString(); // Returns format like "2025-08-24T06:00:00.000Z"
+      };
+
+      const payload = {
+        machine_id: parseInt(bookingForm.machineid), // Ensure it's a number
+        actual_start_date_time: formatDateForAPI(bookingForm.plannedstartdatetime),
+        actual_end_date_time: formatDateForAPI(bookingForm.plannedenddatetime),
+        booking_status: 'blocked', // Manual bookings are blocked
+        cancelled_reason: '',
+        rescheduled_reason: '',
+        // Add additional fields that might be required by your backend
+        hirer_company_id: null, // Manual bookings might not have company IDs
+        renter_company_id: null,
+        quote_id: null,
+        notes: bookingForm.notes || 'Manually created booking'
+      };
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Creating booking with payload:', payload);
+      console.log('Payload JSON:', JSON.stringify(payload, null, 2));
+      
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
+      }
+      
+      const response = await axios.post('/booking/createBooking', payload);
+      console.log('Booking creation response:', response);
       
       await fetchBookings();
       setBookingModal(false);
@@ -393,20 +425,31 @@ const MachineBookingSystem = () => {
         notes: ''
       });
       
-      console.log('Booking created successfully!');
+      message.success('Manual booking created successfully!');
       
     } catch (err) {
       console.error('Error creating booking:', err);
-      console.log(`Failed to create booking: ${err.message}`);
+      console.error('Error response:', err.response);
+      console.error('Error data:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error headers:', err.response?.headers);
+      
+      // Show detailed error message
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.response?.statusText || 
+                          err.message || 
+                          'Unknown error occurred';
+      
+      message.error(`Failed to create booking (${err.response?.status || 'Network Error'}): ${errorMessage}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Cancel booking
   const handleBookingCancel = async () => {
     if (!cancelForm.reason.trim()) {
-      console.log('Please provide a reason for cancellation');
+      message.warning('Please provide a reason for cancellation');
       return;
     }
 
@@ -414,25 +457,32 @@ const MachineBookingSystem = () => {
     try {
       console.log('Cancelling booking:', selectedBooking.id, 'Reason:', cancelForm.reason);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        axios.defaults.headers.common["authorization"] = "Bearer " + token;
+      }
+      
+      const response = await axios.put(`/booking/updateBooking/${selectedBooking.id}`, {
+        booking_status: 'cancelled',
+        cancelled_reason: cancelForm.reason
+      });
+      console.log('Booking cancellation response:', response);
       
       await fetchBookings();
       setCancelModal(false);
       setSelectedBooking(null);
       setCancelForm({ reason: '' });
       
-      console.log('Booking cancelled successfully!');
+      message.success('Booking cancelled successfully!');
       
     } catch (err) {
       console.error('Error cancelling booking:', err);
-      console.log(`Failed to cancel booking: ${err.message}`);
+      message.error(`Failed to cancel booking: ${err.response?.data?.message || err.message}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Export data
   const exportData = () => {
     const csvHeader = "Machine ID,Booking ID,Start Date,End Date,Status,Hirer Company,Renter Company,Quote ID,Notes\n";
     const csvContent = Object.entries(bookings).flatMap(([machine, machineBookings]) =>
@@ -450,7 +500,7 @@ const MachineBookingSystem = () => {
     link.click();
     document.body.removeChild(link);
     
-    console.log('Booking data exported to CSV');
+    message.success('Booking data exported to CSV');
   };
 
   const dates = getDates();
@@ -465,220 +515,174 @@ const MachineBookingSystem = () => {
   };
 
   const getStatusColor = (status) => {
+    console.log('Getting color for status:', status); // Debug log
     switch (status) {
-      case 'accepted': return '#3B82F6'; // Blue for backend/system bookings
-      case 'blocked': return '#10B981';  // Green for manual bookings
-      case 'cancelled': return '#EF4444';
-      case 'change_of_date': return '#F59E0B';
-      default: return '#6B7280';
+      case 'accepted': 
+        console.log('Returning green for accepted');
+        return '#10B981'; // Green for system bookings
+      case 'blocked': 
+        console.log('Returning orange for blocked');
+        return '#F97316';  // Orange for manual bookings
+      case 'cancelled': 
+        console.log('Returning red for cancelled');
+        return '#EF4444';
+      case 'change_of_date': 
+        console.log('Returning yellow for change_of_date');
+        return '#F59E0B';
+      default: 
+        console.log('Returning default grey for status:', status);
+        return '#6B7280';
     }
   };
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div className="machine-booking-system">
       {/* Header */}
-      <div style={{ 
-        backgroundColor: 'white', 
-        borderRadius: '6px', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', 
-        marginBottom: '16px' 
-      }}>
-        <div style={{ 
-          backgroundColor: '#2563eb', 
-          color: 'white', 
-          padding: '16px', 
-          borderTopLeftRadius: '6px',
-          borderTopRightRadius: '6px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h1 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Machine Booking Calendar</h1>
-              <p style={{ color: 'rgba(219, 234, 254, 1)', fontSize: '14px', margin: '4px 0 0 0' }}>Resource Management & Scheduling</p>
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={exportData}
-                style={{ 
-                  padding: '8px', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+      <div className="machine-booking-system__container">
+        <div className="machine-booking-system__header">
+          <div>
+            <h1 className="machine-booking-system__header-title">Machine Booking Calendar</h1>
+            <p className="machine-booking-system__header-subtitle">Resource Management & Scheduling</p>
+          </div>
+          <div className="machine-booking-system__header-actions">
+            <Button 
+              type="primary"
+              icon={<Download size={16} />}
+              onClick={exportData}
+              style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                color: 'white'
+              }}
+              title="Export CSV"
+            />
+          </div>
+        </div>
+
+        {/* Machine Filters */}
+        <div className="machine-booking-system__filters">
+          <div className="machine-booking-system__filters-row">
+            <div className="machine-booking-system__filters-group">
+              <label className="machine-booking-system__filters-label">Choose Machine ID</label>
+              <select
+                className="machine-booking-system__filters-select"
+                value={selectedMachineId}
+                onChange={(e) => {
+                  setSelectedMachineId(e.target.value);
+                  if (e.target.value) {
+                    setSearchQuery('');
+                    setMachineType('');
+                    setMachineCategory('');
+                  }
                 }}
-                title="Export CSV"
               >
-                <Download size={16} />
-              </button>
+                <option value="">All Machines</option>
+                {machines.map(machine => {
+                  const machineId = machine.replace('Machine_', '');
+                  return (
+                    <option key={machine} value={machineId}>
+                      Machine {machineId}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            
+            <div className="machine-booking-system__filters-group">
+              <label className="machine-booking-system__filters-label">Choose Machine Category</label>
+              <select
+                className="machine-booking-system__filters-select"
+                value={machineCategory}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                disabled={selectedMachineId}
+              >
+                <option value="">All Categories</option>
+                {categories.map(category => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="machine-booking-system__filters-group">
+              <label className="machine-booking-system__filters-label">Choose Machine Type</label>
+              <select
+                className="machine-booking-system__filters-select"
+                value={machineType}
+                onChange={(e) => handleMachineTypeChange(e.target.value)}
+                disabled={selectedMachineId || !machineCategory}
+              >
+                <option value="">All Machine Types</option>
+                {machineTypes.map(type => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
-        {/* Stats Dashboard - Commented out */}
-        {/* {showStats && (
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
-            gap: '8px', 
-            padding: '12px',
-            backgroundColor: '#f9fafb'
-          }}>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#6366f1', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <Activity size={16} />
+        {/* Search */}
+        <div className="machine-booking-system__filters">
+          <div className="machine-booking-system__filters-search-container">
+            <div className="machine-booking-system__filters-search-icon">
+              <Search size={16} />
+            </div>
+            <input
+              className="machine-booking-system__filters-input"
+              type="text"
+              placeholder="Search machines (e.g., 5121, 5152)..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (e.target.value) {
+                  setSelectedMachineId('');
+                }
+              }}
+              disabled={selectedMachineId}
+            />
+            {selectedMachineId && (
+              <div className="machine-booking-system__filters-search-hint">
+                Machine {selectedMachineId} selected
               </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.totalBookings}</div>
-              <div style={{ fontSize: '12px' }}>Total</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#3B82F6', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <CheckCircle size={16} />
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.activeBookings}</div>
-              <div style={{ fontSize: '12px' }}>System</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#10b981', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <Shield size={16} />
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.blockedBookings}</div>
-              <div style={{ fontSize: '12px' }}>Manual</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#ef4444', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <XCircle size={16} />
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.cancelledBookings}</div>
-              <div style={{ fontSize: '12px' }}>Cancelled</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#f59e0b', color: 'white' }}>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.changeOfDateBookings}</div>
-              <div style={{ fontSize: '12px' }}>Rescheduled</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#14b8a6', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <Zap size={16} />
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.availableMachines}</div>
-              <div style={{ fontSize: '12px' }}>Available</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: '#8b5cf6', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
-                <TrendingUp size={16} />
-              </div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.utilizationRate}%</div>
-              <div style={{ fontSize: '12px' }}>Utilization</div>
-            </div>
-          </div>
-        )} */}
-
-        {/* Search and Controls */}
-        <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }}>
-                <Search size={16} />
-              </div>
-              <input
-                type="text"
-                placeholder="Search machines (e.g., 5121, 5152)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  paddingLeft: '36px',
-                  paddingRight: '16px',
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  fontSize: '14px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  backgroundColor: 'white',
-                  color: '#111827'
-                }}
-              />
-            </div>
+            )}
           </div>
         </div>
 
         {/* View Controls */}
-        <div style={{ 
-          padding: '12px', 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          gap: '12px',
-          borderBottom: '1px solid #e5e7eb'
-        }}>
-          <div style={{ fontSize: '16px', fontWeight: '600', color: '#374151' }}>
+        <div className="machine-booking-system__view-controls">
+          <div className="machine-booking-system__view-controls-title">
             {viewDays === 1 ? 'Today View' : `${viewDays} Days View`} ({filteredMachines.length} machines)
           </div>
           
-          <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
-            <button
+          <div className="machine-booking-system__view-controls-buttons">
+            <Button
+              type={viewDays === 1 ? "primary" : "default"}
               onClick={() => setViewDays(1)}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                backgroundColor: viewDays === 1 ? '#2563eb' : 'transparent',
-                color: viewDays === 1 ? 'white' : '#374151',
-                transition: 'all 0.2s'
-              }}
+              size="small"
             >
               Today
-            </button>
-            <button
+            </Button>
+            <Button
+              type={viewDays === 7 ? "primary" : "default"}
               onClick={() => setViewDays(7)}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                backgroundColor: viewDays === 7 ? '#2563eb' : 'transparent',
-                color: viewDays === 7 ? 'white' : '#374151',
-                transition: 'all 0.2s'
-              }}
+              size="small"
             >
               7 Days
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div style={{ 
-            padding: '16px', 
-            backgroundColor: '#fef2f2', 
-            border: '1px solid #fecaca', 
-            color: '#b91c1c',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
+          <div className="machine-booking-system__error">
             <AlertCircle size={16} />
-            <span style={{ flex: '1' }}>{error}</span>
+            <span className="machine-booking-system__error-content">{error}</span>
             <button 
-              onClick={fetchBookings} 
-              style={{
-                padding: '4px 12px',
-                backgroundColor: '#dc2626',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '14px',
-                cursor: 'pointer'
-              }}
+              className="machine-booking-system__error-button"
+              onClick={fetchBookings}
               disabled={loading}
             >
               {loading ? 'Retrying...' : 'Retry'}
@@ -688,250 +692,103 @@ const MachineBookingSystem = () => {
 
         {/* Loading State */}
         {loading && (
-          <div style={{ padding: '32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <Loader size={20} style={{ animation: 'spin 1s linear infinite', color: '#2563eb' }} />
-              <span style={{ color: '#6b7280' }}>Loading booking data...</span>
-            </div>
+          <div className="machine-booking-system__loading">
+            <Loader size={20} className="machine-booking-system__loading-spinner" />
+            <span className="machine-booking-system__loading-text">Loading booking data...</span>
           </div>
         )}
 
         {/* Calendar Grid */}
         {!loading && (
-          <div style={{ overflowY: 'auto', maxHeight: '60vh' }}>
-            <div style={{ minWidth: '100%' }}>
+          <div className="machine-booking-system__calendar">
+            <div className="machine-booking-system__calendar-content">
+              {/* Month Name Header */}
+              <div className="machine-booking-system__month-header">
+                {viewDays === 1 
+                  ? currentDate.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })
+                  : currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                }
+                {viewDays > 1 && (
+                  <div className="machine-booking-system__month-header-subtitle">
+                    {currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {' '}
+                    {(() => {
+                      const endDate = new Date(currentDate);
+                      endDate.setDate(currentDate.getDate() + viewDays - 1);
+                      return endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    })()}
+                  </div>
+                )}
+              </div>
+
               {/* Navigation Header */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
-                marginBottom: '16px', 
-                padding: '0 16px',
-                backgroundColor: '#f8fafc',
-                borderRadius: '8px',
-                margin: '0 16px 16px 16px',
-                paddingTop: '12px',
-                paddingBottom: '12px'
-              }}>
-                {/* Navigation Controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button
+              <div className="machine-booking-system__navigation">
+                <div className="machine-booking-system__navigation-group">
+                  <Button
                     onClick={() => navigate('prevFast')}
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: 'white',
-                      color: '#374151',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                      transition: 'all 0.2s'
-                    }}
                     title={`Previous ${viewDays === 1 ? 'day' : `${viewDays} days`}`}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#f3f4f6';
-                      e.target.style.transform = 'translateY(-1px)';
-                      e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
-                    }}
                   >
-                    <span style={{ fontSize: '16px', fontWeight: 'bold' }}>�</span>
-                    <span>{viewDays === 1 ? 'Prev Day' : 'Prev'}</span>
-                  </button>
-                  <button
+                    &lt;&lt;
+                  </Button>
+                  <Button
                     onClick={() => navigate('prev')}
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: 'white',
-                      color: '#374151',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                      transition: 'all 0.2s'
-                    }}
                     title="Previous day"
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#f3f4f6';
-                      e.target.style.transform = 'translateY(-1px)';
-                      e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
-                    }}
                   >
-                    <span style={{ fontSize: '16px', fontWeight: 'bold' }}>9</span>
-                  </button>
+                    &lt;
+                  </Button>
                 </div>
                 
-                {/* Current Period Display */}
-                <div style={{ textAlign: 'center', flex: 1 }}>
-                  <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
-                    {viewDays === 1 
-                      ? currentDate.toLocaleDateString('en-US', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })
-                      : currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                    }
-                  </h2>
-                  {viewDays > 1 && (
-                    <p style={{ fontSize: '14px', color: '#6b7280', margin: '2px 0 0 0' }}>
-                      {currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {' '}
-                      {(() => {
-                        const endDate = new Date(currentDate);
-                        endDate.setDate(currentDate.getDate() + viewDays - 1);
-                        return endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                      })()}
-                    </p>
-                  )}
-                </div>
+                <div></div>
                 
-                {/* Forward Navigation */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button
+                <div className="machine-booking-system__navigation-group">
+                  <Button
                     onClick={() => navigate('next')}
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: 'white',
-                      color: '#374151',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                      transition: 'all 0.2s'
-                    }}
                     title="Next day"
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#f3f4f6';
-                      e.target.style.transform = 'translateY(-1px)';
-                      e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
-                    }}
                   >
-                    <span style={{ fontSize: '16px', fontWeight: 'bold' }}>:</span>
-                  </button>
-                  <button
+                    &gt;
+                  </Button>
+                  <Button
                     onClick={() => navigate('nextFast')}
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: 'white',
-                      color: '#374151',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                      transition: 'all 0.2s'
-                    }}
                     title={`Next ${viewDays === 1 ? 'day' : `${viewDays} days`}`}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#f3f4f6';
-                      e.target.style.transform = 'translateY(-1px)';
-                      e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
-                    }}
                   >
-                    <span>{viewDays === 1 ? 'Next Day' : 'Next'}</span>
-                    <span style={{ fontSize: '16px', fontWeight: 'bold' }}>�</span>
-                  </button>
+                    &gt;&gt;
+                  </Button>
                 </div>
               </div>
 
               {/* Table */}
-              <div style={{ 
-                overflow: 'hidden', 
-                borderRadius: '4px', 
-                border: '1px solid #d1d5db', 
-                margin: '0 16px' 
-              }}>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ 
-                    width: '100%', 
-                    borderCollapse: 'collapse', 
-                    minWidth: '800px',
-                    fontSize: '14px'
-                  }}>
+              <div className="machine-booking-system__table-container">
+                <div className="machine-booking-system__table-container-scroll">
+                  <table className="machine-booking-system__table">
                     <thead>
                       <tr>
-                        <th style={{
-                          border: '1px solid #d1d5db',
-                          padding: '12px',
-                          textAlign: 'left',
-                          fontWeight: '500',
-                          width: '96px',
-                          position: 'sticky',
-                          left: 0,
-                          zIndex: 20,
-                          backgroundColor: '#f9fafb',
-                          color: '#374151'
-                        }}>
+                        <th className="machine-booking-system__table-header machine-booking-system__table-header--machine-id">
                           Machine ID
                         </th>
                         {dates.map((date, idx) => (
                           <th 
                             key={idx} 
-                            style={{
-                              border: '1px solid #d1d5db',
-                              padding: '8px',
-                              textAlign: 'center',
-                              fontWeight: '500',
-                              minWidth: '70px',
-                              backgroundColor: isToday(date) 
-                                ? '#2563eb' 
-                                : isWeekend(date)
-                                  ? '#f3f4f6'
-                                  : '#f9fafb',
-                              color: isToday(date) 
-                                ? 'white' 
-                                : isWeekend(date)
-                                  ? '#6b7280'
-                                  : '#374151'
-                            }}
+                            className={`machine-booking-system__table-header machine-booking-system__table-header--date ${
+                              isToday(date) ? 'today' : ''
+                            } ${
+                              isWeekend(date) ? 'weekend' : ''
+                            }`}
                           >
-                            <div style={{ fontSize: '12px' }}>
+                            <div className="machine-booking-system__table-header--date-day">
                               {date.toLocaleDateString('en-US', { weekday: 'short' })}
                             </div>
-                            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                              {date.getDate()}-{date.toLocaleString('en', { month: 'short' })}
+                            <div className="machine-booking-system__table-header--date-number">
+                              {viewDays === 1 
+                                ? `${date.getDate()}`
+                                : `${date.getDate()}`
+                              }
                             </div>
                             {isToday(date) && (
-                              <div style={{ fontSize: '12px', opacity: '0.75' }}>Today</div>
+                              <div className="machine-booking-system__table-header--date-today-label">Today</div>
                             )}
                           </th>
                         ))}
@@ -940,62 +797,84 @@ const MachineBookingSystem = () => {
                     <tbody>
                       {filteredMachines.length === 0 ? (
                         <tr>
-                          <td colSpan={dates.length + 1} style={{ 
-                            textAlign: 'center', 
-                            padding: '32px', 
-                            color: '#6b7280' 
-                          }}>
-                            {searchQuery ? 'No machines found matching your search' : 'No machines available'}
+                          <td colSpan={dates.length + 1} className="machine-booking-system__table-cell machine-booking-system__table-cell--no-data">
+                            {searchQuery || machineType || machineCategory ? 'No machines found matching your filters' : 'No machines available'}
                           </td>
                         </tr>
                       ) : (
                         filteredMachines.map((machine) => (
-                          <tr key={machine} style={{ backgroundColor: 'transparent' }}>
-                            <td style={{
-                              border: '1px solid #d1d5db',
-                              padding: '12px',
-                              fontWeight: '500',
-                              fontSize: '14px',
-                              position: 'sticky',
-                              left: 0,
-                              zIndex: 10,
-                              backgroundColor: '#f9fafb',
-                              color: '#374151'
-                            }}>
+                          <tr key={machine}>
+                            <td className="machine-booking-system__table-row-header">
                               {machine.replace('Machine_', '')}
                             </td>
                             {dates.map((date, idx) => {
                               const status = getCellStatus(machine, date);
+                              const nextStatus = idx < dates.length - 1 ? getCellStatus(machine, dates[idx + 1]) : null;
+                              
                               let cellStyle = {
-                                border: '1px solid #d1d5db',
-                                padding: '4px',
-                                height: '40px',
-                                position: 'relative',
-                                cursor: 'pointer',
-                                fontSize: '12px',
-                                textAlign: 'center'
+                                borderRight: ''
                               };
+                              
+                              // Only add right border if this cell and next cell are not part of the same booking
+                              if (idx < dates.length - 1) {
+                                const shouldShowBorder = !status || !nextStatus || 
+                                  status.id !== nextStatus.id || 
+                                  status.status !== nextStatus.status;
+                                
+                                if (shouldShowBorder) {
+                                  cellStyle.borderRight = '1px solid #e5e7eb';
+                                }
+                              }
+                              
                               let cellContent = null;
+                              let cellClass = 'machine-booking-system__table-cell';
                               
                               if (status) {
-                                cellStyle.backgroundColor = getStatusColor(status.status);
+                                console.log('Cell status found:', status.status, 'for booking ID:', status.id); // Debug log
+                                
+                                // Apply background color directly via style for immediate effect
+                                const backgroundColor = getStatusColor(status.status);
+                                cellStyle.backgroundColor = backgroundColor;
                                 cellStyle.color = 'white';
                                 cellStyle.fontWeight = '500';
                                 
+                                console.log('Applied background color:', backgroundColor); // Debug log
+                                
+                                // Also add CSS classes for additional styling
+                                cellClass += ' machine-booking-system__table-cell--booked';
+                                if (status.status === 'accepted') {
+                                  cellClass += ' system system-booking';
+                                } else if (status.status === 'blocked') {
+                                  cellClass += ' manual manual-booking';
+                                } else if (status.status === 'cancelled') {
+                                  cellClass += ' cancelled cancelled-booking';
+                                } else if (status.status === 'change_of_date') {
+                                  cellClass += ' rescheduled rescheduled-booking';
+                                }
+                                
                                 if (status.isStart) {
-                                  cellContent = `#${status.id}`;
+                                  if (status.status === 'blocked') {
+                                    cellContent = 'Manual';
+                                  } else if (status.status === 'accepted' && status.quoteId) {
+                                    cellContent = `Q#${status.quoteId}`;
+                                  } else if (status.status === 'accepted') {
+                                    cellContent = 'System';
+                                  }
                                 }
                               } else {
-                                cellStyle.backgroundColor = 'transparent';
+                                cellClass += ' machine-booking-system__table-cell--empty';
                               }
                               
                               return (
                                 <td 
                                   key={idx} 
+                                  className={cellClass}
                                   style={cellStyle}
                                   onClick={() => handleCellClick(machine, date)}
                                   title={status ? 
-                                    `Booking #${status.id} - ${status.status === 'blocked' ? 'Manual Booking' : 'System Booking'} (Click to cancel)` : 
+                                    (status.status === 'blocked' 
+                                      ? 'Manual Booking (Click to cancel)' 
+                                      : `System Booking${status.quoteId ? ` - Quote #${status.quoteId}` : ` #${status.id}`} (Cannot be cancelled)`) : 
                                     'Click to create booking'}
                                 >
                                   {cellContent}
@@ -1011,52 +890,22 @@ const MachineBookingSystem = () => {
               </div>
 
               {/* Legend */}
-              <div style={{ 
-                display: 'flex', 
-                gap: '16px', 
-                justifyContent: 'center', 
-                flexWrap: 'wrap', 
-                marginTop: '16px', 
-                padding: '12px', 
-                borderRadius: '4px', 
-                margin: '16px 16px 0 16px',
-                backgroundColor: '#f9fafb' 
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ 
-                    width: '12px', 
-                    height: '12px', 
-                    borderRadius: '2px', 
-                    backgroundColor: '#3B82F6' 
-                  }}></div>
-                  <span style={{ fontSize: '12px', color: '#374151' }}>System Booking</span>
+              <div className="machine-booking-system__legend">
+                <div className="machine-booking-system__legend-item">
+                  <div className="machine-booking-system__legend-color machine-booking-system__legend-color--system"></div>
+                  <span className="machine-booking-system__legend-label">System Booking</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ 
-                    width: '12px', 
-                    height: '12px', 
-                    borderRadius: '2px', 
-                    backgroundColor: '#10b981' 
-                  }}></div>
-                  <span style={{ fontSize: '12px', color: '#374151' }}>Manual Booking</span>
+                <div className="machine-booking-system__legend-item">
+                  <div className="machine-booking-system__legend-color machine-booking-system__legend-color--manual"></div>
+                  <span className="machine-booking-system__legend-label">Manual Booking</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ 
-                    width: '12px', 
-                    height: '12px', 
-                    borderRadius: '2px', 
-                    backgroundColor: '#ef4444' 
-                  }}></div>
-                  <span style={{ fontSize: '12px', color: '#374151' }}>Cancelled</span>
+                <div className="machine-booking-system__legend-item">
+                  <div className="machine-booking-system__legend-color machine-booking-system__legend-color--cancelled"></div>
+                  <span className="machine-booking-system__legend-label">Cancelled</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ 
-                    width: '12px', 
-                    height: '12px', 
-                    borderRadius: '2px', 
-                    backgroundColor: '#f59e0b' 
-                  }}></div>
-                  <span style={{ fontSize: '12px', color: '#374151' }}>Rescheduled</span>
+                <div className="machine-booking-system__legend-item">
+                  <div className="machine-booking-system__legend-color machine-booking-system__legend-color--rescheduled"></div>
+                  <span className="machine-booking-system__legend-label">Rescheduled</span>
                 </div>
               </div>
             </div>
@@ -1065,110 +914,49 @@ const MachineBookingSystem = () => {
       </div>
 
       {/* Floating Action Button */}
-      <button
+      <Button
+        className="machine-booking-system__fab"
+        type="primary"
+        shape="circle"
+        icon={<Plus size={20} />}
         onClick={() => {
           setSelectedSlot(null);
           setBookingModal(true);
         }}
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          width: '48px',
-          height: '48px',
-          backgroundColor: '#2563eb',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          zIndex: 40
-        }}
         title="Create new booking"
-      >
-        <Plus size={20} />
-      </button>
+      />
 
       {/* Booking Modal */}
       {bookingModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px',
-          zIndex: 50
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-            maxWidth: '448px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <div style={{
-              backgroundColor: '#2563eb',
-              color: 'white',
-              padding: '16px',
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px'
-            }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Create Manual Booking</h2>
-              <p style={{ fontSize: '14px', color: 'rgba(219, 234, 254, 1)', margin: '4px 0 0 0' }}>
+        <div className="machine-booking-system__modal">
+          <div className="machine-booking-system__modal-content">
+            <div className="machine-booking-system__modal-header machine-booking-system__modal-header--create">
+              <h2 className="machine-booking-system__modal-header-title">Create Manual Booking</h2>
+              <p className="machine-booking-system__modal-header-subtitle">
                 Block machine slot manually
               </p>
             </div>
             
-            <div style={{ padding: '16px' }}>
+            <div className="machine-booking-system__modal-body">
               {selectedSlot && (
-                <div style={{
-                  marginBottom: '16px',
-                  padding: '12px',
-                  backgroundColor: '#eff6ff',
-                  borderRadius: '4px',
-                  borderLeft: '4px solid #3b82f6'
-                }}>
-                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>
+                <div className="machine-booking-system__modal-info-box">
+                  <p className="machine-booking-system__modal-info-box-title">
                     <strong>Machine ID:</strong> {selectedSlot.machineId}
                   </p>
-                  <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+                  <p className="machine-booking-system__modal-info-box-text">
                     <strong>Selected Date:</strong> {selectedSlot.date.toLocaleDateString()}
                   </p>
                 </div>
               )}
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="machine-booking-system__modal-form">
                 {!selectedSlot && (
-                  <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      marginBottom: '4px',
-                      color: '#374151' 
-                    }}>
+                  <div className="machine-booking-system__modal-form-group">
+                    <label className="machine-booking-system__modal-form-group-label">
                       Machine ID
                     </label>
                     <select
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        outline: 'none',
-                        backgroundColor: 'white',
-                        color: '#111827'
-                      }}
+                      className="machine-booking-system__modal-form-group-select"
                       value={bookingForm.machineid}
                       onChange={(e) => setBookingForm({...bookingForm, machineid: parseInt(e.target.value)})}
                     >
@@ -1182,124 +970,69 @@ const MachineBookingSystem = () => {
                   </div>
                 )}
                 
-                <div>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '500', 
-                    marginBottom: '4px',
-                    color: '#374151' 
-                  }}>
+                <div className="machine-booking-system__modal-form-group">
+                  <label className="machine-booking-system__modal-form-group-label">
                     Start Date *
                   </label>
                   <input
+                    className="machine-booking-system__modal-form-group-input"
                     type="date"
                     value={bookingForm.plannedstartdatetime ? bookingForm.plannedstartdatetime.split(' ')[0] : ''}
                     onChange={(e) => {
                       const dateValue = e.target.value;
                       if (dateValue) {
                         setBookingForm({...bookingForm, plannedstartdatetime: `${dateValue} 06:00:00`});
+                      } else {
+                        setBookingForm({...bookingForm, plannedstartdatetime: ''});
                       }
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      backgroundColor: 'white',
-                      color: '#111827'
                     }}
                   />
                 </div>
                 
-                <div>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '500', 
-                    marginBottom: '4px',
-                    color: '#374151' 
-                  }}>
+                <div className="machine-booking-system__modal-form-group">
+                  <label className="machine-booking-system__modal-form-group-label">
                     End Date *
                   </label>
                   <input
+                    className="machine-booking-system__modal-form-group-input"
                     type="date"
                     value={bookingForm.plannedenddatetime ? bookingForm.plannedenddatetime.split(' ')[0] : ''}
                     onChange={(e) => {
                       const dateValue = e.target.value;
                       if (dateValue) {
                         setBookingForm({...bookingForm, plannedenddatetime: `${dateValue} 18:00:00`});
+                      } else {
+                        setBookingForm({...bookingForm, plannedenddatetime: ''});
                       }
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      backgroundColor: 'white',
-                      color: '#111827'
                     }}
                   />
                 </div>
                 
-                <div>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '500', 
-                    marginBottom: '4px',
-                    color: '#374151' 
-                  }}>
+                <div className="machine-booking-system__modal-form-group">
+                  <label className="machine-booking-system__modal-form-group-label">
                     Notes
                   </label>
                   <textarea
+                    className="machine-booking-system__modal-form-group-textarea"
                     value={bookingForm.notes}
                     onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
                     placeholder="Add any notes for this booking..."
-                    rows={3}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      backgroundColor: 'white',
-                      color: '#111827',
-                      resize: 'vertical'
-                    }}
+                    rows={2}
                   />
                 </div>
                 
-                <div style={{ display: 'flex', gap: '12px', paddingTop: '16px' }}>
-                  <button
+                <div className="machine-booking-system__modal-form-actions">
+                  <Button
+                    className="machine-booking-system__modal-form-actions-button machine-booking-system__modal-form-actions-button--primary"
+                    type="primary"
                     onClick={handleBookingSubmit}
                     disabled={submitting || !bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime}
-                    style={{
-                      flex: 1,
-                      backgroundColor: '#2563eb',
-                      color: 'white',
-                      padding: '12px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontWeight: '500',
-                      cursor: submitting ? 'not-allowed' : 'pointer',
-                      opacity: (submitting || !bookingForm.machineid || !bookingForm.plannedstartdatetime || !bookingForm.plannedenddatetime) ? 0.5 : 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}
+                    loading={submitting}
                   >
-                    {submitting ? (
-                      <>
-                        <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                        Creating...
-                      </>
-                    ) : 'Block Slot'}
-                  </button>
-                  <button
+                    {submitting ? 'Blocking...' : 'Block'}
+                  </Button>
+                  <Button
+                    className="machine-booking-system__modal-form-actions-button machine-booking-system__modal-form-actions-button--secondary"
                     onClick={() => {
                       setBookingModal(false);
                       setSelectedSlot(null);
@@ -1310,19 +1043,9 @@ const MachineBookingSystem = () => {
                         notes: ''
                       });
                     }}
-                    style={{
-                      flex: 1,
-                      padding: '12px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      backgroundColor: '#f3f4f6',
-                      color: '#374151'
-                    }}
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1332,146 +1055,70 @@ const MachineBookingSystem = () => {
 
       {/* Cancel Booking Modal */}
       {cancelModal && selectedBooking && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px',
-          zIndex: 50
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-            maxWidth: '448px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <div style={{
-              backgroundColor: '#ef4444',
-              color: 'white',
-              padding: '16px',
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px'
-            }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="machine-booking-system__modal">
+          <div className="machine-booking-system__modal-content machine-booking-system__modal-content--cancel">
+            <div className="machine-booking-system__modal-header machine-booking-system__modal-header--cancel">
+              <h2 className="machine-booking-system__modal-header-title machine-booking-system__modal-header-title--cancel">
                 <Trash2 size={20} />
                 Cancel Booking
               </h2>
-              <p style={{ fontSize: '14px', color: 'rgba(254, 202, 202, 1)', margin: '4px 0 0 0' }}>
+              <p className="machine-booking-system__modal-header-subtitle machine-booking-system__modal-header-subtitle--cancel">
                 Remove this booking from the calendar
               </p>
             </div>
             
-            <div style={{ padding: '16px' }}>
-              <div style={{
-                marginBottom: '16px',
-                padding: '12px',
-                backgroundColor: '#fef2f2',
-                borderRadius: '4px',
-                borderLeft: '4px solid #ef4444'
-              }}>
-                <p style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937', margin: '0 0 4px 0' }}>
+            <div className="machine-booking-system__modal-body machine-booking-system__modal-body--cancel">
+              <div className="machine-booking-system__modal-info-box machine-booking-system__modal-info-box--cancel">
+                <p className="machine-booking-system__modal-info-box-title machine-booking-system__modal-info-box-title--cancel">
                   <strong>Booking ID:</strong> #{selectedBooking.id}
                 </p>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 4px 0' }}>
+                <p className="machine-booking-system__modal-info-box-text machine-booking-system__modal-info-box-text--cancel">
                   <strong>Machine:</strong> {selectedBooking.id ? machines.find(m => m.includes(''))?.replace('Machine_', '') || 'Unknown' : 'Unknown'}
                 </p>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 4px 0' }}>
+                <p className="machine-booking-system__modal-info-box-text machine-booking-system__modal-info-box-text--cancel">
                   <strong>Duration:</strong> {selectedBooking.start?.toLocaleDateString()} - {selectedBooking.end?.toLocaleDateString()}
                 </p>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+                <p className="machine-booking-system__modal-info-box-text machine-booking-system__modal-info-box-text--cancel">
                   <strong>Type:</strong> {selectedBooking.status === 'blocked' ? 'Manual Booking' : 'System Booking'}
                 </p>
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '500', 
-                    marginBottom: '4px',
-                    color: '#374151' 
-                  }}>
+              <div className="machine-booking-system__modal-form machine-booking-system__modal-form--cancel">
+                <div className="machine-booking-system__modal-form-group">
+                  <label className="machine-booking-system__modal-form-group-label machine-booking-system__modal-form-group-label--cancel">
                     Cancellation Reason *
                   </label>
                   <textarea
+                    className="machine-booking-system__modal-form-group-textarea machine-booking-system__modal-form-group-textarea--cancel"
                     value={cancelForm.reason}
                     onChange={(e) => setCancelForm({...cancelForm, reason: e.target.value})}
                     placeholder="Please provide a reason for cancelling this booking..."
                     rows={4}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      backgroundColor: 'white',
-                      color: '#111827',
-                      resize: 'vertical'
-                    }}
                   />
                 </div>
                 
-                <div style={{ display: 'flex', gap: '12px', paddingTop: '16px' }}>
-                  <button
+                <div className="machine-booking-system__modal-form-actions machine-booking-system__modal-form-actions--cancel">
+                  <Button
+                    type="primary"
+                    danger
                     onClick={handleBookingCancel}
                     disabled={submitting || !cancelForm.reason.trim()}
-                    style={{
-                      flex: 1,
-                      backgroundColor: '#ef4444',
-                      color: 'white',
-                      padding: '12px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontWeight: '500',
-                      cursor: submitting || !cancelForm.reason.trim() ? 'not-allowed' : 'pointer',
-                      opacity: submitting || !cancelForm.reason.trim() ? 0.5 : 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}
+                    loading={submitting}
+                    icon={<Trash2 size={16} />}
+                    style={{ flex: 1 }}
                   >
-                    {submitting ? (
-                      <>
-                        <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                        Cancelling...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 size={16} />
-                        Cancel Booking
-                      </>
-                    )}
-                  </button>
-                  <button
+                    {submitting ? 'Cancelling...' : 'Cancel Booking'}
+                  </Button>
+                  <Button
                     onClick={() => {
                       setCancelModal(false);
                       setSelectedBooking(null);
                       setCancelForm({ reason: '' });
                     }}
-                    style={{
-                      flex: 1,
-                      padding: '12px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      backgroundColor: '#f3f4f6',
-                      color: '#374151'
-                    }}
+                    style={{ flex: 1 }}
                   >
                     Keep Booking
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
